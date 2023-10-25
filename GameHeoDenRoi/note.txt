@@ -1,0 +1,13 @@
+.method public injectEvent(Landroid/view/InputEvent;)Z
+
+:cond_0
+invoke-static {p1}, Lcom/wawahuy/pigmod/MainActivity;->hookEvent(Landroid/view/InputEvent;)Z
+move-result v0
+if-nez v0, :cond_1
+const/4 p1, 0x0
+return p1
+
+:cond_1
+
+
+invoke-static {p0}, Lcom/wawahuy/pigmod/MainActivity;->startMain(Landroid/content/Context;)V

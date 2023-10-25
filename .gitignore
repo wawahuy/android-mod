@@ -1,2 +1,4 @@
 Game*/*.apk
 Game*/smali
+Game*/*.dex
+Game*/*.so

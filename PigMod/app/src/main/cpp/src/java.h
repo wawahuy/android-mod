@@ -26,15 +26,15 @@ extern "C" {
         if (Renderer::g_Initialized) {
             ImGuiIO& io = ImGui::GetIO();
             switch (action) {
-                case 1: // Down
+                case 0: // Down
                     io.AddMousePosEvent(x, y);
                     io.AddMouseButtonEvent(0, true);
                     break;
-                case 2: // Up
+                case 1: // Up
                     io.AddMouseButtonEvent(0, false);
                     io.AddMousePosEvent(-1, -1);
                     break;
-                case 3: // Mouse
+                case 2: // Mouse
                     io.AddMousePosEvent(x, y);
                     break;
             }

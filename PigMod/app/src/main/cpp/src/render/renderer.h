@@ -44,7 +44,7 @@ namespace Renderer {
             static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Hello, world!");
+            ImGui::Begin("Hello, world! 789");
             ImGui::Text("This is some useful text.");
             ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
             ImGui::ColorEdit4("clear color", (float*)&clear_color);
