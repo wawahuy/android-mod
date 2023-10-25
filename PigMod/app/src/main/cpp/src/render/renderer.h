@@ -7,6 +7,7 @@
 
 namespace Renderer {
     static bool g_Initialized = false;
+    static bool g_Test = false;
 
     void SetupRenderer(int w, int  h) {
         g_ScreenWidth = w;
@@ -43,18 +44,11 @@ namespace Renderer {
         {
             static float f = 0.0f;
             static int counter = 0;
+            ImGui::Begin("wawahuy");
+            if (g_Test && ImGui::Button("Test")) {
 
-            ImGui::Begin("Hello, world! 789");
-            ImGui::Text("This is some useful text.");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit4("clear color", (float*)&clear_color);
+            }
 
-            if (ImGui::Button("Button"))
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
         }
 

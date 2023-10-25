@@ -4,7 +4,7 @@
 
 #ifndef PIGMOD_JAVA_H
 #define PIGMOD_JAVA_H
-
+#include <iostream>
 
 extern "C" {
     JNIEXPORT void JNICALL

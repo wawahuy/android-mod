@@ -15,6 +15,7 @@
 #include "external-lib/ImGui/imgui_impl_opengl3.h"
 #include "external-lib/ImGui/imgui_impl_android.h"
 
+#include "src/util.h"
 #include "src/render/renderer.h"
 #include "src/java.h"
 
