@@ -2,8 +2,8 @@
 // Created by nguye on 10/25/2023.
 //
 
-#ifndef PIGMOD_RENDERER_H
-#define PIGMOD_RENDERER_H
+#ifndef HOTRELOAD_RENDERER_H
+#define HOTRELOAD_RENDERER_H
 
 namespace Renderer {
     static bool g_Initialized = false;
@@ -42,14 +42,13 @@ namespace Renderer {
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
-            static float f = 0.0f;
-            static int counter = 0;
-            ImGui::SetNextWindowSize({ 300, 300 });
-            ImGui::Begin("Inject V2");
-            if (g_Test && ImGui::Button("Test")) {
-
+            static bool isOpen = true;
+            ImGui::SetNextWindowPos({ g_ScreenWidth / 2.0f, 10.0f });
+            ImGui::SetNextWindowBgAlpha(0);
+            ImGui::Begin("", &isOpen, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+            if (g_Test && ImGui::Button("RELOAD")) {
+                hotReloadLibrary();
             }
-
             ImGui::End();
         }
 
@@ -62,4 +61,4 @@ namespace Renderer {
     }
 }
 
-#endif //PIGMOD_RENDERER_H
+#endif //HOTRELOAD_RENDERER_H

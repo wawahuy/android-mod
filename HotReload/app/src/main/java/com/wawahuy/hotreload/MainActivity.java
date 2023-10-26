@@ -1,4 +1,4 @@
-package com.wawahuy.pigmod;
+package com.wawahuy.hotreload;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,7 @@ import android.view.WindowManager;
 
 public class MainActivity extends Activity {
     static {
-        System.loadLibrary("pigmod");
+        System.loadLibrary("hotreload");
     }
 
     @Override

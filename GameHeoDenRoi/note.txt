@@ -11,3 +11,17 @@ return p1
 
 
 invoke-static {p0}, Lcom/wawahuy/pigmod/MainActivity;->startMain(Landroid/content/Context;)V
+
+
+
+
+:cond_1
+invoke-static {p1}, Lcom/wawahuy/hotreload/MainActivity;->hookEvent(Landroid/view/InputEvent;)Z
+move-result v0
+if-nez v0, :cond_2
+const/4 p1, 0x0
+return p1
+
+:cond_2
+
+invoke-static {p0}, Lcom/wawahuy/hotreload/MainActivity;->startMain(Landroid/content/Context;)V

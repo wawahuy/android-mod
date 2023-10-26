@@ -1,4 +1,4 @@
-package com.wawahuy.pigmod;
+package com.wawahuy.hotreload;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
