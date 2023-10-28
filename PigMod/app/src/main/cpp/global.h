@@ -8,6 +8,7 @@
 #include "stdint.h"
 
 #define IS_DEBUG true
+#define DEBUG_PORT 1234
 
 int g_ScreenWidth = 0;
 int g_ScreenHeight = 0;

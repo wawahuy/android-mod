@@ -1,1 +1,1 @@
-adb logcat *:E
+adb logcat | findstr /C:"E YUH"

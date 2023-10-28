@@ -6,6 +6,15 @@
 #define PIGMOD_COMMON_H
 
 #include "global.h"
+
+#ifdef IS_DEBUG
+#include <android/log.h>
+#define LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, "YUH", __VA_ARGS__);
+#else
+#define LOG_E(...)
+#endif
+
+
 #include <jni.h>
 #include <string>
 
@@ -19,6 +28,7 @@
 #include "src/game.h"
 #ifdef IS_DEBUG
 #include "src/debug.h"
+#include "src/debug_socket.h"
 #endif
 
 #ifdef IS_DEBUG

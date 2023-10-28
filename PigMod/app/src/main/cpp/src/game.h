@@ -17,8 +17,7 @@ namespace Game {
     } fncptr;
 
     void unprotectIl2cpp() {
-        unprotect((void*)g_Il2CppBaseRange.start, g_Il2CppBaseRange.end - g_Il2CppBaseRange.start);
-        g_Unprotected = true;
+        g_Unprotected = unprotect((void*)g_Il2CppBaseRange.start, g_Il2CppBaseRange.end - g_Il2CppBaseRange.start);
     }
 
     void init() {

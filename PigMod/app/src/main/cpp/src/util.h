@@ -9,7 +9,6 @@
 #include "stdint.h"
 #include <sys/mman.h>
 #include <cstdio>
-#include <android/log.h>
 #include <chrono>
 
 uintptr_t get_libBase(const char* libName) {
@@ -46,15 +45,13 @@ Il2CppBaseRange get_libBaseRange(const char* libName) {
 bool unprotect(void*  offset, unsigned  int size) {
     int result = mprotect(offset, size, PROT_READ | PROT_WRITE | PROT_EXEC);
     if (result == 0) {
-#ifdef IS_DEBUG
-        __android_log_print(ANDROID_LOG_ERROR, "WTF", "WTF oke");
-#endif
+        LOG_E("unprotect oke");
         return true;
     } else {
 #ifdef IS_DEBUG
         int error = errno;
         const char* errorMessage = strerror(error);
-        __android_log_print(ANDROID_LOG_ERROR, "WTF", "%s", errorMessage);
+        LOG_E("%s", errorMessage);
 #endif
         return false;
     }
