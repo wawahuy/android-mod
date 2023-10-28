@@ -15,7 +15,7 @@ using namespace boost::asio;
 
 namespace Debug {
     void on_message(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg) {
-        std::cout << "Received message: " << msg->get_payload() << std::endl;
+        LOG_E("Received message: %s",  msg->get_payload().c_str());
         s->send(hdl, msg->get_payload(), msg->get_opcode());
     }
 
