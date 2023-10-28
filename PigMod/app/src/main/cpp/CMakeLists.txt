@@ -45,3 +45,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         EGL
         GLESv3
         log)
+
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        external-lib/)

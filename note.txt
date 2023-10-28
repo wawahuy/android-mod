@@ -1,0 +1,2 @@
+https://github.com/moritz-wundke/Boost-for-Android
+C:\Users\nguye\Downloads\Compressed\Boost-for-Android-master\build-android.bat C:/Users/nguye/AppData/Local/Android/Sdk/ndk/25.1.8937393

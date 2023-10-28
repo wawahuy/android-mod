@@ -18,6 +18,12 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDir 'jniLibs'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

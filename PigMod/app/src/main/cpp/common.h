@@ -27,8 +27,8 @@
 #include "src/util.h"
 #include "src/game.h"
 #ifdef IS_DEBUG
-#include "src/debug.h"
 #include "src/debug_socket.h"
+#include "src/debug.h"
 #endif
 
 #ifdef IS_DEBUG

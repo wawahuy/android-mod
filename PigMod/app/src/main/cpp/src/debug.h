@@ -5,9 +5,8 @@
 #ifndef PIGMOD_DEBUG_H
 #define PIGMOD_DEBUG_H
 
-namespace Debug {
-    void init() {
-    }
+namespace DebugSocket {
+    void init() {}
 }
 
 #endif //PIGMOD_DEBUG_H

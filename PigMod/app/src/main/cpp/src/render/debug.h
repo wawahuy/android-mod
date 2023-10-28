@@ -51,18 +51,18 @@ namespace DebugRenderer {
             RenderUnprotect();
             RenderMap();
 
-            uintptr_t np = g_Il2CppBase + 0x1FF656C;
-            const unsigned char over[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-            ImGui::Text("OnExitBtnClicked");
-            for (int i = 0; i < sizeof over; i++) {
-                if (i != 0) {
-                    ImGui::SameLine();
-                }
-                ImGui::Text("%p", *((unsigned  char *)(np + i)));
-            }
-            if (ImGui::Button("test")) {
-                memcpy((void*)np, &over, sizeof over);
-            }
+//            uintptr_t np = g_Il2CppBase + 0x1FF656C;
+//            const unsigned char over[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
+//            ImGui::Text("OnExitBtnClicked");
+//            for (int i = 0; i < sizeof over; i++) {
+//                if (i != 0) {
+//                    ImGui::SameLine();
+//                }
+//                ImGui::Text("%p", *((unsigned  char *)(np + i)));
+//            }
+//            if (ImGui::Button("test")) {
+//                memcpy((void*)np, &over, sizeof over);
+//            }
         } else {
             ImGui::Text("find library...");
         }
