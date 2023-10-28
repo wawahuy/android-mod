@@ -8,7 +8,7 @@
 #include "stdint.h"
 
 #define IS_DEBUG true
-#define DEBUG_PORT 1234
+#define DEBUG_PORT 1235
 #define DEBUG_SOCKET_BUFFER_SIZE 1024
 
 int g_ScreenWidth = 0;

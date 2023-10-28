@@ -44,6 +44,17 @@ namespace DebugRenderer {
         }
     }
 
+    void RenderCommandIl2CppWatch(Debug::CommandDataIl2CppWatch* cmd) {
+        uintptr_t np = g_Il2CppBase + cmd->offset;
+        ImGui::Text("addr: %p, offset: %p", np, cmd->offset);
+        for (int i = 0; i < cmd->size; i++) {
+            if (i != 0) {
+                ImGui::SameLine();
+            }
+            ImGui::Text("%p", *((unsigned  char *)(np + i)));
+        }
+    };
+
     void Render() {
         ImGui::Begin("Debug");
 
@@ -51,18 +62,13 @@ namespace DebugRenderer {
             RenderUnprotect();
             RenderMap();
 
-//            uintptr_t np = g_Il2CppBase + 0x1FF656C;
-//            const unsigned char over[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-//            ImGui::Text("OnExitBtnClicked");
-//            for (int i = 0; i < sizeof over; i++) {
-//                if (i != 0) {
-//                    ImGui::SameLine();
-//                }
-//                ImGui::Text("%p", *((unsigned  char *)(np + i)));
-//            }
-//            if (ImGui::Button("test")) {
-//                memcpy((void*)np, &over, sizeof over);
-//            }
+            for(auto& cmd: Debug::commandDataList) {
+                switch (cmd->command) {
+                    case Debug::CommandType::Il2CppWatch:
+                        RenderCommandIl2CppWatch((Debug::CommandDataIl2CppWatch *)cmd);
+                        break;
+                }
+            }
         } else {
             ImGui::Text("find library...");
         }

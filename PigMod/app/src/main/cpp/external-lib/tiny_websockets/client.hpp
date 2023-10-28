@@ -76,6 +76,12 @@ namespace websockets {
       _endpoint.setUseMasking(useMasking);
     }
 
+    int getSocket() {
+      return _client->getSocket();
+    }
+
+
+
     virtual ~WebsocketsClient();
 
   private:

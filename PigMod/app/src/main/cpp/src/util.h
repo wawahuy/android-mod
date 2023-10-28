@@ -10,6 +10,7 @@
 #include <sys/mman.h>
 #include <cstdio>
 #include <chrono>
+#include <sstream>
 
 uintptr_t get_libBase(const char* libName) {
     uintptr_t addr = 0;
@@ -62,6 +63,14 @@ uint64_t getMs() {
     return duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()
     ).count();
+}
+
+uintptr_t hexStrToPtr(std::string hexString) {
+    uintptr_t v;
+    std::stringstream ss;
+    ss << std::hex << hexString;
+    ss >> v;
+    return v;
 }
 
 #endif //PIGMOD_UTIL_H
