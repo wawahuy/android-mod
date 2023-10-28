@@ -51,11 +51,7 @@ public class MainActivity extends Activity {
 
     public static boolean hookEvent(InputEvent event) {
         if (event instanceof MotionEvent) {
-            try {
-                return NativeMethods.hookEvent(((MotionEvent) event).getX(), ((MotionEvent) event).getY(), ((MotionEvent) event).getAction());
-            } catch (Exception ex) {
-                return true;
-            }
+            return NativeMethods.hookEvent(((MotionEvent) event).getX(), ((MotionEvent) event).getY(), ((MotionEvent) event).getAction());
         }
         return true;
     }

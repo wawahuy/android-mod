@@ -8,7 +8,6 @@
 #include <unistd.h>
 #include <dlfcn.h>
 #include <android/log.h>
-#include <android/looper.h>
 #include "stdint.h"
 
 uintptr_t get_libBase(const char* libName) {
@@ -39,10 +38,7 @@ const char* getPathLibPigMod() {
     }
 }
 
-static ALooper* mainThreadLooper;
-static int messagePipe[2];
-
-static int looperCallback(int fd, int events, void* data) {
+void hotReloadLibrary() {
     const char* newLibPath = getPathLibPigMod();
     __android_log_print(ANDROID_LOG_ERROR, "LibraryPath", "%s", newLibPath);
     void* oldLib = dlopen(newLibPath, RTLD_NOW);
@@ -56,13 +52,6 @@ static int looperCallback(int fd, int events, void* data) {
         __android_log_print(ANDROID_LOG_ERROR, "LibraryPath", "%s", getPathLibPigMod());
     }
     void* newLib = dlopen(newLibPath, RTLD_NOW);
-}
-
-void hotReloadLibrary() {
-    mainThreadLooper = ALooper_forThread(); // get looper for this thread
-    ALooper_acquire(mainThreadLooper);
-    ALooper_addFd(mainThreadLooper, messagePipe[0],
-                  0, ALOOPER_EVENT_INPUT, looperCallback, nullptr);
 }
 
 #endif //HOTRELOAD_UTIL_H

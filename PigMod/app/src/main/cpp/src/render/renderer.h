@@ -7,7 +7,6 @@
 
 namespace Renderer {
     static bool g_Initialized = false;
-    static bool g_Test = false;
 
     void SetupRenderer(int w, int  h) {
         g_ScreenWidth = w;
@@ -41,17 +40,7 @@ namespace Renderer {
         ImGui::NewFrame();
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-            ImGui::SetNextWindowSize({ 300, 300 });
-            ImGui::Begin("Inject V2");
-            if (g_Test && ImGui::Button("Test")) {
-
-            }
-
-            ImGui::End();
-        }
+        DebugRenderer::Render();
 
         // Rendering
         ImGui::Render();

@@ -21,25 +21,16 @@ public class GLViewWrapper extends GLSurfaceView implements GLSurfaceView.Render
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        try {
-            NativeMethods.onSurfaceCreated();
-        } catch (Exception ex) {
-        }
+        NativeMethods.onSurfaceCreated();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        try {
-            NativeMethods.onSurfaceChanged(width, height);
-        } catch (Exception ex) {
-        }
+        NativeMethods.onSurfaceChanged(width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        try {
-            NativeMethods.onDrawFrame();
-        } catch (Exception ex) {
-        }
+        NativeMethods.onDrawFrame();
     }
 }

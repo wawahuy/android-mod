@@ -16,6 +16,14 @@
 #include "external-lib/ImGui/imgui_impl_android.h"
 
 #include "src/util.h"
+#include "src/game.h"
+#ifdef IS_DEBUG
+#include "src/debug.h"
+#endif
+
+#ifdef IS_DEBUG
+#include "src/render/debug.h"
+#endif
 #include "src/render/renderer.h"
 #include "src/java.h"
 
