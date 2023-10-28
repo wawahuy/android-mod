@@ -4,29 +4,39 @@
 
 #ifndef PIGMOD_DEBUG_SOCKET_H
 #define PIGMOD_DEBUG_SOCKET_H
-#include <boost/asio.hpp>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-#include <functional>
 
-typedef websocketpp::server<websocketpp::config::asio> server;
-
-using namespace boost::asio;
+#include <tiny_websockets/client.hpp>
+#include <tiny_websockets/server.hpp>
+#include <iostream>
+using namespace websockets;
 
 namespace Debug {
-    void on_message(server* s, websocketpp::connection_hdl hdl, server::message_ptr msg) {
-        LOG_E("Received message: %s",  msg->get_payload().c_str());
-        s->send(hdl, msg->get_payload(), msg->get_opcode());
-    }
 
     void init() {
-        boost::asio::io_service io_service;
-        server srv;
-        srv.init_asio(&io_service);
-        srv.set_message_handler(bind(&on_message, &srv, std::placeholders::_1, std::placeholders::_2));
-        srv.listen(DEBUG_PORT);
-        srv.start_accept();
-        io_service.run();
+        WebsocketsServer server;
+        server.listen(DEBUG_PORT);
+
+        // while the server is alive
+        while(server.available()) {
+            // accept a client
+            WebsocketsClient client = server.accept();
+            std::cout << "Client connected" << std::endl;
+
+            while(client.available()) {
+                // get a message, if it is text, return an echo
+                auto message = client.readBlocking();
+                if(message.isText()) {
+                    client.send("Echo: " + message.data());
+                    std::cout << "Sending echo: " << message.data() << std::endl;
+                }
+            }
+
+            // close the connection
+            if(client.available() == false) {
+                std::cout << static_cast<int>(client.getCloseReason()) << std::endl;
+            }
+            client.close();
+        }
     }
 }
 
