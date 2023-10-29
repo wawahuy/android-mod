@@ -17,6 +17,7 @@ namespace websockets {
         _eventsCallback([](WebsocketsClient&, WebsocketsEvent, WSInterfaceString){}),
         _sendMode(SendMode_Normal) {
         // Empty
+        _id = client->getSocket();
     }
 
     WebsocketsClient::WebsocketsClient(const WebsocketsClient& other) : 
@@ -26,7 +27,7 @@ namespace websockets {
         _messagesCallback(other._messagesCallback),
         _eventsCallback(other._eventsCallback),
         _sendMode(other._sendMode) {
-        
+        _id = other._id;
         // delete other's client
         const_cast<WebsocketsClient&>(other)._client = nullptr;
         const_cast<WebsocketsClient&>(other)._connectionOpen = false;
@@ -39,13 +40,16 @@ namespace websockets {
         _messagesCallback(other._messagesCallback),
         _eventsCallback(other._eventsCallback),
         _sendMode(other._sendMode) {
-        
+
+        _id = other._id;
         // delete other's client
         const_cast<WebsocketsClient&>(other)._client = nullptr;
         const_cast<WebsocketsClient&>(other)._connectionOpen = false;
     }
     
     WebsocketsClient& WebsocketsClient::operator=(const WebsocketsClient& other) {
+        _id = other._id;
+
         // call endpoint's copy operator
         _endpoint = other._endpoint;
 
@@ -63,6 +67,8 @@ namespace websockets {
     }
 
     WebsocketsClient& WebsocketsClient::operator=(const WebsocketsClient&& other) {
+        _id = other._id;
+
         // call endpoint's copy operator
         _endpoint = other._endpoint;
 

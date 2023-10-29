@@ -76,15 +76,14 @@ namespace websockets {
       _endpoint.setUseMasking(useMasking);
     }
 
-    int getSocket() {
-      return _client->getSocket();
-    }
-
-
-
     virtual ~WebsocketsClient();
 
+    int getId() {
+      return _id;
+    }
+
   private:
+    int _id;
     std::shared_ptr<network::TcpClient> _client;
     std::vector<std::pair<WSString, WSString>> _customHeaders;
     internals::WebsocketsEndpoint _endpoint;

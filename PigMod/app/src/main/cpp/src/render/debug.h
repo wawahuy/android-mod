@@ -22,7 +22,7 @@ namespace DebugRenderer {
         }
     }
 
-    void RenderMap() {
+    void RenderCommandVIl2CppMapList() {
         uint64_t currentTime = getMs();
         if (currentTime - lastMapAccessTime >= 1000) {
             mapStrVector.clear();
@@ -44,7 +44,7 @@ namespace DebugRenderer {
         }
     }
 
-    void RenderCommandIl2CppWatch(Debug::CommandDataIl2CppWatch* cmd) {
+    void RenderCommandVIl2CppWatch(Debug::CommandDataVIl2CppWatch* cmd) {
         uintptr_t np = g_Il2CppBase + cmd->offset;
         ImGui::Text("addr: %p, offset: %p", np, cmd->offset);
         for (int i = 0; i < cmd->size; i++) {
@@ -60,12 +60,13 @@ namespace DebugRenderer {
 
         if (Game::isInit) {
             RenderUnprotect();
-            RenderMap();
-
             for(auto& cmd: Debug::commandDataList) {
                 switch (cmd->command) {
-                    case Debug::CommandType::Il2CppWatch:
-                        RenderCommandIl2CppWatch((Debug::CommandDataIl2CppWatch *)cmd);
+                    case Debug::CommandType::VIl2CppWatch:
+                        RenderCommandVIl2CppWatch((Debug::CommandDataVIl2CppWatch *)cmd);
+                        break;
+                    case Debug::CommandType::VIl2CppMapList:
+                        RenderCommandVIl2CppMapList();
                         break;
                 }
             }

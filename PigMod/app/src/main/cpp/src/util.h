@@ -27,6 +27,7 @@ uintptr_t get_libBase(const char* libName) {
     fclose(fp);
     return addr;
 }
+
 Il2CppBaseRange get_libBaseRange(const char* libName) {
     Il2CppBaseRange r;
     FILE *fp = fopen("/proc/self/maps", "rt");
