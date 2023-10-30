@@ -63,6 +63,7 @@ namespace Debug {
                 break;
             }
             case CommandType::VIl2CppMapList:
+                commandData = new CommandData;
                 break;
             case CommandType::EIl2CppWrite:
             {

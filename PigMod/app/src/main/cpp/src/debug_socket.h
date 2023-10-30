@@ -22,7 +22,7 @@ namespace DebugSocket {
     std::unordered_map<int, WebsocketsClient> allClients;
     WebsocketsServer server;
 
-    void init(int port);
+    void init();
 
     void (*onMessageHook)(const json& js);
 
@@ -55,8 +55,9 @@ namespace DebugSocket {
     }
 
     void *mainSocket(void *) {
-        server.listen(DEBUG_PORT);
-        LOG_E("Create server! port: %i", DEBUG_PORT);
+        const int port = DEBUG_PORT[g_DebugPortIndex--];
+        server.listen(port);
+        LOG_E("Create server! port: %i", port);
 
         // while the server is alive
         while(server.available()) {
@@ -78,6 +79,11 @@ namespace DebugSocket {
 
         LOG_E("Close server!");
         closeAllClients();
+
+        if (g_DebugPortIndex >= 0) {
+            init();
+        }
+
         pthread_exit(nullptr);
     }
 

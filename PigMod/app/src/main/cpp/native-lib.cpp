@@ -10,8 +10,10 @@ void *hack_thread(void *) {
     } while ((g_Il2CppBase = get_libBase("libil2cpp.so")) == 0);
     g_Il2CppBaseRange = get_libBaseRange("libil2cpp.so");
     Game::init();
+#ifdef IS_DEBUG
     DebugSocket::init();
     Debug::init();
+#endif
     LOG_E("v2 =================================================");
     pthread_exit(nullptr);
 }

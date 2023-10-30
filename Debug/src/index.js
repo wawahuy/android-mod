@@ -1,7 +1,8 @@
 import { WebSocket } from 'ws';
 
 const host = "192.168.1.42";
-const ports = [1234];
+// const ports = [1234, 1235, 1236];
+const ports = [1235];
 
 const command = {
     VIl2CppWatch: 1,
@@ -64,16 +65,40 @@ function connect() {
     });
     socket.on('close', () => {
         console.log('closed!');
-        setTimeout(() => connect(), 1000);
+        setTimeout(() => connect(), 100);
     });
 }
 
 function onConnected(socket) {
     sendCommand(socket, getCommandReset());
-    sendCommand(socket, getCommandVIl2CppWatch('1FF656C', 5));
-    sendCommand(socket, getCommandEIl2CppWrite('1FF656C', [0x01, 0x02, 0x30]));
-    sendCommand(socket, getCommandVIl2CppWatch('1FF656C', 5));
-    sendCommand(socket, getCommandEIl2CppWrite('1FF656C', [0x01, 0x22, 0x40]));
+    sendCommand(socket, getCommandVIl2CppMapList());
+    // sendCommand(socket, getCommandVIl2CppWatch('223C4F0', 10));
+    // sendCommand(socket, getCommandEIl2CppWrite('223C4F0', [0x00, 0x00, 0x00]));
+
+    // const nop = [0x1f, 0x20, 0x03, 0xd5];
+    // const s = 68 / nop.length + 1;
+    // sendCommand(socket, getCommandVIl2CppWatch('223C524', 10));
+    // sendCommand(socket, getCommandVIl2CppWatch('223C568', 10));
+    // sendCommand(socket, getCommandEIl2CppWrite('223C524', Array.from({ length: s }).reduce((val) => {
+    //     val = val.concat(nop);
+    //     return val;
+    // }, [])));
+
 }
+
+// CalculateHitResult 0x223C4F0
+// Jumb 0x223C604 -> 0x223C618 
+// Jumb 0x223C64c -> 0x223C710
+
+// op: B jum_size + 14
+//       00 00 00
+// jump dst - current addr / 4
+// ex: 
+// addr: 0x223C64c - B libil2cpp.so + 0x223C710
+// jum_size = 0x223C710 - 0x223C64c / 4 = 31 => 31 00 00 14
+
+//
+// addr: 0x223C604 - B libil2cpp.so + 0x223C618 - 05 00 00 14
+// addr: 0x223C64c - B libil2cpp.so + 0x223C710 - 31 00 00 14
 
 connect();

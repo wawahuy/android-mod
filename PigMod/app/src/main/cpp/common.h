@@ -22,6 +22,7 @@
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
 #include "external-lib/ImGui/imgui.h"
+#include "external-lib/ImGui/imgui_internal.h"
 #include "external-lib/ImGui/imgui_impl_opengl3.h"
 #include "external-lib/ImGui/imgui_impl_android.h"
 
@@ -35,6 +36,8 @@
 #ifdef IS_DEBUG
 #include "src/render/debug.h"
 #endif
+#include "src/render/common.h"
+#include "src/render/menu.h"
 #include "src/render/renderer.h"
 #include "src/java.h"
 

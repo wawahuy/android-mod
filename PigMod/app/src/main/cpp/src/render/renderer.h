@@ -40,7 +40,11 @@ namespace Renderer {
         ImGui::NewFrame();
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+#ifdef IS_DEBUG
         DebugRenderer::Render();
+#endif
+
+        MenuRenderer::Render();
 
         // Rendering
         ImGui::Render();
