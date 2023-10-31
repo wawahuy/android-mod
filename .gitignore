@@ -1,5 +1,5 @@
 Game*/*.apk
-Game*/smali
+Game*/smali*
 Game*/*.dex
 Game*/*.so
 Game*/dump

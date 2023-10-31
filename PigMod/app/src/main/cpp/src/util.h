@@ -17,8 +17,12 @@ uintptr_t get_libBase(const char* libName) {
     FILE *fp = fopen("/proc/self/maps", "rt");
     char buf[1024];
     if (fp) {
+        int posRp = 0;
         while (fgets(buf, sizeof (buf), fp)) {
-            if (strstr(buf, libName) && strstr(buf, "r-xp")) {
+            if (strstr(buf, libName) && strstr(buf, "r--p")) {
+                posRp++;
+            }
+            if ((strstr(buf, libName) && strstr(buf, "r-xp")) || posRp == 2) {
                 sscanf(buf, "%lx-%*s", &addr);
                 break;
             }
@@ -33,8 +37,12 @@ Il2CppBaseRange get_libBaseRange(const char* libName) {
     FILE *fp = fopen("/proc/self/maps", "rt");
     char buf[1024];
     if (fp) {
+        int posRp = 0;
         while (fgets(buf, sizeof (buf), fp)) {
-            if (strstr(buf, libName) && strstr(buf, "r-xp")) {
+            if (strstr(buf, libName) && strstr(buf, "r--p")) {
+                posRp++;
+            }
+            if ((strstr(buf, libName) && strstr(buf, "r-xp")) || posRp == 2) {
                 sscanf(buf, "%lx-%lx %*s", &r.start, &r.end);
                 break;
             }

@@ -7,6 +7,31 @@
 
 namespace MenuRenderer {
     bool isFloating = true;
+    uint64_t lastMapAccessTime = getMs();
+    std::vector<std::string> mapStrVector;
+
+    void RenderCommandVIl2CppMapList() {
+        uint64_t currentTime = getMs();
+        if (currentTime - lastMapAccessTime >= 1000) {
+            mapStrVector.clear();
+            FILE *fp = fopen("/proc/self/maps", "rt");
+            char buf[1024];
+            if (fp) {
+                while (fgets(buf, sizeof (buf), fp)) {
+                    if (strstr(buf, "libil2cpp.so")) {
+                        mapStrVector.push_back(std::string(buf));
+                    }
+                }
+                fclose(fp);
+            }
+            lastMapAccessTime = currentTime;
+        }
+
+        for(auto str: mapStrVector) {
+            ImGui::Text("%s", str.c_str());
+        }
+    }
+
 
     void RenderFloatButton() {
         ImGui::SetNextWindowPos({ g_ScreenWidth / 2.0f - 50.0f, 50.0f });
@@ -24,8 +49,10 @@ namespace MenuRenderer {
             RenderFloatButton();
             return;
         }
-        ImGui::SetNextWindowSize(ImVec2(300, 200));
+        ImGui::SetNextWindowPos({ 25, 25 });
+        ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 300));
         ImGui::Begin("0x67Huy");
+        RenderCommandVIl2CppMapList();
         for(auto& gp: Game::dataPatchArray) {
 
             ImGui::Text("%s", gp->name.c_str());

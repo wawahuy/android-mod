@@ -1,0 +1,1 @@
+keytool -genkey -v -keystore my-release-key-v2.keystore -alias alias_name -sigalg MD5withRSA -keyalg RSA -keyalg RSA -validity 14000
