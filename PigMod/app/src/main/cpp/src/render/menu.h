@@ -6,7 +6,7 @@
 #define PIGMOD_MENU_H
 
 namespace MenuRenderer {
-    bool isFloating = false;
+    bool isFloating = true;
     uint64_t lastMapAccessTime = getMs();
     std::vector<std::string> mapStrVector;
 

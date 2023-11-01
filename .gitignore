@@ -4,4 +4,4 @@ Game*/*.dex
 Game*/*.so
 Game*/dump
 
-build.apk.idsig
+**/*/build.apk.idsig
