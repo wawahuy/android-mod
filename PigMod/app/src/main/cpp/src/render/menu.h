@@ -6,7 +6,7 @@
 #define PIGMOD_MENU_H
 
 namespace MenuRenderer {
-    bool isFloating = true;
+    bool isFloating = false;
     uint64_t lastMapAccessTime = getMs();
     std::vector<std::string> mapStrVector;
 
@@ -52,25 +52,26 @@ namespace MenuRenderer {
         ImGui::SetNextWindowPos({ 25, 25 });
         ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 300));
         ImGui::Begin("0x67Huy");
-        RenderCommandVIl2CppMapList();
-        for(auto& gp: Game::dataPatchArray) {
-
-            ImGui::Text("%s", gp->name.c_str());
-
-            ImGui::SameLine();
-            bool active = gp->active;
-            if (ToggleButton(gp->name.c_str(), &active)) {
-                if (active) {
-                    Game::patch(gp);
-                } else {
-                    Game::unpatch(gp);
-                }
-            }
-
-        }
 
         if (ImGui::Button("TAT MENU")) {
             isFloating = true;
+        }
+
+        for(auto& ggp: Game::guiGroupPatchArray) {
+            ImGui::SeparatorText(ggp->name.c_str());
+            for (auto &gp: ggp->dataPatchArray) {
+                ImGui::BulletText("%s", gp->name.c_str());
+
+                ImGui::SameLine();
+                bool active = gp->active;
+                if (ToggleButton(gp->name.c_str(), &active)) {
+                    if (active) {
+                        Game::patch(gp);
+                    } else {
+                        Game::unpatch(gp);
+                    }
+                }
+            }
         }
 
         ImGui::End();

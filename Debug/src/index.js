@@ -97,8 +97,11 @@ function onConnected(socket) {
 // addr: 0x223C64c - B libil2cpp.so + 0x223C710
 // jum_size = 0x223C710 - 0x223C64c / 4 = 31 => 31 00 00 14
 
-//
+// PineTree::CalculateHitResult
 // addr: 0x223C604 - B libil2cpp.so + 0x223C618 - 05 00 00 14
 // addr: 0x223C64c - B libil2cpp.so + 0x223C710 - 31 00 00 14
+
+// Slingshot::Shot
+// addr: 01e47d70 - B libil2cpp.so + 01e47ef4 - 61 00 00 14
 
 connect();

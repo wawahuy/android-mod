@@ -3,3 +3,5 @@ Game*/smali*
 Game*/*.dex
 Game*/*.so
 Game*/dump
+
+build.apk.idsig

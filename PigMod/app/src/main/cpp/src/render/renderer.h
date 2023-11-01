@@ -44,6 +44,7 @@ namespace Renderer {
         DebugRenderer::Render();
 #endif
 
+//        ImGui::ShowDemoWindow();
         MenuRenderer::Render();
 
         // Rendering

@@ -4,9 +4,10 @@
     <CheatEntry>
       <ID>1</ID>
       <Description>"PineTree - CalculateHitResult"</Description>
+      <LastState Value="339473037" RealAddress="6E629E4A34"/>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
-      <Address>libil2cpp.so.1 + 0x223C4F0</Address>
+      <Address>libil2cpp.so.1 +0x1D48A34</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols/>

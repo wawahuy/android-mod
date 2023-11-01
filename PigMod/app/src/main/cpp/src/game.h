@@ -28,11 +28,17 @@ namespace Game {
         bool active;
     };
 
-    struct Patch {
+    struct DataPatch {
         GroupPatch* shootMagicTree;
+        GroupPatch* shootFastMagicTree;
     } dataPatch;
 
-    std::vector<GroupPatch *> dataPatchArray;
+    struct GuiGroupPatch {
+        std::string name;
+        std::vector<GroupPatch *> dataPatchArray;
+    };
+
+    std::vector<GuiGroupPatch *> guiGroupPatchArray;
 
     void unprotectIl2cpp() {
         g_Unprotected = unprotect((void*)g_Il2CppBaseRange.start, g_Il2CppBaseRange.end - g_Il2CppBaseRange.start);
@@ -106,7 +112,7 @@ namespace Game {
         }
 
         dataPatch.shootMagicTree = new GroupPatch {
-                "Cây Thông",
+                "Auto trung",
                 std::vector<OffsetPatch *> {
                         new OffsetPatch {
                                 0x223C604,
@@ -120,15 +126,34 @@ namespace Game {
                 true,
         };
 
-        dataPatchArray = std::vector<GroupPatch *> {
-                dataPatch.shootMagicTree
+        dataPatch.shootFastMagicTree = new GroupPatch {
+                "Ban nhanh",
+                std::vector<OffsetPatch *> {
+                        new OffsetPatch {
+                                0x1D47d70,
+                                std::vector<unsigned char>{0x61, 0x00, 0x00, 0x14},
+                        },
+                },
+                true,
+        };
+
+        guiGroupPatchArray = std::vector<GuiGroupPatch *> {
+            new GuiGroupPatch {
+                "CAY THONG",
+                std::vector<GroupPatch *> {
+                        dataPatch.shootMagicTree,
+                        dataPatch.shootFastMagicTree
+                }
+            }
         };
 
         unprotectIl2cpp();
         if (g_Unprotected) {
-            for(auto& gp: dataPatchArray) {
-                if (gp->activeDefault) {
-                    patch(gp);
+            for(auto& ggp: guiGroupPatchArray) {
+                for (auto &gp: ggp->dataPatchArray) {
+                    if (gp->activeDefault) {
+                        patch(gp);
+                    }
                 }
             }
         }
