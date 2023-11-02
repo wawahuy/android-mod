@@ -13,15 +13,17 @@ return p1
 invoke-static {p0}, Lcom/wawahuy/pigmod/MainActivity;->startMain(Landroid/content/Context;)V
 
 
+---------------------
+facebook login
+com/facebook/login/LoginClient
 
+.method protected getHandlersToTry(Lcom/facebook/login/LoginClient$Request;)[Lcom/facebook/login/LoginMethodHandler;
+    .locals 3
 
-:cond_1
-invoke-static {p1}, Lcom/wawahuy/hotreload/MainActivity;->hookEvent(Landroid/view/InputEvent;)Z
-move-result v0
-if-nez v0, :cond_2
-const/4 p1, 0x0
-return p1
+...
+    :cond_3
+    :goto_0
+    invoke-virtual {v1}, Lcom/facebook/login/LoginBehavior;->allowsCustomTabAuth()Z
+-->
 
-:cond_2
-
-invoke-static {p0}, Lcom/wawahuy/hotreload/MainActivity;->startMain(Landroid/content/Context;)V
+goto :cond_3

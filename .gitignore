@@ -5,3 +5,6 @@ Game*/*.so
 Game*/dump
 
 **/*/build.apk.idsig
+
+node_modules
+native.apk.cache
