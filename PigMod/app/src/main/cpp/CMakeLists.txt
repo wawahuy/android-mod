@@ -35,6 +35,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         external-lib/ImGui/imgui_impl_opengl3.cpp
         external-lib/ImGui/imgui_impl_android.cpp
 
+        external-lib/AES.cpp
+
 #        src/tiny_websockets/ws_common.cpp
 #        src/tiny_websockets/crypto.cpp
 #        src/tiny_websockets/linux_tcp.cpp

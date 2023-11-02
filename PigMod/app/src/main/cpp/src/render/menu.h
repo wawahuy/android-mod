@@ -6,7 +6,11 @@
 #define PIGMOD_MENU_H
 
 namespace MenuRenderer {
-    bool isFloating = true;
+#ifdef IS_DEBUG
+    static bool isFloating = false;
+#elif
+    static bool isFloating = true;
+#endif
     uint64_t lastMapAccessTime = getMs();
     std::vector<std::string> mapStrVector;
 
@@ -57,21 +61,27 @@ namespace MenuRenderer {
             isFloating = true;
         }
 
-        for(auto& ggp: Game::guiGroupPatchArray) {
-            ImGui::SeparatorText(ggp->name.c_str());
-            for (auto &gp: ggp->dataPatchArray) {
-                ImGui::BulletText("%s", gp->name.c_str());
+        if (Socket::clientSocket < 0) {
+            ImGui::Text("Khong the ket noi server...");
+        } else if (Game::isInit) {
+            for (auto &ggp: Game::guiGroupPatchArray) {
+                ImGui::SeparatorText(ggp->name.c_str());
+                for (auto &gp: ggp->dataPatchArray) {
+                    ImGui::BulletText("%s", gp->name.c_str());
 
-                ImGui::SameLine();
-                bool active = gp->active;
-                if (ToggleButton(gp->name.c_str(), &active)) {
-                    if (active) {
-                        Game::patch(gp);
-                    } else {
-                        Game::unpatch(gp);
+                    ImGui::SameLine();
+                    bool active = gp->active;
+                    if (ToggleButton(gp->name.c_str(), &active)) {
+                        if (active) {
+                            Game::patch(gp);
+                        } else {
+                            Game::unpatch(gp);
+                        }
                     }
                 }
             }
+        } else {
+            ImGui::Text("Dang khoi dong...");
         }
 
         ImGui::End();

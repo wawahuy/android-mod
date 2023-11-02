@@ -6,7 +6,7 @@
 #define PIGMOD_GAME_H
 
 namespace Game {
-    bool isInit = false;
+    static bool isInit = false;
 
     struct offset_t {
         uintptr_t gameManager = 0xFCC304;
@@ -38,7 +38,7 @@ namespace Game {
         std::vector<GroupPatch *> dataPatchArray;
     };
 
-    std::vector<GuiGroupPatch *> guiGroupPatchArray;
+    static std::vector<GuiGroupPatch *> guiGroupPatchArray;
 
     void unprotectIl2cpp() {
         g_Unprotected = unprotect((void*)g_Il2CppBaseRange.start, g_Il2CppBaseRange.end - g_Il2CppBaseRange.start);

@@ -21,13 +21,15 @@
 
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
-#include "external-lib/ImGui/imgui.h"
-#include "external-lib/ImGui/imgui_internal.h"
-#include "external-lib/ImGui/imgui_impl_opengl3.h"
-#include "external-lib/ImGui/imgui_impl_android.h"
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_internal.h"
+#include "ImGui/imgui_impl_opengl3.h"
+#include "ImGui/imgui_impl_android.h"
+#include "AES.h"
 
 #include "src/util.h"
 #include "src/game.h"
+#include "src/socket.h"
 #ifdef IS_DEBUG
 #endif
 
