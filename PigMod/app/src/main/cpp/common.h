@@ -29,12 +29,9 @@
 #include "src/util.h"
 #include "src/game.h"
 #ifdef IS_DEBUG
-#include "src/debug_socket.h"
-#include "src/debug.h"
 #endif
 
 #ifdef IS_DEBUG
-#include "src/render/debug.h"
 #endif
 #include "src/render/common.h"
 #include "src/render/menu.h"

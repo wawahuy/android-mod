@@ -35,14 +35,14 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         external-lib/ImGui/imgui_impl_opengl3.cpp
         external-lib/ImGui/imgui_impl_android.cpp
 
-        src/tiny_websockets/ws_common.cpp
-        src/tiny_websockets/crypto.cpp
-        src/tiny_websockets/linux_tcp.cpp
-        src/tiny_websockets/message.cpp
-        src/tiny_websockets/websockets_client.cpp
-        src/tiny_websockets/websockets_endpoint.cpp
-        src/tiny_websockets/websockets_server.cpp
-        src/tiny_websockets/windows_tcp.cpp
+#        src/tiny_websockets/ws_common.cpp
+#        src/tiny_websockets/crypto.cpp
+#        src/tiny_websockets/linux_tcp.cpp
+#        src/tiny_websockets/message.cpp
+#        src/tiny_websockets/websockets_client.cpp
+#        src/tiny_websockets/websockets_endpoint.cpp
+#        src/tiny_websockets/websockets_server.cpp
+#        src/tiny_websockets/windows_tcp.cpp
         )
 
 # Specifies libraries CMake should link to your target library. You

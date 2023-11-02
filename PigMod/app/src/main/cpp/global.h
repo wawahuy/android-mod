@@ -7,11 +7,9 @@
 #pragma once
 #include "stdint.h"
 
-//#define IS_DEBUG true
+#define IS_DEBUG true
 
 #ifdef IS_DEBUG
-const int DEBUG_PORT[] = { 1234, 1235, 1236 };
-unsigned char g_DebugPortIndex = sizeof (DEBUG_PORT) / sizeof (int) - 1;
 #endif
 
 int g_ScreenWidth = 0;
