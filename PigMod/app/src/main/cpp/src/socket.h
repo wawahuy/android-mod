@@ -44,7 +44,7 @@ namespace Socket {
         sk->on(X67_EVENT_OPEN, new OnOpenCallback());
         sk->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
         sk->on(X67_EVENT_CLOSE, new OnCloseCallback());
-        sk->once("test", new TestCallback());
+        sk->once("cmd::test", new TestCallback());
         sk->start();
     }
 }

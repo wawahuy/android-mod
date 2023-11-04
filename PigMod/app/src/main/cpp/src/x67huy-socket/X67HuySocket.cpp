@@ -149,8 +149,10 @@ void X67HuySocket::handleOpcodeJson(uint8_t *data, size_t size, FrameSession& fs
          *      "data": <Any>
          * }
          */
-        std::string commandName = js["command"].template get<std::string>();
-        emit(commandName, js["data"]);
+        if (js.contains("command")) {
+            std::string commandName = js["command"].template get<std::string>();
+            emit(std::string("cmd::") + commandName, js.contains("data") ? js["data"] : json(false));
+        }
     } catch (json::parse_error& ex) {
         LOG_E("Err: %i", ex.byte);
     }
@@ -178,21 +180,10 @@ void X67HuySocket::emit(std::string name, const json &js) {
     }
 }
 
-void LOG_WTF(const char* str, const uint8_t* byteArray, size_t l) {
-    __android_log_print(ANDROID_LOG_ERROR, "YUH", "%s", str);
-    for (size_t i = 0; i < l; i++) {
-        __android_log_print(ANDROID_LOG_ERROR, "YUH", "%02X ", byteArray[i]);
-    }
-    __android_log_print(ANDROID_LOG_ERROR, "YUH", "\n");
-}
-
 void X67HuySocket::send(std::string name, const json &jsData) {
     json js;
     js["name"] = name;
     js["data"] = jsData;
-    for (int i =0;i < 1000;i++) {
-        js["data" + std::to_string(i)] = jsData;
-    }
     std::string jsonStr = js.dump();
     LOG_E("send %s", jsonStr.c_str());
 
@@ -206,6 +197,7 @@ void X67HuySocket::send(std::string name, const json &jsData) {
             fin = BYTE_FIN_END;
         }
 
+        // need update
         std::string sub = jsonStr.substr(i, e - i);
         uint8_t header[HEADER_SIZE] = { 0 };
         header[0] = fin;
@@ -217,10 +209,9 @@ void X67HuySocket::send(std::string name, const json &jsData) {
             header[j + 4] = (rand() % 125);
         }
 
-        LOG_WTF("HEADER", header, HEADER_SIZE);
-
         ::send(_socket, (void *) header, (size_t)HEADER_SIZE, 0);
         if (fin == BYTE_FIN_END) {
+            // need update
             std::string tmp(dataMaxSize, 0);
             copy(sub.begin(), sub.end(), tmp.begin());
             sub = tmp;
