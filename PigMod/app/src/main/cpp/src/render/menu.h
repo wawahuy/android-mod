@@ -54,16 +54,14 @@ namespace MenuRenderer {
             return;
         }
         ImGui::SetNextWindowPos({ 25, 25 });
-        ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 300));
+        ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 0));
         ImGui::Begin("0x67Huy");
 
         if (ImGui::Button("TAT MENU")) {
             isFloating = true;
         }
 
-        if (!Socket::isOpen) {
-            ImGui::Text("Khong the ket noi server...");
-        } else if (Game::isInit) {
+        if (Game::isInit) {
             for (auto &ggp: Game::guiGroupPatchArray) {
                 ImGui::SeparatorText(ggp->name.c_str());
                 for (auto &gp: ggp->dataPatchArray) {

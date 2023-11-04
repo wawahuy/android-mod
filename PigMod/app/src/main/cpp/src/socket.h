@@ -9,6 +9,15 @@ namespace Socket {
     static bool isOpen = false;
     static X67HuySocket* socket = nullptr;
 
+    void handleLogin() {
+        json js;
+        js["package"] = getPackageName();
+        js["key"] = g_AuthKey;
+        g_SystemMessage[0] = 0;
+        g_AuthStage = AuthStage::Doing;
+        socket->send(STR_COMMAND_S_LOGIN, js);
+    }
+
     class OnOpenCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
@@ -23,6 +32,9 @@ namespace Socket {
             isOpen = true;
             g_AuthStage = AuthStage::None;
             g_SystemMessage[0] = 0;
+            if (g_AuthAuto) {
+                handleLogin();
+            }
         }
     };
 
@@ -60,14 +72,12 @@ namespace Socket {
         }
     };
 
-    void handleLogin() {
-        json js;
-        js["package"] = getPackageName();
-        js["key"] = g_AuthKey;
-        g_SystemMessage[0] = 0;
-        g_AuthStage = AuthStage::Doing;
-        socket->send(STR_COMMAND_S_LOGIN, js);
-    }
+    class OnMenuCallback: public X67HuySocketCallback {
+    public:
+        void runnable(const json& js, X67HuySocket* sk) {
+            Game::init(js);
+        }
+    };
 
     void init() {
         socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT);
@@ -76,6 +86,7 @@ namespace Socket {
         socket->on(X67_EVENT_CLOSE, new OnCloseCallback());
         socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
         socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
+        socket->on(STR_COMMAND_R_MENU, new OnMenuCallback());
         socket->start();
     }
 }

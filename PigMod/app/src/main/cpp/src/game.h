@@ -21,11 +21,6 @@ namespace Game {
         bool active;
     };
 
-    struct DataPatch {
-        GroupPatch* shootMagicTree;
-        GroupPatch* shootFastMagicTree;
-    } dataPatch;
-
     struct GuiGroupPatch {
         std::string name;
         std::vector<GroupPatch *> dataPatchArray;
@@ -97,47 +92,55 @@ namespace Game {
         }
     }
 
-    void init() {
+    void init(const json& js) {
         isInit = true;
         if (g_UnprotectedDefault) {
             unprotectIl2cpp();
         }
 
-        dataPatch.shootMagicTree = new GroupPatch {
-                "Auto trung",
-                std::vector<OffsetPatch *> {
-                        new OffsetPatch {
-                                0x223C604,
-                                std::vector<unsigned char>{0x05, 0x00, 0x00, 0x14},
-                        },
-                        new OffsetPatch {
-                                0x223C64c,
-                                std::vector<unsigned char>{0x31, 0x00, 0x00, 0x14},
-                        }
-                },
-                true,
-        };
+        for(auto& ggp: guiGroupPatchArray) {
+            for (auto& gp: ggp->dataPatchArray) {
+                unpatch(gp);
+                for (auto& p: gp->patches) {
+                    delete p;
+                }
+                delete gp;
+            }
+            delete ggp;
+        }
+        guiGroupPatchArray.clear();
 
-        dataPatch.shootFastMagicTree = new GroupPatch {
-                "Ban nhanh",
-                std::vector<OffsetPatch *> {
-                        new OffsetPatch {
-                                0x1D47d70,
-                                std::vector<unsigned char>{0x61, 0x00, 0x00, 0x14},
-                        },
-                },
-                true,
-        };
+        for (auto& groupItem: js) {
+            GuiGroupPatch* guiGroupPatch = new GuiGroupPatch();
+            guiGroupPatch->name = groupItem["name"];
 
-        guiGroupPatchArray = std::vector<GuiGroupPatch *> {
-            new GuiGroupPatch {
-                "CAY THONG",
-                std::vector<GroupPatch *> {
-                        dataPatch.shootMagicTree,
-                        dataPatch.shootFastMagicTree
+            for (auto &menuItem: groupItem["items"]) {
+                const json &il2cppPatch = menuItem["il2cppPatch"];
+                GroupPatch *gp = new GroupPatch();
+                gp->name = menuItem["name"].template get<std::string>();
+                gp->activeDefault = menuItem["activeDefault"].template get<bool>();
+                gp->active = gp->activeDefault;
+                guiGroupPatch->dataPatchArray.push_back(gp);
+
+                for (auto& il2cppPatchItem: il2cppPatch) {
+                    OffsetPatch* op = new OffsetPatch();
+                    op->offset = hexStrToPtr(il2cppPatchItem["offset"].template get<std::string>());
+                    LOG_E("%p", op->offset);
+
+                    auto patchStr = il2cppPatchItem["patch"].template get<std::string>();
+                    LOG_E("%s", patchStr.c_str());
+                    for(int i = 0; i < patchStr.size(); i += 2) {
+                        uint8_t byte = hexStrToByte(patchStr.substr(i, 2));
+                        op->patch.push_back(byte);
+                        LOG_E("%p", byte);
+                    }
+
+                    gp->patches.push_back(op);
                 }
             }
-        };
+
+            guiGroupPatchArray.push_back(guiGroupPatch);
+        }
 
         unprotectIl2cpp();
         if (g_Unprotected) {

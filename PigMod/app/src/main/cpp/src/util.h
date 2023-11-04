@@ -96,6 +96,10 @@ uintptr_t hexStrToPtr(std::string hexString) {
     return v;
 }
 
+uint8_t hexStrToByte(std::string hexString) {
+    return ((hexString[0] - '0') << 4) | (hexString[1] - '0');
+}
+
 std::string getPackageName() {
     pid_t pid = getpid();
     LOG_E( "process id %d", pid);

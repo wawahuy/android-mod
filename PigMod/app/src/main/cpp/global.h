@@ -12,7 +12,11 @@
 #ifdef IS_DEBUG
 #define SOCKET_PORT 1235
 #define SOCKET_HOST "192.168.1.21"
+#else
+#define SOCKET_PORT 8998
+#define SOCKET_HOST x67log.j2run.com
 #endif
+
 
 int g_ScreenWidth = 0;
 int g_ScreenHeight = 0;

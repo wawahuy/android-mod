@@ -5,12 +5,11 @@
 
 void *hack_thread(void *) {
     LOG_E("v1 =================================================");
-    Socket::init();
     do {
         sleep(1);
     } while ((g_Il2CppBase = get_libBase("libil2cpp.so")) == 0);
     g_Il2CppBaseRange = get_libBaseRange("libil2cpp.so");
-    Game::init();
+    Socket::init();
 #ifdef IS_DEBUG
 #endif
     LOG_E("v2 =================================================");
