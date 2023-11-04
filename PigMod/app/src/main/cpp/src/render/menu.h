@@ -61,7 +61,7 @@ namespace MenuRenderer {
             isFloating = true;
         }
 
-        if (Socket::clientSocket < 0) {
+        if (!Socket::isOpen) {
             ImGui::Text("Khong the ket noi server...");
         } else if (Game::isInit) {
             for (auto &ggp: Game::guiGroupPatchArray) {

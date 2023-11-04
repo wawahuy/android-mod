@@ -36,6 +36,7 @@ using namespace nlohmann;
 #define OFFSET_SIZE 2
 #define OFFSET_IV 4
 #define HEADER_SIZE 32
+#define FRAME_SIZE 1024
 
 #define BYTE_FIN_END 0x01
 #define BYTE_FIN_CONTINUE 0x00
@@ -43,6 +44,10 @@ using namespace nlohmann;
 #define BYTE_OPCODE_JSON 0b00000011
 
 class X67HuySocket;
+
+#define X67_EVENT_OPEN  "std::open::sk"
+#define X67_EVENT_ESTABLISH "std::establish::sk"
+#define X67_EVENT_CLOSE "std::close::sk"
 
 class X67HuySocketCallback {
 public:
@@ -64,6 +69,7 @@ public:
     void start();
     void on(std::string name, X67HuySocketCallback* cb);
     void once(std::string name, X67HuySocketCallback* cb);
+    void send(std::string name, const json &json);
 
 private:
     X67HuySocket(const X67HuySocket& sk);
@@ -83,6 +89,8 @@ private:
     void handleFrame(uint8_t* data, size_t size, FrameSession& fs);
     void handleOpcodeKey(uint8_t* data, size_t size, FrameSession& fs);
     void handleOpcodeJson(uint8_t* data, size_t size, FrameSession& fs);
+
+    void emit(std::string name, const json& json);
 
     int _socket = -1;
     int _port, _offsetAllData = 0;

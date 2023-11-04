@@ -46,6 +46,7 @@ void* X67HuySocket::socketThread() {
     int receivedBytes = -1;
     int totalBytesReceived = 0;
 
+    emit(X67_EVENT_OPEN, json());
     do {
         receivedBytes = recv(_socket, buffer + totalBytesReceived, SOCKET_BUFFER_SIZE - totalBytesReceived, 0);
         totalBytesReceived += receivedBytes;
@@ -60,6 +61,7 @@ void* X67HuySocket::socketThread() {
         }
     } while (receivedBytes > 0);
 
+    emit(X67_EVENT_CLOSE, json());
     LOG_E("Socket closed!");
     sleep(1);
     start();
@@ -130,6 +132,8 @@ void X67HuySocket::handleOpcodeKey(uint8_t *data, size_t size, FrameSession& fs)
     memcpy(_key, data, size);
     LOG_E("set key %p %p", _key[0], _key[1]);
     fs.stage = FrameStage::Continue;
+
+    emit(X67_EVENT_ESTABLISH, json());
 }
 
 void X67HuySocket::handleOpcodeJson(uint8_t *data, size_t size, FrameSession& fs) {
@@ -146,15 +150,7 @@ void X67HuySocket::handleOpcodeJson(uint8_t *data, size_t size, FrameSession& fs
          * }
          */
         std::string commandName = js["command"].template get<std::string>();
-        auto range = _listeners.equal_range(commandName);
-        for (auto it = range.first; it != range.second; ++it) {
-            it->second->runnable(js["data"], this);
-            if (it->second->isOnce()) {
-                it = _listeners.erase(it);
-            } else {
-                ++it;
-            }
-        }
+        emit(commandName, js["data"]);
     } catch (json::parse_error& ex) {
         LOG_E("Err: %i", ex.byte);
     }
@@ -168,4 +164,58 @@ void X67HuySocket::on(std::string name, X67HuySocketCallback *cb) {
 void X67HuySocket::once(std::string name, X67HuySocketCallback *cb) {
     cb->setOnce(true);
     _listeners.emplace(name, cb);
+}
+
+void X67HuySocket::emit(std::string name, const json &js) {
+    auto range = _listeners.equal_range(name);
+    for (auto it = range.first; it != range.second; ) {
+        it->second->runnable(js, this);
+        if (it->second->isOnce()) {
+            it = _listeners.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void X67HuySocket::send(std::string name, const json &jsData) {
+    json js;
+    js["name"] = name;
+    js["data"] = jsData;
+    std::string jsonStr = js.dump();
+    LOG_E("send %s", jsonStr.c_str());
+
+    uint8_t fin = BYTE_FIN_CONTINUE;
+    int dataMaxSize = FRAME_SIZE - HEADER_SIZE;
+    int dataLength = jsonStr.size();
+    for (int i = 0; i < dataLength; i += dataMaxSize) {
+        int e = i + dataMaxSize;
+        if (e >= dataLength) {
+            e = dataLength;
+            fin = BYTE_FIN_END;
+        }
+
+        std::string sub = jsonStr.substr(i, e - i);
+        uint8_t header[HEADER_SIZE] = { 0 };
+        header[0] = fin;
+        header[1] = BYTE_OPCODE_JSON;
+        header[2] = (sub.size() >> 8) & 0xFF;
+        header[3] = sub.size() & 0xFF;
+
+        for (int j = 0; j < AES_BLOCKLEN; j++) {
+            header[j + 4] = (rand() % 125);
+        }
+
+        ::send(_socket, (void *) header, (size_t)HEADER_SIZE, 0);
+        if (fin == BYTE_FIN_END) {
+            std::string tmp(dataMaxSize, 0);
+            copy(sub.begin(), sub.end(), tmp.begin());
+            sub = tmp;
+        }
+
+        struct AES_ctx ctx;
+        AES_init_ctx_iv(&ctx, _key, header + OFFSET_IV);
+        AES_CBC_encrypt_buffer(&ctx, (uint8_t *)(&sub[0]), dataMaxSize);
+        ::send(_socket, (void *) header, (size_t)HEADER_SIZE, 0);
+    }
 }
