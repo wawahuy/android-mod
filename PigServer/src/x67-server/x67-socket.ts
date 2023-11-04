@@ -2,12 +2,15 @@ import { Logger } from '@nestjs/common';
 import * as events from 'events';
 import * as net from 'net';
 import * as crypto from 'crypto'; 
-import { ByteFin, ByteOpcode, DataSize, ENC_SIZE_IV, ENC_SIZE_KEY, FrameSession, FrameSessionStage, FrameSize, HEADER_SIZE, HeaderSize, OFFSET_FIN, OFFSET_IV, OFFSET_OPCODE, OFFSET_SIZE } from './x67-frame';
+import { isNil, isNumber, isString } from 'lodash';
+import { ByteFin, ByteOpcode, DataSize, ENC_SIZE_IV, ENC_SIZE_KEY, FrameSession, FrameSessionStage, FrameSize, HEADER_SIZE, HeaderSize, OFFSET_FIN, OFFSET_IV, OFFSET_OPCODE, OFFSET_SIZE } from './x67-config';
 import { randomUint8 } from 'src/utils/common';
+import { X67Command } from './x67-command';
 
 declare interface X67Socket {
-    on(event: 'close', listener: () => void): this;
-    once(event: 'close', listener: () => void): this;
+    // on(event: 'close', listener: () => void): this;
+    // on(event: 'cmd', listener: (command: X67Command<any>, socket: X67Socket) => void): this;
+    // once(event: 'close', listener: () => void): this;
     on(event: string, listener: Function): this;
     once(event: string, listener: Function): this;
 }
@@ -19,13 +22,14 @@ class X67Socket extends events.EventEmitter {
     private _bytesReceived = Buffer.alloc(FrameSize);
     private _totalBytesReceived = 0;
 
-    readonly id = crypto.randomUUID();
-
     private _frameSession: FrameSession = { 
         stage: FrameSessionStage.Continue
     };
     private _allData = null;
     private _offsetAllData = 0;
+
+    readonly id = crypto.randomUUID();
+    readonly eventSystem = new events.EventEmitter;
 
     constructor(
         private _socket: net.Socket
@@ -60,18 +64,16 @@ class X67Socket extends events.EventEmitter {
         const sub = Buffer.alloc(DataSize);
         this._key.copy(sub);
         this._socket.write(sub);
-        
-        this.sendJson({ command: "test", data: 123 });
     }
 
     private onError(err: Error) {
         this._logger.error(err);
-        this.emit('close');
+        this.eventSystem.emit('close');
     }
 
     private onClose() {
         this._logger.log(`client ${this.id} closed!`);
-        this.emit('close');
+        this.eventSystem.emit('close');
     }
 
     private onData(data: Buffer) {
@@ -147,14 +149,22 @@ class X67Socket extends events.EventEmitter {
     private handleOpcodeJson(data: Buffer, frameSession: FrameSession) {
         const dataSize = data.length;
         try {
-          const jsonString = data.toString('utf-8', 0, dataSize - 1);
-          const js = JSON.parse(jsonString);
-          console.log(js);
-          frameSession.stage = FrameSessionStage.Continue;
+            const jsonString = data.toString('utf-8', 0, dataSize - 1);
+            const js = JSON.parse(jsonString);
+            if (isString(js.command) || isNumber(js.command)) {
+                this.handleCommand(js);
+            }
+            frameSession.stage = FrameSessionStage.Continue;
         } catch (error) {
-          console.error('JSON Parse Error:', error);
-          frameSession.stage = FrameSessionStage.Error;
+            this._logger.error(error);
+            frameSession.stage = FrameSessionStage.Error;
         }
+    }
+
+    private handleCommand(cmd: X67Command<any>) {
+        this._logger.log(cmd);
+        this.emit(cmd.command, cmd.data);
+        this.eventSystem.emit('command', cmd, this);
     }
 
     sendJson(json: Object) {
@@ -198,6 +208,13 @@ class X67Socket extends events.EventEmitter {
             const encryptedData = cipher.update(sub);
             this._socket.write(encryptedData);
         }
+    }
+
+    command<T>(command: string, data: T) {
+        const cmd = new X67Command<T>();
+        cmd.command = command;
+        cmd.data = data;
+        this.sendJson(command);
     }
 }
 

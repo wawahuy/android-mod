@@ -2,16 +2,18 @@ import { Logger } from '@nestjs/common';
 import * as events from 'events';
 import * as net from 'net';
 import X67Socket from './x67-socket';
+import { X67Command } from './x67-command';
 
 
-export class X67Server extends events.EventEmitter {
+export class X67Server {
     private _logger = new Logger("X67Socket");
     private _port: number;
     private _server: net.Server;
     private _clients: { [key: string]: X67Socket } = {};
 
+    readonly eventClients = new events.EventEmitter();
+
     constructor() {
-        super();
         this._server = net.createServer();
         this._server.on("close", this.onClose.bind(this));
         this._server.on('error', this.onError.bind(this));
@@ -38,9 +40,20 @@ export class X67Server extends events.EventEmitter {
 
     onConnection(socket: net.Socket) {
         const client = new X67Socket(socket);
-        client.once('close', () => {
+        client.eventSystem.on('command', this.onClientCommand.bind(this));
+        client.eventSystem.once('close', () => {
             delete this._clients[client.id];
         })
         this._clients[client.id] = client;
+    }
+
+    onClientCommand(command: X67Command<any>, socket: X67Socket) {
+        this.eventClients.emit(command.command, command.data, socket);
+    }
+
+    broadcastCommand<T>(command: string, data: T) {
+        for (const clientId in this._clients) {
+            this._clients[clientId].command(command, data);
+        }
     }
 }

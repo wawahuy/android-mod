@@ -151,7 +151,7 @@ void X67HuySocket::handleOpcodeJson(uint8_t *data, size_t size, FrameSession& fs
          */
         if (js.contains("command")) {
             std::string commandName = js["command"].template get<std::string>();
-            emit(std::string("cmd::") + commandName, js.contains("data") ? js["data"] : json(false));
+            emit(commandName, js.contains("data") ? js["data"] : json(false));
         }
     } catch (json::parse_error& ex) {
         LOG_E("Err: %i", ex.byte);
@@ -182,7 +182,7 @@ void X67HuySocket::emit(std::string name, const json &js) {
 
 void X67HuySocket::send(std::string name, const json &jsData) {
     json js;
-    js["name"] = name;
+    js["command"] = name;
     js["data"] = jsData;
     std::string jsonStr = js.dump();
     LOG_E("send %s", jsonStr.c_str());
