@@ -33,4 +33,5 @@ public class GLViewWrapper extends GLSurfaceView implements GLSurfaceView.Render
     public void onDrawFrame(GL10 gl) {
         NativeMethods.onDrawFrame();
     }
+
 }

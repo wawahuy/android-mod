@@ -96,4 +96,20 @@ uintptr_t hexStrToPtr(std::string hexString) {
     return v;
 }
 
+std::string getPackageName() {
+    pid_t pid = getpid();
+    LOG_E( "process id %d", pid);
+    char path[64] = { 0 };
+    sprintf(path, "/proc/%d/cmdline", pid);
+    FILE *cmdline = fopen(path, "r");
+    if (cmdline) {
+        char application_id[64] = { 0 };
+        fread(application_id, sizeof(application_id), 1, cmdline);
+        LOG_E("application id %s\n", application_id);
+        fclose(cmdline);
+        return std::string(application_id);
+    }
+    return std::string();
+}
+
 #endif //PIGMOD_UTIL_H

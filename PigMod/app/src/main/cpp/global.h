@@ -26,4 +26,16 @@ struct Il2CppBaseRange {
 bool g_UnprotectedDefault = false;
 bool g_Unprotected = g_UnprotectedDefault;
 
+enum AuthStage {
+    None,
+    Doing,
+    Oke
+};
+
+AuthStage g_AuthStage = AuthStage::None;
+char g_SystemMessageColor[] = { 255, 0, 0, 255 };
+char g_SystemMessage[255] = { 0 };
+char g_AuthKey[255];
+bool g_AuthAuto = true;
+
 #endif //PIGMOD_GLOBAL_H

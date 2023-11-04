@@ -214,7 +214,7 @@ class X67Socket extends events.EventEmitter {
         const cmd = new X67Command<T>();
         cmd.command = command;
         cmd.data = data;
-        this.sendJson(command);
+        this.sendJson(cmd);
     }
 }
 

@@ -8,13 +8,6 @@
 namespace Game {
     static bool isInit = false;
 
-    struct offset_t {
-        uintptr_t gameManager = 0xFCC304;
-    } offset;
-
-    struct Function {
-    } fncptr;
-
     struct OffsetPatch {
         uintptr_t offset;
         std::vector<unsigned char> patch;
@@ -103,7 +96,6 @@ namespace Game {
             protectIl2cpp();
         }
     }
-
 
     void init() {
         isInit = true;

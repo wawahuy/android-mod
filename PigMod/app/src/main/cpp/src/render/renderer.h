@@ -22,9 +22,10 @@ namespace Renderer {
         ImGui_ImplOpenGL3_Init("#version 300 es");
 
         ImFontConfig font_cfg;
-        font_cfg.SizePixels = 22.0f;
+        // 22 3.0
+        font_cfg.SizePixels = 36.0f;
         io.Fonts->AddFontDefault(&font_cfg);
-        ImGui::GetStyle().ScaleAllSizes(3.0f);
+        ImGui::GetStyle().ScaleAllSizes(4.0f);
         g_Initialized = true;
     }
 
@@ -44,7 +45,18 @@ namespace Renderer {
 #endif
 
 //        ImGui::ShowDemoWindow();
-        MenuRenderer::Render();
+
+        if (!Socket::isOpen) {
+            ImGui::SetNextWindowPos({ 25, g_ScreenHeight / 2 - 200.0f });
+            ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 0));
+            ImGui::Begin(STR_WINDOWS_SERVER);
+            ImGui::Text(STR_SOCKET_CONNECTING);
+            ImGui::End();
+        } else if (g_AuthStage != AuthStage::Oke) {
+            AuthRenderer::Render();
+        } else {
+            MenuRenderer::Render();
+        }
 
         // Rendering
         ImGui::Render();

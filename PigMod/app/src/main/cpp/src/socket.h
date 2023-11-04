@@ -7,6 +7,7 @@
 
 namespace Socket {
     static bool isOpen = false;
+    static X67HuySocket* socket = nullptr;
 
     class OnOpenCallback: public X67HuySocketCallback {
     public:
@@ -19,8 +20,9 @@ namespace Socket {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
             LOG_E("establish!");
-            sk->send("test", 12);
             isOpen = true;
+            g_AuthStage = AuthStage::None;
+            g_SystemMessage[0] = 0;
         }
     };
 
@@ -32,20 +34,49 @@ namespace Socket {
         }
     };
 
-    class TestCallback: public X67HuySocketCallback {
+    class OnIsLoginCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
-            LOG_E("test!");
+            if (js == true) {
+                g_AuthStage = AuthStage::Oke;
+            } else {
+                g_AuthStage = AuthStage::None;
+            }
         }
     };
 
+    class OnSysMsgCallback: public X67HuySocketCallback {
+    public:
+        void runnable(const json& js, X67HuySocket* sk) {
+            std::string msg = js["msg"].template get<std::string>();
+            memcpy(g_SystemMessage, &msg[0], msg.size() < 255 ? msg.size() : 255);
+
+            if (js.contains("color")) {
+                g_SystemMessageColor[0] = js["color"][0].template get<char>();
+                g_SystemMessageColor[1] = js["color"][1].template get<char>();
+                g_SystemMessageColor[2] = js["color"][2].template get<char>();
+                g_SystemMessageColor[3] = js["color"][3].template get<char>();
+            }
+        }
+    };
+
+    void handleLogin() {
+        json js;
+        js["package"] = getPackageName();
+        js["key"] = g_AuthKey;
+        g_SystemMessage[0] = 0;
+        g_AuthStage = AuthStage::Doing;
+        socket->send(STR_COMMAND_S_LOGIN, js);
+    }
+
     void init() {
-        X67HuySocket* sk = new X67HuySocket(SOCKET_HOST, SOCKET_PORT);
-        sk->on(X67_EVENT_OPEN, new OnOpenCallback());
-        sk->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
-        sk->on(X67_EVENT_CLOSE, new OnCloseCallback());
-        sk->once("test", new TestCallback());
-        sk->start();
+        socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT);
+        socket->on(X67_EVENT_OPEN, new OnOpenCallback());
+        socket->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
+        socket->on(X67_EVENT_CLOSE, new OnCloseCallback());
+        socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
+        socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
+        socket->start();
     }
 }
 
