@@ -89,10 +89,116 @@ function sendJson(socket, json) {
     }
 }
 
+const SOCKET_BUFFER_SIZE = 1024;
+const HEADER_SIZE = 32;
+const OFFSET_FIN = 0;
+const OFFSET_OPCODE = 1;
+const OFFSET_SIZE = 2;
+const OFFSET_IV = 4;
+const BYTE_FIN_END = 0x01;
+const BYTE_OPCODE_KEY = 0b00000001;
+const BYTE_OPCODE_JSON = 0b00000011;
+
+let allData = null;
+let offsetAllData = 0;
+
+function handleOpcodeJson(data, fs) {
+  const dataSize = data.length;
+  try {
+    const jsonString = data.toString('utf-8', 0, dataSize - 1);
+    const js = JSON.parse(jsonString);
+    console.log(js);
+    fs.stage = 'Continue';
+  } catch (error) {
+    console.error('JSON Parse Error:', error);
+    fs.stage = 'Error';
+  }
+}
+
+function handleFrame(buffer, fs) {
+const dataMaxSize = frameSize - headerSize; 
+  const byteFin = buffer[OFFSET_FIN];
+  const byteOpcode = buffer[OFFSET_OPCODE];
+  const dataSize = buffer.readUInt16LE(OFFSET_SIZE);
+  const iv = buffer.slice(OFFSET_IV, OFFSET_IV + 16);
+  const data = buffer.slice(HEADER_SIZE, SOCKET_BUFFER_SIZE);
+  const isFinEnd = (byteFin & BYTE_FIN_END) === BYTE_FIN_END;
+  console.log("byteFin", byteFin);
+  console.log("byteOpcode", byteOpcode);
+  console.log("size", buffer.slice(OFFSET_SIZE, OFFSET_SIZE + 2));
+  console.log("size", dataSize);
+  console.log("iv", iv);
+  console.log("data", data.slice(0, 2), data.slice(dataMaxSize - 2, dataMaxSize));
+
+  if (key === null) {
+    console.error('Not key');
+    fs.stage = 'Error';
+    return;
+  }
+
+
+
+  const decipher = crypto.createDecipheriv('aes-128-cbc', key, iv);
+  decipher.setAutoPadding(false);
+  let decryptedData = Buffer.concat([decipher.update(data), decipher.final()]);
+  decryptedData = decryptedData.slice(0, dataSize + 1);
+  console.log(decryptedData.toString('utf-8'));
+
+  if (offsetAllData === 0) {
+    allData = decryptedData;
+  } else {
+    allData = Buffer.concat([allData, decryptedData]);
+  }
+  offsetAllData += dataSize;
+
+  if (isFinEnd && byteOpcode === BYTE_OPCODE_JSON) {
+    handleOpcodeJson(allData, fs);
+    allData = null;
+    offsetAllData = 0;
+  }
+}
+
+
 server.on('connection', (socket) => {
     sendKey(socket);
-    sendJson(socket, { command: "test", data: "abc" });
-    sendJson(socket, { command: "test", data: "abc" });
+    let frameSession = { stage: 'Continue' };
+    const buffer = Buffer.alloc(SOCKET_BUFFER_SIZE);
+    let totalBytesReceived = 0;
+
+    function pushData(data) {
+        let irem = -1;
+        if (totalBytesReceived + data.length > SOCKET_BUFFER_SIZE) {
+            data.subarray(0, SOCKET_BUFFER_SIZE - totalBytesReceived).copy(buffer, totalBytesReceived);
+            irem = SOCKET_BUFFER_SIZE - totalBytesReceived;
+            totalBytesReceived = SOCKET_BUFFER_SIZE;
+        } else {
+            data.copy(buffer, totalBytesReceived);
+            totalBytesReceived += data.length;
+        }
+        console.log(totalBytesReceived);
+    
+        if (totalBytesReceived == SOCKET_BUFFER_SIZE) {
+            console.log('handleFrame', buffer.length);
+          handleFrame(buffer, frameSession);
+          console.log('handleFrame done!');
+          if (frameSession.stage === 'Error') {
+            console.error('Frame false!');
+            socket.destroy();
+          }
+
+          totalBytesReceived = 0;
+        }
+
+        if (irem > -1) {
+            const sub = data.subarray(irem, data.length);
+            pushData(sub);
+        }
+    }
+
+    socket.on('data', (data) => {
+        pushData(data);
+    });
+
     socket.once('error', (e) => {
         console.log(e);
     })

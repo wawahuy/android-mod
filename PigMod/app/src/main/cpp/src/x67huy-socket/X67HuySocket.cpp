@@ -178,10 +178,21 @@ void X67HuySocket::emit(std::string name, const json &js) {
     }
 }
 
+void LOG_WTF(const char* str, const uint8_t* byteArray, size_t l) {
+    __android_log_print(ANDROID_LOG_ERROR, "YUH", "%s", str);
+    for (size_t i = 0; i < l; i++) {
+        __android_log_print(ANDROID_LOG_ERROR, "YUH", "%02X ", byteArray[i]);
+    }
+    __android_log_print(ANDROID_LOG_ERROR, "YUH", "\n");
+}
+
 void X67HuySocket::send(std::string name, const json &jsData) {
     json js;
     js["name"] = name;
     js["data"] = jsData;
+    for (int i =0;i < 1000;i++) {
+        js["data" + std::to_string(i)] = jsData;
+    }
     std::string jsonStr = js.dump();
     LOG_E("send %s", jsonStr.c_str());
 
@@ -199,12 +210,14 @@ void X67HuySocket::send(std::string name, const json &jsData) {
         uint8_t header[HEADER_SIZE] = { 0 };
         header[0] = fin;
         header[1] = BYTE_OPCODE_JSON;
-        header[2] = (sub.size() >> 8) & 0xFF;
-        header[3] = sub.size() & 0xFF;
+        header[2] = sub.size() & 0xFF;
+        header[3] = (sub.size() >> 8) & 0xFF;
 
         for (int j = 0; j < AES_BLOCKLEN; j++) {
             header[j + 4] = (rand() % 125);
         }
+
+        LOG_WTF("HEADER", header, HEADER_SIZE);
 
         ::send(_socket, (void *) header, (size_t)HEADER_SIZE, 0);
         if (fin == BYTE_FIN_END) {
@@ -216,6 +229,7 @@ void X67HuySocket::send(std::string name, const json &jsData) {
         struct AES_ctx ctx;
         AES_init_ctx_iv(&ctx, _key, header + OFFSET_IV);
         AES_CBC_encrypt_buffer(&ctx, (uint8_t *)(&sub[0]), dataMaxSize);
-        ::send(_socket, (void *) header, (size_t)HEADER_SIZE, 0);
+        LOG_E("data %p %p ... %p %p", sub[0], sub[1], sub[dataMaxSize - 2], sub[dataMaxSize - 1]);
+        ::send(_socket, (void *) &sub[0], sub.size(), 0);
     }
 }
