@@ -25,8 +25,8 @@
 #include "ImGui/imgui_internal.h"
 #include "ImGui/imgui_impl_opengl3.h"
 #include "ImGui/imgui_impl_android.h"
-#include "AES.h"
 
+#include "src/x67huy-socket/X67HuySocket.h"
 #include "src/util.h"
 #include "src/game.h"
 #include "src/socket.h"

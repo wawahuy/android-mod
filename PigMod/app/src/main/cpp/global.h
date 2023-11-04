@@ -10,11 +10,9 @@
 #define IS_DEBUG true
 
 #ifdef IS_DEBUG
-#define SOCKET_BUFFER_SIZE 1024
 #define SOCKET_PORT 1235
 #define SOCKET_HOST "192.168.1.21"
 #endif
-
 
 int g_ScreenWidth = 0;
 int g_ScreenHeight = 0;

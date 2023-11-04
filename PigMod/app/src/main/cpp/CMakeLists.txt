@@ -37,6 +37,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 
         external-lib/AES.cpp
 
+        src/x67huy-socket/X67HuySocket.cpp
+
 #        src/tiny_websockets/ws_common.cpp
 #        src/tiny_websockets/crypto.cpp
 #        src/tiny_websockets/linux_tcp.cpp

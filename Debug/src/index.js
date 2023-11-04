@@ -11,13 +11,28 @@ const fin = {
 };
 
 const opcode = {
-    json: 0b00000001,
+    key:  0b00000001,
+    json: 0b00000011,
 };
 
 const frameSize = 1024;
 const headerSize = 32; // fin opcode 2size 16iv 12pad ....
 
 const key = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
+
+function sendKey(socket) {
+    const dataMaxSize = frameSize - headerSize; 
+
+    const header = Buffer.alloc(headerSize);
+    header[0] = fin.end;
+    header[1] = opcode.key;
+    header.writeInt16LE(key.length, 2);
+    socket.write(header);
+
+    const sub = Buffer.alloc(dataMaxSize);
+    key.copy(sub);
+    socket.write(sub);
+}
 
 function sendJson(socket, json) {
     const dataMaxSize = frameSize - headerSize; 
@@ -75,17 +90,14 @@ function sendJson(socket, json) {
 }
 
 server.on('connection', (socket) => {
-    sendJson(socket, { oq: true });
-    // socket.write(Buffer.from([
-    //     fin.end,
-    //     opcode.json,
-    //     ...keys
-    // ]));
-
-    // socket.write(Buffer.alloc(1017));
-    // console.log(socket);
-
-    // sendJson(socket, Array.from({length: 2000 }).map(() => ({ test: 1 })));
+    sendKey(socket);
+    sendJson(socket, { command: "test", data: "abc" });
+    sendJson(socket, { command: "test", data: "abc" });
+    socket.once('error', (e) => {
+        console.log(e);
+    })
+}).on('error', () => {
+    console.log('sk err');
 });
 
 
