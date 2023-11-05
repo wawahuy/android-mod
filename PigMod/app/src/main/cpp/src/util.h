@@ -96,8 +96,8 @@ uintptr_t hexStrToPtr(std::string hexString) {
     return v;
 }
 
-uint8_t hexStrToByte(std::string hexString) {
-    return ((hexString[0] - '0') << 4) | (hexString[1] - '0');
+uint8_t hexStrToByte(const std::string& hex) {
+    return strtol(hex.c_str(), NULL, 16);
 }
 
 std::string getPackageName() {

@@ -7,7 +7,7 @@
 
 namespace MenuRenderer {
 #ifdef IS_DEBUG
-    static bool isFloating = false;
+    static bool isFloating = true;
 #elif
     static bool isFloating = true;
 #endif
@@ -71,7 +71,6 @@ namespace MenuRenderer {
         if (g_MenuInit) {
             for (auto &ggp: Game::guiGroupPatchArray) {
                 ImGui::SeparatorText(ggp->name.c_str());
-                ImGui::NewLine();
                 for (auto &gp: ggp->dataPatchArray) {
                     ImGui::BulletText("%s", gp->name.c_str());
 

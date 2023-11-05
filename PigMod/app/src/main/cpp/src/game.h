@@ -164,7 +164,7 @@ namespace Game {
                     for(int i = 0; i < patchStr.size(); i += 2) {
                         uint8_t byte = hexStrToByte(patchStr.substr(i, 2));
                         op->patch.push_back(byte);
-                        LOG_E("%p", byte);
+                        LOG_E("%s %p", patchStr.substr(i, 2).c_str(), byte);
                     }
                     gp->patches.push_back(op);
                 }

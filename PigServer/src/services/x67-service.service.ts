@@ -10,7 +10,7 @@ const menu = [
         items: [
             {
                 name: 'Auto trung',
-                activeDefault: false,
+                activeDefault: true,
                 il2cppPatch: [
                     {
                         offset: '223C604',
@@ -24,14 +24,35 @@ const menu = [
             },
             {
                 name: 'Ban nhanh',
-                activeDefault: false,
+                activeDefault: true,
                 il2cppPatch: [
                     {
                         offset: '1D47d70',
                         patch: '61000014'
                     },
                 ],
-            }
+            },
+            {
+                name: 'Ban 1 cham',
+                activeDefault: true,
+                il2cppPatch: [
+                    {
+                        offset: '1D4766C',
+                        patch: '1F2003D5' // NOP
+                    },
+                ],
+            },
+            {
+                name: 'Ban sieu toc (x8)',
+                activeDefault: false,
+                active: false,
+                il2cppPatch: [
+                    {
+                        offset: '1D47618',
+                        patch: '1F2003D5' // NOP
+                    },
+                ],
+            },
         ]
     }
 ]
