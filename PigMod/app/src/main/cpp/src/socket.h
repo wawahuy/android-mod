@@ -52,8 +52,10 @@ namespace Socket {
         void runnable(const json& js, X67HuySocket* sk) {
             if (js == true) {
                 g_AuthStage = AuthStage::Oke;
+                socket->send(STR_COMMAND_S_GET_MENU, json());
             } else {
                 g_AuthStage = AuthStage::None;
+                Game::release();
             }
         }
     };
@@ -76,7 +78,9 @@ namespace Socket {
     class OnMenuCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
-            Game::init(js);
+            if (Game::canInit(js)) {
+                Game::init(js);
+            }
         }
     };
 

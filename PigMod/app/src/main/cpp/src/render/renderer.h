@@ -44,16 +44,20 @@ namespace Renderer {
 #ifdef IS_DEBUG
 #endif
 
-        if (!Socket::isOpen) {
-            ImGui::SetNextWindowPos({ 25, g_ScreenHeight / 2 - 200.0f });
-            ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 0));
-            ImGui::Begin(STR_WINDOWS_SERVER);
-            ImGui::Text(STR_SOCKET_CONNECTING);
-            ImGui::End();
-        } else if (g_AuthStage != AuthStage::Oke) {
-            AuthRenderer::Render();
-        } else {
+        if (g_MenuInit) {
             MenuRenderer::Render();
+        } else {
+            if (!Socket::isOpen) {
+                ImGui::SetNextWindowPos({25, g_ScreenHeight / 2 - 200.0f});
+                ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 0));
+                ImGui::Begin(STR_WINDOWS_SERVER);
+                ImGui::Text(STR_SOCKET_CONNECTING);
+                ImGui::End();
+            } else if (g_AuthStage != AuthStage::Oke) {
+                AuthRenderer::Render();
+            } else {
+                MenuRenderer::Render();
+            }
         }
 
         // Rendering

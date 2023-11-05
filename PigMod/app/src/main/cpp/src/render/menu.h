@@ -63,18 +63,15 @@ namespace MenuRenderer {
         }
 
         ImGui::SameLine();
-        ImGui::Checkbox(STR_MENU_AUTO_RELOAD, &g_MenuAutoUpdate);
-
-        ImGui::SameLine();
         if (ImGui::Button(STR_BUTTON_LOGOUT)) {
+            Game::release();
             g_AuthStage = AuthStage::None;
         }
 
         if (g_MenuInit) {
-            ImGui::Separator();
-            ImGui::Text("Hash: %s", Game::menuInfo.hash.c_str());
             for (auto &ggp: Game::guiGroupPatchArray) {
                 ImGui::SeparatorText(ggp->name.c_str());
+                ImGui::NewLine();
                 for (auto &gp: ggp->dataPatchArray) {
                     ImGui::BulletText("%s", gp->name.c_str());
 
@@ -89,6 +86,10 @@ namespace MenuRenderer {
                     }
                 }
             }
+
+            ImGui::Separator();
+            ImGui::Text("%s", Game::menuInfo.hash.c_str());
+
         } else {
             ImGui::Text(STR_MENU_STARTING);
         }

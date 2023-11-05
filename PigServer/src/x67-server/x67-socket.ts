@@ -162,7 +162,7 @@ class X67Socket extends events.EventEmitter {
     }
 
     private handleCommand(cmd: X67Command<any>) {
-        this._logger.log(cmd);
+        // this._logger.log(cmd);
         this.emit(cmd.command, cmd.data);
         this.eventSystem.emit('command', cmd, this);
     }

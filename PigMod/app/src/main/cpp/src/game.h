@@ -94,11 +94,18 @@ namespace Game {
         }
     }
 
-    void init(const json& js) {
-        if (g_UnprotectedDefault) {
-            unprotectIl2cpp();
+    bool canInit(const json& js) {
+        bool isInit = !g_MenuInit;
+        if (isInit || js.contains("versionHash")) {
+            auto newHash = js["versionHash"].template get<std::string>();
+            if (newHash != Game::menuInfo.hash) {
+                isInit = true;
+            }
         }
+        return isInit;
+    }
 
+    void release() {
         for(auto& ggp: guiGroupPatchArray) {
             for (auto& gp: ggp->dataPatchArray) {
                 if (gp->active) {
@@ -112,6 +119,15 @@ namespace Game {
             delete ggp;
         }
         guiGroupPatchArray.clear();
+        g_MenuInit = false;
+    }
+
+    void init(const json& js) {
+        if (g_UnprotectedDefault) {
+            unprotectIl2cpp();
+        }
+
+        release();
 
         if (js.contains("versionHash")) {
             menuInfo.hash = js["versionHash"].template get<std::string>();

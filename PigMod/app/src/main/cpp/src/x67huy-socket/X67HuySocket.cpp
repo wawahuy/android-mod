@@ -61,6 +61,16 @@ void* X67HuySocket::socketThread() {
         }
     } while (receivedBytes > 0);
 
+    if (_allData != nullptr) {
+        free(_allData);
+        _allData = nullptr;
+    }
+
+    if (_key != nullptr) {
+        free(_key);
+        _key = nullptr;
+    }
+
     emit(X67_EVENT_CLOSE, json());
     LOG_E("Socket closed!");
     sleep(1);
@@ -119,6 +129,7 @@ void X67HuySocket::handleFrame(uint8_t *buffer, size_t size, FrameSession& fs) {
         }
         free(_allData);
         _offsetAllData = 0;
+        _allData = nullptr;
     } else {
         LOG_E("continue size: %i", dataSize);
     }

@@ -9,6 +9,7 @@
 #define STR_SAVE_AUTO_LOGIN "autoLogin"
 
 #define STR_COMMAND_S_LOGIN "login"
+#define STR_COMMAND_S_GET_MENU "get-menu"
 #define STR_COMMAND_R_IS_LOGIN "is-login"
 #define STR_COMMAND_R_SYS_MSG "sys-message"
 #define STR_COMMAND_R_MENU "menu"

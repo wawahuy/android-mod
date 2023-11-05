@@ -5,35 +5,35 @@ import { X67Server } from 'src/x67-server/x67-server';
 import X67Socket from 'src/x67-server/x67-socket';
 
 const menu = [
-    // {
-    //     name: "Cay Thong",
-    //     items: [
-    //         {
-    //             name: 'Auto trung',
-    //             activeDefault: true,
-    //             il2cppPatch: [
-    //                 {
-    //                     offset: '223C604',
-    //                     patch: '05000014'
-    //                 },
-    //                 {
-    //                     offset: '223C64c',
-    //                     patch: '31000014'
-    //                 }
-    //             ],
-    //         },
-    //         {
-    //             name: 'Ban nhanh',
-    //             activeDefault: true,
-    //             il2cppPatch: [
-    //                 {
-    //                     offset: '1D47d70',
-    //                     patch: '61000014'
-    //                 },
-    //             ],
-    //         }
-    //     ]
-    // }
+    {
+        name: "Cay Thong V2",
+        items: [
+            {
+                name: 'Auto trung',
+                activeDefault: false,
+                il2cppPatch: [
+                    {
+                        offset: '223C604',
+                        patch: '05000014'
+                    },
+                    {
+                        offset: '223C64c',
+                        patch: '31000014'
+                    }
+                ],
+            },
+            {
+                name: 'Ban nhanh',
+                activeDefault: false,
+                il2cppPatch: [
+                    {
+                        offset: '1D47d70',
+                        patch: '61000014'
+                    },
+                ],
+            }
+        ]
+    }
 ]
 
 const description = {
@@ -60,6 +60,8 @@ export class X67ServiceService {
             //     color: [255, 0, 0, 255]
             // });
             socket.command("is-login", true);
+        });
+        this._server.eventClients.on('get-menu', (data: any, socket: X67Socket) => {
             socket.command("menu", description);
         })
     }

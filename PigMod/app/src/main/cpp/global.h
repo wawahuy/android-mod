@@ -49,9 +49,7 @@ bool g_AuthAuto = g_AuthAutoDefault;
 bool g_MenuInit = false;
 
 #ifdef IS_DEBUG
-bool g_MenuAutoUpdate = true;
 #else
-bool g_MenuAutoUpdate = false;
 #endif
 
 #endif //PIGMOD_GLOBAL_H
