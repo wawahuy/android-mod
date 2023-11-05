@@ -7,8 +7,8 @@
 
 namespace MenuRenderer {
 #ifdef IS_DEBUG
-    static bool isFloating = true;
-#elif
+    static bool isFloating = false;
+#else
     static bool isFloating = true;
 #endif
     uint64_t lastMapAccessTime = getMs();
