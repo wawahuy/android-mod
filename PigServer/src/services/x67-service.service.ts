@@ -6,7 +6,7 @@ import X67Socket from 'src/x67-server/x67-socket';
 
 const menu = [
     {
-        name: "Cay Thong V2",
+        name: "Cay Thong",
         items: [
             {
                 name: 'Auto trung',

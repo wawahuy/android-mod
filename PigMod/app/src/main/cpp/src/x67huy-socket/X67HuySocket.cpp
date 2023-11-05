@@ -37,6 +37,7 @@ void* X67HuySocket::socketThread() {
     if (connect(_socket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         LOG_E("Can't connect socket");
         close(_socket);
+        sleep(1);
         start();
         return nullptr;
     }
