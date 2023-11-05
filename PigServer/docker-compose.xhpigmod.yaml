@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  xhpigmod-server:
+    image: xhpigmod-server
+    ports:
+      - "1235:1235"
