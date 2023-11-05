@@ -43,4 +43,17 @@ bool ToggleButton(const char* str_id, bool* v)
     return hasChange;
 }
 
+void renderSystemMessage() {
+    if (g_SystemMessage[0] != 0) {
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(
+                g_SystemMessageColor[0],
+                g_SystemMessageColor[1],
+                g_SystemMessageColor[2],
+                g_SystemMessageColor[3]
+        ));
+        ImGui::Text("%s", g_SystemMessage);
+        ImGui::PopStyleColor();
+    }
+}
+
 #endif //PIGMOD_RENDERER_COMMON_H

@@ -13,6 +13,7 @@ namespace Socket {
         json js;
         js["package"] = getPackageName();
         js["key"] = g_AuthKey;
+        js["version"] = g_PackageVersion;
         g_SystemMessage[0] = 0;
         g_AuthStage = AuthStage::Doing;
         socket->send(STR_COMMAND_S_LOGIN, js);
@@ -32,7 +33,7 @@ namespace Socket {
             isOpen = true;
             g_AuthStage = AuthStage::None;
             g_SystemMessage[0] = 0;
-            if (g_AuthAuto) {
+            if (g_AuthAuto && strlen(g_AuthKey) > 0) {
                 handleLogin();
             }
         }

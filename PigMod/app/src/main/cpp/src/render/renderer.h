@@ -44,8 +44,6 @@ namespace Renderer {
 #ifdef IS_DEBUG
 #endif
 
-//        ImGui::ShowDemoWindow();
-
         if (!Socket::isOpen) {
             ImGui::SetNextWindowPos({ 25, g_ScreenHeight / 2 - 200.0f });
             ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 0));

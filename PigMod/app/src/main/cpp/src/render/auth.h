@@ -16,29 +16,28 @@ namespace AuthRenderer {
             ImGui::Text(STR_AUTH_DOING);
         }
 
-        if (g_SystemMessage[0] != 0) {
-            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(
-                    g_SystemMessageColor[0],
-                    g_SystemMessageColor[1],
-                    g_SystemMessageColor[2],
-                    g_SystemMessageColor[3]
-                    ));
-            ImGui::Text("%s", g_SystemMessage);
-            ImGui::PopStyleColor();
-        }
-
+        renderSystemMessage();
         ImGui::Text(STR_INPUT_KEY);
         ImGui::InputText("", g_AuthKey, sizeof(g_AuthKey));
         ImGui::SameLine();
-        ImGui::Button(STR_INPUT_KEY_PASTE);
+
+        if (ImGui::Button(STR_INPUT_KEY_PASTE)) {
+            auto str = getClipboard();
+            memcpy(g_AuthKey, &str[0], std::min(255, (int)str.size()));
+        }
+
         ImGui::NewLine();
         ImGui::Text(STR_AUTH_AUTO);
         ImGui::SameLine();
-        ToggleButton("g_AuthAuto", &g_AuthAuto);
+
+        if (ToggleButton("g_AuthAuto", &g_AuthAuto)) {
+            setSaveBool(STR_SAVE_AUTO_LOGIN, g_AuthAuto);
+        }
 
         if (g_AuthStage != AuthStage::Doing) {
             if (ImGui::Button(STR_AUTH_LOGIN)) {
                 Socket::handleLogin();
+                setSaveString(STR_SAVE_KEY, g_AuthKey);
             }
         }
         ImGui::NewLine();

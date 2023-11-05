@@ -1,14 +1,20 @@
 package com.wawahuy.pigmod;
 
+import static android.content.ClipDescription.MIMETYPE_TEXT_PLAIN;
+
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.view.InputEvent;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +31,63 @@ public class MainActivity extends Activity {
         startMain(this);
     }
 
+    public static Context contextCurrent;
+
+    public static String getClipboard() {
+        String dataClipboard = "";
+        ClipboardManager clipboard = (ClipboardManager)contextCurrent.getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard.hasPrimaryClip()) {
+            ClipData clip = clipboard.getPrimaryClip();
+            if (clip.getDescription().hasMimeType(MIMETYPE_TEXT_PLAIN))
+                dataClipboard = clip.getItemAt(0).getText().toString();
+            dataClipboard = clip.getItemAt(0).coerceToText(contextCurrent).toString();
+        }
+        return dataClipboard;
+    }
+
+    public static String getPackageVersion() {
+        String version = "";
+        try {
+            PackageInfo pInfo = contextCurrent.getPackageManager().getPackageInfo(contextCurrent.getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return version;
+    }
+
+    public static boolean getSaveContains(String name) {
+        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
+        return settings.contains(name);
+    }
+
+    public static boolean getSaveBool(String name) {
+        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
+        return settings.getBoolean(name, false);
+    }
+
+    public static String getSaveString(String name) {
+        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
+        return settings.getString(name, "");
+    }
+
+    public static void setSaveString(String name, String value) {
+        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(name, value);
+        editor.apply();
+    }
+
+    public static void setSaveBool(String name, boolean value) {
+        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(name, value);
+        editor.apply();
+    }
+
     public static void startMain(Context context) {
+        contextCurrent = context;
+        NativeMethods.initEnv();
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(() -> startMenu(context), 500);
     }

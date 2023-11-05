@@ -116,4 +116,200 @@ std::string getPackageName() {
     return std::string();
 }
 
+std::string getClipboard() {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return "";
+    }
+
+    jmethodID getClipboardMethod = env->GetStaticMethodID(mainAClass, "getClipboard", "()Ljava/lang/String;");
+    if (getClipboardMethod == nullptr) {
+        LOG_E("Method not found");
+        return "";
+    }
+
+    jstring result = (jstring)env->CallStaticObjectMethod(mainAClass, getClipboardMethod);
+    const char* resultStr = env->GetStringUTFChars(result, nullptr);
+    LOG_E("resultStr %s", resultStr);
+
+    env->ReleaseStringUTFChars(result, resultStr);
+    return resultStr;
+}
+
+std::string getPackageVersion() {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return "";
+    }
+
+    jmethodID getPackageVersionMethod = env->GetStaticMethodID(mainAClass, "getPackageVersion", "()Ljava/lang/String;");
+    if (getPackageVersionMethod == nullptr) {
+        LOG_E("Method not found");
+        return "";
+    }
+
+    jstring result = (jstring)env->CallStaticObjectMethod(mainAClass, getPackageVersionMethod);
+    const char* resultStr = env->GetStringUTFChars(result, nullptr);
+    LOG_E("resultStr %s", resultStr);
+
+    env->ReleaseStringUTFChars(result, resultStr);
+    return resultStr;
+}
+
+bool getSaveContains(const char* name) {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return false;
+    }
+
+    jmethodID getSaveContainsMethod = env->GetStaticMethodID(mainAClass, "getSaveContains",
+                                                         "(Ljava/lang/String;)Z");
+    if (getSaveContainsMethod == nullptr) {
+        LOG_E("Method not found");
+        return false;
+    }
+
+    jstring jName = env->NewStringUTF(name);
+    jboolean result = env->CallStaticBooleanMethod(mainAClass, getSaveContainsMethod, jName);
+    return result == JNI_TRUE;
+}
+
+std::string getSaveString(const char* name) {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return "";
+    }
+
+    jmethodID getSaveStringMethod = env->GetStaticMethodID(mainAClass, "getSaveString",
+                                                               "(Ljava/lang/String;)Ljava/lang/String;");
+    if (getSaveStringMethod == nullptr) {
+        LOG_E("Method not found");
+        return "";
+    }
+
+    jstring jName = env->NewStringUTF(name);
+    jstring result = (jstring)env->CallStaticObjectMethod(mainAClass, getSaveStringMethod, jName);
+    const char* resultStr = env->GetStringUTFChars(result, nullptr);
+    LOG_E("resultStr %s", resultStr);
+
+    env->ReleaseStringUTFChars(result, resultStr);
+    return resultStr;
+}
+
+void setSaveString(const char* name, const char* value) {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return;
+    }
+
+    jmethodID setSaveStringMethod = env->GetStaticMethodID(mainAClass, "setSaveString",
+                                                           "(Ljava/lang/String;Ljava/lang/String;)V");
+    if (setSaveStringMethod == nullptr) {
+        LOG_E("Method not found");
+        return;
+    }
+
+    jstring jName = env->NewStringUTF(name);
+    jstring jValue = env->NewStringUTF(value);
+    env->CallStaticVoidMethod(mainAClass, setSaveStringMethod, jName, jValue);
+}
+
+bool getSaveBool(const char* name) {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return false;
+    }
+
+    jmethodID getSaveBoolMethod = env->GetStaticMethodID(mainAClass, "getSaveBool",
+                                                         "(Ljava/lang/String;)Z");
+    if (getSaveBoolMethod == nullptr) {
+        LOG_E("Method not found");
+        return false;
+    }
+
+    jstring jName = env->NewStringUTF(name);
+    jboolean result = env->CallStaticBooleanMethod(mainAClass, getSaveBoolMethod, jName);
+    return result == JNI_TRUE;
+}
+
+void setSaveBool(const char* name, bool value) {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return;
+    }
+
+    jmethodID setSaveBoolMethod = env->GetStaticMethodID(mainAClass, "setSaveBool",
+                                                         "(Ljava/lang/String;Z)V");
+    if (setSaveBoolMethod == nullptr) {
+        LOG_E("Method not found");
+        return;
+    }
+
+    jstring jName = env->NewStringUTF(name);
+    env->CallStaticVoidMethod(mainAClass, setSaveBoolMethod, jName, value);
+}
+
 #endif //PIGMOD_UTIL_H

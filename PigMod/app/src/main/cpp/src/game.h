@@ -6,8 +6,6 @@
 #define PIGMOD_GAME_H
 
 namespace Game {
-    static bool isInit = false;
-
     struct OffsetPatch {
         uintptr_t offset;
         std::vector<unsigned char> patch;
@@ -27,6 +25,10 @@ namespace Game {
     };
 
     static std::vector<GuiGroupPatch *> guiGroupPatchArray;
+    static struct MenuInfo {
+        std::string hash;
+    } menuInfo;
+
 
     void unprotectIl2cpp() {
         g_Unprotected = unprotect((void*)g_Il2CppBaseRange.start, g_Il2CppBaseRange.end - g_Il2CppBaseRange.start);
@@ -93,14 +95,15 @@ namespace Game {
     }
 
     void init(const json& js) {
-        isInit = true;
         if (g_UnprotectedDefault) {
             unprotectIl2cpp();
         }
 
         for(auto& ggp: guiGroupPatchArray) {
             for (auto& gp: ggp->dataPatchArray) {
-                unpatch(gp);
+                if (gp->active) {
+                    unpatch(gp);
+                }
                 for (auto& p: gp->patches) {
                     delete p;
                 }
@@ -110,16 +113,29 @@ namespace Game {
         }
         guiGroupPatchArray.clear();
 
-        for (auto& groupItem: js) {
+        if (js.contains("versionHash")) {
+            menuInfo.hash = js["versionHash"].template get<std::string>();
+        }
+
+        auto menu = js["menu"];
+        for (auto& groupItem: menu) {
             GuiGroupPatch* guiGroupPatch = new GuiGroupPatch();
             guiGroupPatch->name = groupItem["name"];
 
             for (auto &menuItem: groupItem["items"]) {
                 const json &il2cppPatch = menuItem["il2cppPatch"];
+                bool isActive = false;
+                if (menuItem.contains("activeDefault")) {
+                    isActive = menuItem["activeDefault"].template get<bool>();
+                }
+                if (menuItem.contains("active")) {
+                    isActive = menuItem["active"].template get<bool>();
+                }
+
                 GroupPatch *gp = new GroupPatch();
                 gp->name = menuItem["name"].template get<std::string>();
-                gp->activeDefault = menuItem["activeDefault"].template get<bool>();
-                gp->active = gp->activeDefault;
+                gp->activeDefault = isActive;
+                gp->active = isActive;
                 guiGroupPatch->dataPatchArray.push_back(gp);
 
                 for (auto& il2cppPatchItem: il2cppPatch) {
@@ -134,7 +150,6 @@ namespace Game {
                         op->patch.push_back(byte);
                         LOG_E("%p", byte);
                     }
-
                     gp->patches.push_back(op);
                 }
             }
@@ -153,6 +168,8 @@ namespace Game {
             }
         }
         protectIl2cpp();
+
+        g_MenuInit = true;
     }
 }
 

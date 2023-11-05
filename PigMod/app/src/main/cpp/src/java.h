@@ -8,8 +8,7 @@
 
 extern "C" {
     JNIEXPORT void JNICALL
-    Java_com_wawahuy_pigmod_NativeMethods_onSurfaceCreated(JNIEnv * env , jclass clazz ) {
-    }
+    Java_com_wawahuy_pigmod_NativeMethods_onSurfaceCreated(JNIEnv * env , jclass clazz ) {}
 
     JNIEXPORT void JNICALL
     Java_com_wawahuy_pigmod_NativeMethods_onSurfaceChanged(JNIEnv *env, jclass clazz, jint width, jint height) {
@@ -42,6 +41,21 @@ extern "C" {
                 return false;
         }
         return true;
+    }
+
+    JNIEXPORT void JNICALL
+    Java_com_wawahuy_pigmod_NativeMethods_initEnv(JNIEnv *env, jclass clazz) {
+        env->GetJavaVM(&g_Jvm);
+        g_PackageVersion = getPackageVersion();
+
+        if (getSaveContains(STR_SAVE_AUTO_LOGIN)) {
+            auto key = getSaveString(STR_SAVE_KEY);
+            memcpy(g_AuthKey, &key[0], std::min(255, (int) key.size()));
+            g_AuthAuto = getSaveBool(STR_SAVE_AUTO_LOGIN);
+        } else {
+            setSaveBool(STR_SAVE_AUTO_LOGIN, g_AuthAutoDefault);
+            g_AuthAuto = g_AuthAutoDefault;
+        }
     }
 }
 #endif //PIGMOD_JAVA_H

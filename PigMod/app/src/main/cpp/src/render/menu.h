@@ -42,7 +42,7 @@ namespace MenuRenderer {
         ImGui::SetNextWindowBgAlpha(0);
         ImGui::Begin("", &isFloating, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
         ImGui::SetNextWindowSize(ImVec2(300, 200));
-        if (ImGui::Button("0x67Huy")) {
+        if (ImGui::Button(STR_BUTTON_FLOAT)) {
             isFloating = false;
         }
         ImGui::End();
@@ -55,13 +55,24 @@ namespace MenuRenderer {
         }
         ImGui::SetNextWindowPos({ 25, 25 });
         ImGui::SetNextWindowSize(ImVec2(g_ScreenWidth - 50, 0));
-        ImGui::Begin("0x67Huy");
+        ImGui::Begin(STR_WINDOWS_MENU);
+        renderSystemMessage();
 
-        if (ImGui::Button("TAT MENU")) {
+        if (ImGui::Button(STR_BUTTON_HIDE_MENU)) {
             isFloating = true;
         }
 
-        if (Game::isInit) {
+        ImGui::SameLine();
+        ImGui::Checkbox(STR_MENU_AUTO_RELOAD, &g_MenuAutoUpdate);
+
+        ImGui::SameLine();
+        if (ImGui::Button(STR_BUTTON_LOGOUT)) {
+            g_AuthStage = AuthStage::None;
+        }
+
+        if (g_MenuInit) {
+            ImGui::Separator();
+            ImGui::Text("Hash: %s", Game::menuInfo.hash.c_str());
             for (auto &ggp: Game::guiGroupPatchArray) {
                 ImGui::SeparatorText(ggp->name.c_str());
                 for (auto &gp: ggp->dataPatchArray) {
@@ -79,7 +90,7 @@ namespace MenuRenderer {
                 }
             }
         } else {
-            ImGui::Text("Dang khoi dong...");
+            ImGui::Text(STR_MENU_STARTING);
         }
 
         ImGui::End();
