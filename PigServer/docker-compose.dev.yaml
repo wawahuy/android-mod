@@ -1,0 +1,34 @@
+version: '3.8'
+
+
+x-shared_environment: &shared_environment
+  XH_PIGMOD_MONGO_HOST: xhpigmod-mongo
+  
+services:
+  xhpigmod-gateway:
+    image: xhpigmod-dev
+    build:
+      dockerfile: ./Dockerfile.dev
+      context: .
+      args:
+        - gUser=${XH_PIGMOD_H_NAME}
+        - gId=${XH_PIGMOD_H_ID}
+    environment:
+      <<: *shared_environment
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/data/apps
+    networks:
+      - all
+
+  xhpigmod-cloudflare:
+    image: cloudflare/cloudflared
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiZWNmZjk1N2MtNzUyNC00MTA3LTlmMjktMGJiMjM1ZGUyZGI2IiwicyI6Ill6RTJNekF4WkdJdE56bGlZaTAwWXpFeUxXSTBNMll0TldOak5UWXpOamN5TXprMyJ9
+    networks:
+      - all
+
+networks:
+  all:

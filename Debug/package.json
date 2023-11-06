@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --watch src --ext js -x \"node  --openssl-legacy-provider src/index.js\" "
+    "dev": "nodemon --watch src --ext js -x \"node  --openssl-legacy-provider src/c.js\" "
   },
   "author": "",
   "license": "ISC",

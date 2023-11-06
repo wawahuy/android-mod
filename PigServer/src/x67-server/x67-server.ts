@@ -12,7 +12,7 @@ export class X67Server {
 
   readonly eventClients = new events.EventEmitter();
 
-  constructor() {
+  constructor(private isWebsocketHybird: boolean = true) {
     this._server = net.createServer();
     this._server.on('close', this.onClose.bind(this));
     this._server.on('error', this.onError.bind(this));
@@ -38,7 +38,7 @@ export class X67Server {
   }
 
   onConnection(socket: net.Socket) {
-    const client = new X67Socket(socket);
+    const client = new X67Socket(socket, this.isWebsocketHybird);
     client.eventSystem.on('command', this.onClientCommand.bind(this));
     client.eventSystem.once('close', () => {
       delete this._clients[client.id];

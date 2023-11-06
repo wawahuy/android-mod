@@ -6,6 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "dev:gen": "bash script/gen-id.sh",
+    "dev:up": "npm run dev:gen && docker-compose --env-file ./env/.env.dev -f ./docker-compose.dev.yaml up --abort-on-container-exit --remove-orphans --build --force-recreate",
+    "dev:halt": "docker-compose --env-file ./env/.env.dev -f ./docker-compose.dev.yaml down",
+    "dev:destroy": "docker-compose --env-file ./env/.env.dev -f ./docker-compose.dev.yaml rm -f",
+
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

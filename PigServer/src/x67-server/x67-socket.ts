@@ -21,6 +21,9 @@ import {
 } from './x67-config';
 import { randomUint8 } from 'src/utils/common';
 import { X67Command } from './x67-command';
+import { generateWebSocketAcceptKey, wsKeyPattern } from 'src/utils/ws';
+
+const wsEol = Buffer.from([0x0d, 0x0a, 0x0d, 0x0a]);
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 declare interface X67Socket {
@@ -45,17 +48,25 @@ class X67Socket extends events.EventEmitter {
   private _allData = null;
   private _offsetAllData = 0;
 
+  private _isWebsocketHandshaked = false;
+
   readonly id = crypto.randomUUID();
   readonly eventSystem = new events.EventEmitter();
 
-  constructor(private _socket: net.Socket) {
+  constructor(
+    private _socket: net.Socket,
+    private _isWebsocketHybird: boolean,
+  ) {
     super();
 
     this._logger.log(`client ${this.id} connected!`);
     this._socket.on('close', this.onClose.bind(this));
     this._socket.on('error', this.onError.bind(this));
     this._socket.on('data', this.onData.bind(this));
-    this.establish();
+
+    if (!this._isWebsocketHybird) {
+      this.sendKey();
+    }
   }
 
   private randomKey(buffer: Buffer, size: number) {
@@ -64,7 +75,7 @@ class X67Socket extends events.EventEmitter {
     }
   }
 
-  private establish() {
+  private sendKey() {
     this.randomKey(this._key, ENC_SIZE_KEY);
 
     /**
@@ -79,6 +90,7 @@ class X67Socket extends events.EventEmitter {
     const sub = Buffer.alloc(DataSize);
     this._key.copy(sub);
     this._socket.write(sub);
+    this._logger.debug('send key id: ' + this.id);
   }
 
   private onError(err: Error) {
@@ -91,7 +103,55 @@ class X67Socket extends events.EventEmitter {
     this.eventSystem.emit('close');
   }
 
+  private onDataWebsocketHybird(data: Buffer) {
+    this._allData = Buffer.concat([this._allData || Buffer.from([]), data]);
+    if (this._allData.length > 1024) {
+      this._socket.destroy();
+    }
+
+    const indexEnd = data.indexOf(wsEol);
+    if (indexEnd > -1) {
+      const dataStr: string = this._allData.toString('utf-8');
+      const wsMathes = dataStr.match(wsKeyPattern);
+      if (!wsMathes || wsMathes.length === 0) {
+        this._socket.write('HTTP/1.1 403 OK\r\n');
+        this._socket.write('Content-Length: 3\r\n');
+        this._socket.write('\r\n403');
+        this._socket.destroy();
+        return;
+      }
+
+      const secWsKey = dataStr.split(wsKeyPattern)?.[1]?.split('\r\n')?.[0];
+      const secWsAccept = generateWebSocketAcceptKey(secWsKey);
+      this._logger.debug('client sec ws key: ' + secWsKey);
+      this._logger.debug('client sec ws accept: ' + secWsAccept);
+
+      this._socket.write('HTTP/1.1 101 Switching Protocols\r\n');
+      this._socket.write('Upgrade: websocket\r\n');
+      this._socket.write('Connection: Upgrade\r\n');
+      this._socket.write(`Sec-WebSocket-Accept: ${secWsAccept}\r\n`);
+      this._socket.write('\r\n');
+      this._isWebsocketHandshaked = true;
+      this.sendKey();
+
+      const cutStart = indexEnd + wsEol.length;
+      const cutEnd = data.length;
+      if (cutStart < cutEnd) {
+        // const sub = data.subarray(cutStart, cutEnd);
+        // this._logger.debug('ws next buffer: ' + sub.length);
+        // this.onData(sub);
+        this._logger.debug('over buffer ws' + this.id);
+        this._socket.destroy();
+      }
+    }
+  }
+
   private onData(data: Buffer) {
+    if (!this._isWebsocketHandshaked) {
+      this.onDataWebsocketHybird(data);
+      return;
+    }
+
     const stack = [data];
 
     while (stack.length) {
