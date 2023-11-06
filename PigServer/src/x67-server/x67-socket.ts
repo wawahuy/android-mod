@@ -109,7 +109,7 @@ class X67Socket extends events.EventEmitter {
       this._socket.destroy();
     }
 
-    const indexEnd = data.indexOf(wsEol);
+    const indexEnd = this._allData.indexOf(wsEol);
     if (indexEnd > -1) {
       const dataStr: string = this._allData.toString('utf-8');
       const wsMathes = dataStr.match(wsKeyPattern);
@@ -118,6 +118,7 @@ class X67Socket extends events.EventEmitter {
         this._socket.write('Content-Length: 3\r\n');
         this._socket.write('\r\n403');
         this._socket.destroy();
+        this._logger.debug('what http: ' + this.id);
         return;
       }
 
@@ -135,9 +136,9 @@ class X67Socket extends events.EventEmitter {
       this.sendKey();
 
       const cutStart = indexEnd + wsEol.length;
-      const cutEnd = data.length;
+      const cutEnd = this._allData.length;
       if (cutStart < cutEnd) {
-        // const sub = data.subarray(cutStart, cutEnd);
+        // const sub = this._allData.subarray(cutStart, cutEnd);
         // this._logger.debug('ws next buffer: ' + sub.length);
         // this.onData(sub);
         this._logger.debug('over buffer ws' + this.id);

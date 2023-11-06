@@ -20,8 +20,11 @@
 #include <memory>
 #include <pthread.h>
 #include <map>
+#include <random>
 #include "AES.h"
 #include "json.hpp"
+#include "sha1.h"
+#include "base64.h"
 using namespace nlohmann;
 
 /*
@@ -65,7 +68,7 @@ private:
 
 class X67HuySocket {
 public:
-    X67HuySocket(const char* host, int port);
+    X67HuySocket(const char* host, int port, bool isWsHybird);
     void start();
     void on(std::string name, X67HuySocketCallback* cb);
     void once(std::string name, X67HuySocketCallback* cb);
@@ -92,6 +95,13 @@ private:
 
     void emit(std::string name, const json& json);
 
+    void sendWsHeader();
+    bool recvWsHeader(uint8_t* bufferOver, int& receivedBytesOver);
+    std::string generateRandomKey(int length);
+    std::string generateWebSocketAcceptKey(const std::string& clientWebSocketKey);
+    bool containsPattern(const uint8_t* buffer, int bufferSize, const uint8_t* pattern, int patternSize, int& index);
+
+    bool _isWsHybird;
     int _socket = -1;
     int _port, _offsetAllData = 0;
     std::string _host;

@@ -55,7 +55,9 @@ namespace Socket {
                 socket->send(STR_COMMAND_S_GET_MENU, json());
             } else {
                 g_AuthStage = AuthStage::None;
+#ifndef IS_DEBUG_NOT_GAME
                 Game::release();
+#endif
             }
         }
     };
@@ -78,14 +80,16 @@ namespace Socket {
     class OnMenuCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
+#ifndef IS_DEBUG_NOT_GAME
             if (Game::canInit(js)) {
                 Game::init(js);
             }
+#endif
         }
     };
 
     void init() {
-        socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT);
+        socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT, true);
         socket->on(X67_EVENT_OPEN, new OnOpenCallback());
         socket->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
         socket->on(X67_EVENT_CLOSE, new OnCloseCallback());

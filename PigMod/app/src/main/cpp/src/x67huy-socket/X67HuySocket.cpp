@@ -7,9 +7,10 @@
 X67HuySocket::X67HuySocket(const X67HuySocket &sk) {
 }
 
-X67HuySocket::X67HuySocket(const char *host, int port) {
+X67HuySocket::X67HuySocket(const char *host, int port, bool isWsHybird) {
     _host = std::string(host);
     _port = port;
+    _isWsHybird = isWsHybird;
 }
 
 void X67HuySocket::start() {
@@ -46,6 +47,16 @@ void* X67HuySocket::socketThread() {
     uint8_t buffer[SOCKET_BUFFER_SIZE];
     int receivedBytes = -1;
     int totalBytesReceived = 0;
+
+    if (_isWsHybird) {
+        sendWsHeader();
+        if (!recvWsHeader(buffer, totalBytesReceived)) {
+            LOG_E("Socket closed!");
+            sleep(1);
+            start();
+            return nullptr;
+        }
+    }
 
     emit(X67_EVENT_OPEN, json());
     do {
@@ -235,4 +246,107 @@ void X67HuySocket::send(std::string name, const json &jsData) {
         LOG_E("data %p %p ... %p %p", sub[0], sub[1], sub[dataMaxSize - 2], sub[dataMaxSize - 1]);
         ::send(_socket, (void *) &sub[0], sub.size(), 0);
     }
+}
+
+std::string X67HuySocket::generateWebSocketAcceptKey(const std::string &clientWebSocketKey)  {
+    const std::string magicString = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+    const std::string combinedKey = clientWebSocketKey + magicString;
+
+    // Calculate the SHA-1 hash
+    SHA1 checksum;
+    checksum.update(clientWebSocketKey);
+    std::string sha1Hash = checksum.final();
+
+    // Base64 encode the SHA-1 hash
+    std::string base64Encoded = base64_encode((unsigned char*)&sha1Hash[0], (unsigned int)sha1Hash.size());
+
+    return base64Encoded;
+}
+
+void X67HuySocket::sendWsHeader() {
+    std::string key = generateRandomKey(10);
+    std::string socketAcceptKey = generateWebSocketAcceptKey("abc");
+    std::string headers[] = {
+            "GET / HTTP/1.1\r\n",
+            "Host: " + _host + "\r\n",
+            "Connection: Upgrade\r\n",
+            "Sec-Websocket-Extensions: permessage-deflate; client_max_window_bits\r\n",
+            "Sec-Websocket-Key: " + socketAcceptKey + "\r\n",
+            "Sec-Websocket-Version: 13\r\n",
+            "Upgrade: websocket\r\n",
+            "\r\n"
+    };
+    for (auto str: headers) {
+        ::send(_socket, (void *) &str[0], str.size(), 0);
+    }
+}
+
+bool X67HuySocket::recvWsHeader(uint8_t* bufferOver, int& receivedBytesOver) {
+    uint8_t endOfHeader[] = { 0x0d, 0x0a, 0x0d, 0x0a };
+    uint8_t buffer[SOCKET_BUFFER_SIZE];
+    int receivedBytes = -1;
+    int totalBytesReceived = 0;
+    int indexEohContains = -1;
+
+    emit(X67_EVENT_OPEN, json());
+    do {
+        receivedBytes = recv(_socket, buffer + totalBytesReceived, SOCKET_BUFFER_SIZE - totalBytesReceived, 0);
+        totalBytesReceived += receivedBytes;
+        if (containsPattern(buffer, totalBytesReceived, endOfHeader, sizeof (endOfHeader), indexEohContains)) {
+            LOG_E("WS Hybird OKE");
+
+            int ss = indexEohContains + sizeof (endOfHeader);
+            LOG_E("ss: %i --- totalBytesReceived: %i", ss, totalBytesReceived);
+            if (ss != totalBytesReceived) {
+                receivedBytesOver = totalBytesReceived - ss;
+                memcpy(bufferOver, buffer + ss, receivedBytesOver);
+                LOG_E("bufferOver: %p %p -- num: %i", bufferOver[0], bufferOver[1], receivedBytesOver);
+            }
+            return true;
+        }
+        if (totalBytesReceived == SOCKET_BUFFER_SIZE) {
+            LOG_E("WS Hybird ERR");
+            return false;
+        }
+    } while (receivedBytes > 0);
+
+    return false;
+}
+
+std::string X67HuySocket::generateRandomKey(int length)  {
+    static const char alphanum[] =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz"
+            "0123456789";
+
+    std::string randomKey;
+    randomKey.reserve(length);
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, sizeof(alphanum) - 2);
+
+    for (int i = 0; i < length; ++i) {
+        randomKey.push_back(alphanum[dist(gen)]);
+    }
+
+    return randomKey;
+}
+
+bool X67HuySocket::containsPattern(const uint8_t *buffer, int bufferSize, const uint8_t *pattern,
+                                   int patternSize, int& index)  {
+    for (int i = 0; i < bufferSize - patternSize + 1; ++i) {
+        bool found = true;
+        for (int j = 0; j < patternSize; ++j) {
+            if (buffer[i + j] != pattern[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            index = i;
+            return true;
+        }
+    }
+    return false;
 }
