@@ -1,13 +1,13 @@
 // fin opcode 2size 16iv 12pad .... (32 byte header)
 
 export const ByteFin = {
-    end: 0x01,
-    continue: 0x00,
+  end: 0x01,
+  continue: 0x00,
 };
 
 export const ByteOpcode = {
-    key:  0b00000001,
-    json: 0b00000011,
+  key: 0b00000001,
+  json: 0b00000011,
 };
 
 export const FrameSize = 1024;
@@ -24,10 +24,10 @@ export const ENC_SIZE_KEY = 16; // 16 byte
 export const ENC_SIZE_IV = 16;
 
 export enum FrameSessionStage {
-    Continue,
-    Error,
+  Continue,
+  Error,
 }
 
 export class FrameSession {
-    stage: FrameSessionStage;
+  stage: FrameSessionStage;
 }
