@@ -226,5 +226,6 @@ server.on('connection', (socket) => {
 // addr: 01e47d70 - B libil2cpp.so + 01e47ef4 - 61 00 00 14
 
 // Slingshot::OnPointerUp
-// addr: 01D4766C - NOP - 1F 20 03 D5
-// addr: 01D47618 - NOP - 1F 20 03 D5
+// addr: 01D4766C - NOP - 1F 20 03 D5 (1 cham)
+// addr: 01D47618 - NOP - 1F 20 03 D5 (x8)
+// addr: 01D47620 - NOP - 1F 20 03 D5 (nhanh)

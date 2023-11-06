@@ -16,7 +16,8 @@
 #define SOCKET_HOST "192.168.1.21"
 #else
 #define SOCKET_PORT 1235
-#define SOCKET_HOST "x67huy.j2run.com"
+#define SOCKET_HOST "14.225.255.89"
+//#define SOCKET_HOST "x67huy.j2run.com"
 #endif
 
 JavaVM* g_Jvm;

@@ -43,7 +43,18 @@ const menu = [
                 ],
             },
             {
-                name: 'Ban sieu toc (x8)',
+                name: 'Ban nhanh (8v/1cay)',
+                activeDefault: false,
+                active: false,
+                il2cppPatch: [
+                    {
+                        offset: '01D47620',
+                        patch: '1F2003D5' // NOP
+                    },
+                ],
+            },
+            {
+                name: 'Ban sieu toc (x100v/1cay)',
                 activeDefault: false,
                 active: false,
                 il2cppPatch: [
