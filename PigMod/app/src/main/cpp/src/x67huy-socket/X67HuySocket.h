@@ -5,7 +5,7 @@
 #ifndef PIGMOD_X67_HUY_SOCKET_H
 #define PIGMOD_X67_HUY_SOCKET_H
 
-#define IS_DEBUG true
+//#define IS_DEBUG true
 #ifdef IS_DEBUG
 #include <android/log.h>
 #define LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, "YUH", __VA_ARGS__);
@@ -21,6 +21,8 @@
 #include <pthread.h>
 #include <map>
 #include <random>
+#include <netdb.h>
+
 #include "AES.h"
 #include "json.hpp"
 #include "sha1.h"
@@ -87,6 +89,9 @@ private:
     };
 
     static void *socketThreadStatic(void *);
+
+    bool isIPAddress(const std::string &input);
+
     void* socketThread();
 
     void handleFrame(uint8_t* data, size_t size, FrameSession& fs);

@@ -31,10 +31,42 @@ void* X67HuySocket::socketThread() {
     }
 
     struct sockaddr_in serverAddr;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(_port);
-    serverAddr.sin_addr.s_addr = inet_addr(_host.c_str());
 
+    if (isIPAddress(_host)) {
+        LOG_E("connect ip: %s", _host.c_str());
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_port = htons(_port);
+        serverAddr.sin_addr.s_addr = inet_addr(_host.c_str());
+    } else {
+        LOG_E("connect domain: %s", _host.c_str());
+
+        struct addrinfo hints;
+        struct addrinfo *result = nullptr;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+        hints.ai_socktype = SOCK_STREAM;
+
+        int status = getaddrinfo(_host.c_str(), nullptr, &hints, &result);
+        if (status != 0) {
+            LOG_E("getaddrinfo error");
+            return nullptr;
+        }
+
+        struct addrinfo *addr = result;
+        while (addr != nullptr) {
+            if (addr->ai_family == AF_INET) { // IPv4
+                struct sockaddr_in *ipv4 = (struct sockaddr_in *)addr->ai_addr;
+                serverAddr.sin_family = ipv4->sin_family;
+                serverAddr.sin_port = htons(_port);
+                serverAddr.sin_addr.s_addr = ipv4->sin_addr.s_addr;
+                break;
+            }
+            addr = addr->ai_next;
+        }
+        freeaddrinfo(result);
+    }
+
+    LOG_E("connecting... %s", _host.c_str());
     if (connect(_socket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         LOG_E("Can't connect socket");
         close(_socket);
@@ -349,4 +381,9 @@ bool X67HuySocket::containsPattern(const uint8_t *buffer, int bufferSize, const 
         }
     }
     return false;
+}
+
+bool X67HuySocket::isIPAddress(const std::string &input)  {
+    struct sockaddr_in sa;
+    return inet_pton(AF_INET, input.c_str(), &(sa.sin_addr)) != 0;
 }
