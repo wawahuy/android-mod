@@ -3,5 +3,16 @@ version: '3.8'
 services:
   xhpigmod-server:
     image: xhpigmod-server
-    ports:
-      - "1235:1235"
+    networks:
+      - all
+
+  xhpigmod-cloudflare:
+    image: cloudflare/cloudflared
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiOTFkMjBkYTEtYWZhNy00NWM1LWFjODAtNTMyNDA5YTEwOTkyIiwicyI6Ik1UUTJaRGxrWVdFdFpUUXhZaTAwTVdJNExXSTFPRFF0TnprMllXWXhOell5WWpjeiJ9
+    networks:
+      - all
+
+networks:
+  all:
