@@ -8,7 +8,7 @@ services:
 
   xhpigmod-cloudflare:
     image: cloudflare/cloudflared
-    command: tunnel run
+    command: tunnel --protocol http2 --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiOTFkMjBkYTEtYWZhNy00NWM1LWFjODAtNTMyNDA5YTEwOTkyIiwicyI6Ik1UUTJaRGxrWVdFdFpUUXhZaTAwTVdJNExXSTFPRFF0TnprMllXWXhOell5WWpjeiJ9
     networks:
