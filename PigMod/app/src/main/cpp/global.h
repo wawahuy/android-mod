@@ -9,7 +9,7 @@
 #include "stdint.h"
 #include "string"
 
-//#define IS_DEBUG true
+#define IS_DEBUG true
 //#define IS_DEBUG_NOT_GAME true
 
 #ifdef IS_DEBUG
@@ -17,7 +17,7 @@
 #define SOCKET_HOST "192.168.1.21"
 #else
 #define SOCKET_PORT 80
-#define SOCKET_HOST "x67huy.j2run.com"
+#define SOCKET_HOST "x67huy-s1.j2run.com"
 #endif
 
 JavaVM* g_Jvm;

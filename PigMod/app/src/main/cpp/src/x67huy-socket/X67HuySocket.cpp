@@ -297,13 +297,13 @@ std::string X67HuySocket::generateWebSocketAcceptKey(const std::string &clientWe
 
 void X67HuySocket::sendWsHeader() {
     std::string key = generateRandomKey(10);
-    std::string socketAcceptKey = generateWebSocketAcceptKey("abc");
+    std::string webSocketKey = generateWebSocketAcceptKey(key);
     std::string headers[] = {
             "GET / HTTP/1.1\r\n",
             "Host: " + _host + "\r\n",
             "Connection: Upgrade\r\n",
             "Sec-Websocket-Extensions: permessage-deflate; client_max_window_bits\r\n",
-            "Sec-Websocket-Key: " + socketAcceptKey + "\r\n",
+            "Sec-Websocket-Key: " + webSocketKey + "\r\n",
             "Sec-Websocket-Version: 13\r\n",
             "Upgrade: websocket\r\n",
             "\r\n"
@@ -325,6 +325,15 @@ bool X67HuySocket::recvWsHeader(uint8_t* bufferOver, int& receivedBytesOver) {
         receivedBytes = recv(_socket, buffer + totalBytesReceived, SOCKET_BUFFER_SIZE - totalBytesReceived, 0);
         totalBytesReceived += receivedBytes;
         if (containsPattern(buffer, totalBytesReceived, endOfHeader, sizeof (endOfHeader), indexEohContains)) {
+            // check ws
+            std::string strHeader((char*)&buffer[0]);
+            std::transform(strHeader.begin(), strHeader.end(), strHeader.begin(),
+                           [](unsigned char c){ return std::tolower(c); });
+            if (strHeader.find("sec-websocket-accept") == std::string::npos) {
+                LOG_E("WS Hybird FAILED");
+                return false;
+            }
+
             LOG_E("WS Hybird OKE");
 
             int ss = indexEohContains + sizeof (endOfHeader);

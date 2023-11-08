@@ -31,12 +31,25 @@
       <Address>70CAC93000 + 13C</Address>
     </CheatEntry>
     <CheatEntry>
-      <ID>4</ID>
+      <ID>6</ID>
       <Description>"No description"</Description>
-      <ShowAsHex>1</ShowAsHex>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
-      <Address>libil2cpp.so.1 + 0x1D478E8</Address>
+      <Address>libil2cpp.so.1 + 0x1D475C0</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"No description"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>libil2cpp.so.1 + 1114064</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"No description"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>2 Bytes</VariableType>
+      <Address>79BFDB8000 + 0x508</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols/>

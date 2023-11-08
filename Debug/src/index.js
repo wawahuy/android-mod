@@ -229,3 +229,6 @@ server.on('connection', (socket) => {
 // addr: 01D4766C - NOP - 1F 20 03 D5 (1 cham)
 // addr: 01D47618 - NOP - 1F 20 03 D5 (x8)
 // addr: 01D47620 - NOP - 1F 20 03 D5 (nhanh)
+
+// ./cloudflared tunnel --protocol http2 --no-autoupdate run --token eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiYjA3ZDBiNWUtNzdlMS00NjFmLTk0NTMtNmU4ZWRmMjllZGEzIiwicyI6IlpqSTRaR1kwTVRFdFlqVTJaQzAwTmpZNUxXRXdNV010TWpZNU9URXlaREJrTXpNNCJ9
+// export PATH=$PATH:/data/data/com.termux/files/usr/bin:/data/test
