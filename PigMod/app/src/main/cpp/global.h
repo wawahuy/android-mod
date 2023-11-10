@@ -10,7 +10,7 @@
 #include "string"
 
 #define IS_DEBUG true
-//#define IS_DEBUG_NOT_GAME true
+#define IS_DEBUG_NOT_GAME true
 
 #ifdef IS_DEBUG
 #define SOCKET_PORT 1235

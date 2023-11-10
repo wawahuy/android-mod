@@ -5,11 +5,13 @@
 # Sets the minimum CMake version required for this project.
 cmake_minimum_required(VERSION 3.22.1)
 
+include(my-toolchain.cmake)
+
 # Declares the project name. The project name can be accessed via ${ PROJECT_NAME},
 # Since this is the top level CMakeLists.txt, the project name is also accessible
 # with ${CMAKE_PROJECT_NAME} (both CMake variables are in-sync within the top level
 # build script scope).
-project("pigmod")
+project("pigmodij")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -26,29 +28,8 @@ project("pigmod")
 # used in the AndroidManifest.xml file.
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
-        native-lib.cpp
-        external-lib/ImGui/imgui.cpp
-        external-lib/ImGui/imgui_draw.cpp
-        external-lib/ImGui/imgui_widgets.cpp
-        external-lib/ImGui/imgui_tables.cpp
-        external-lib/ImGui/imgui_demo.cpp
-        external-lib/ImGui/imgui_impl_opengl3.cpp
-        external-lib/ImGui/imgui_impl_android.cpp
-
-        external-lib/AES.cpp
-
-        src/x67huy-socket/X67HuySocket.cpp
-
-        src/external-lib/And64InlineHook.cpp
-
-#        src/tiny_websockets/ws_common.cpp
-#        src/tiny_websockets/crypto.cpp
-#        src/tiny_websockets/linux_tcp.cpp
-#        src/tiny_websockets/message.cpp
-#        src/tiny_websockets/websockets_client.cpp
-#        src/tiny_websockets/websockets_endpoint.cpp
-#        src/tiny_websockets/websockets_server.cpp
-#        src/tiny_websockets/windows_tcp.cpp
+        src/native-lib.cpp
+        src/And64InlineHook.cpp
         )
 
 # Specifies libraries CMake should link to your target library. You
@@ -57,9 +38,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 target_link_libraries(${CMAKE_PROJECT_NAME}
         # List libraries link to the target library
         android
-        EGL
-        GLESv3
         log)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-        external-lib/)
+
+# target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+#         )
