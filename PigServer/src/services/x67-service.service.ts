@@ -84,39 +84,49 @@ const menu = [
     items: [
       {
         label: 'Auto trung',
-        defaultValue: true,
+        valueDefault: true,
         type: WidgetMenuItem.Switch,
         action: 'autoTrung',
       },
       {
         label: 'Ban nhanh',
-        defaultValue: true,
+        valueDefault: true,
         type: WidgetMenuItem.Switch,
         action: 'banNhanh',
       },
       {
         label: 'Ban 1 cham',
-        defaultValue: true,
+        valueDefault: true,
         type: WidgetMenuItem.Switch,
         action: 'ban1Cham',
       },
       {
         label: 'Nap dan nhanh',
-        defaultValue: false,
+        valueDefault: false,
         type: WidgetMenuItem.Switch,
         action: 'napDanNhanh',
-        args: [
+        items: [
           {
-            name: 'count',
+            arg: 'count',
             label: 'So luong (vien/1 lan)',
             type: WidgetMenuItem.InputInt,
-            defaultValue: 1,
+            valueDefault: 1,
+            valueMin: 1,
+            valueMax: 8,
+            valueStep: 1,
+            valueStepFast: 2,
+            valueWidth: 250,
           },
           {
-            name: 'speed',
+            arg: 'speed',
             label: 'Toc do',
             type: WidgetMenuItem.SliderFloat,
-            defaultValue: 0.1,
+            valueDefault: 0.1,
+            valueMin: 0,
+            valueMax: 1,
+            valueStep: 0.1,
+            valueStepFast: 0.2,
+            valueWidth: 250,
           }
         ]
       }
@@ -125,8 +135,8 @@ const menu = [
 ]
 
 const description = {
-  versionHash: md5(JSON.stringify([])),
-  menu: [],
+  versionHash: md5(JSON.stringify(menu)),
+  menu,
 };
 
 @Injectable()

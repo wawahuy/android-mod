@@ -91,9 +91,10 @@ namespace Socket {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
 #ifndef IS_DEBUG_NOT_GAME
-            if (Game::canInit(js)) {
-                Game::init(js);
-            }
+//            if (Game::canInit(js)) {
+//                Game::init(js);
+//            }
+            Menu::init(js);
 #endif
         }
     };

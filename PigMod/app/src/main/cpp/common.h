@@ -31,6 +31,7 @@
 #include "src/x67huy-socket/X67HuySocket.h"
 #include "src/util.h"
 #include "src/libij.h"
+#include "src/menu.h"
 #include "src/game.h"
 #include "src/socket.h"
 #ifdef IS_DEBUG
