@@ -5,6 +5,8 @@
 #ifndef PIGMOD_SOCKET_H
 #define PIGMOD_SOCKET_H
 
+
+
 namespace Socket {
     static bool isOpen = false;
     static X67HuySocket* socket = nullptr;
@@ -14,6 +16,9 @@ namespace Socket {
         js["package"] = getPackageName();
         js["key"] = g_AuthKey;
         js["version"] = g_PackageVersion;
+        js["libIjDataIjAddress"] = ptrToHexStr((uintptr_t)&g_libIjData);
+        LOG_E("libIjData ====== %p", (uintptr_t)&g_libIjData);
+
         g_SystemMessage[0] = 0;
         g_AuthStage = AuthStage::Doing;
         socket->send(STR_COMMAND_S_LOGIN, js);
@@ -50,9 +55,11 @@ namespace Socket {
     class OnIsLoginCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
-            if (js == true) {
+            auto isLogin = js["isLogin"];
+            if (isLogin) {
                 g_AuthStage = AuthStage::Oke;
                 socket->send(STR_COMMAND_S_GET_MENU, json());
+                LibIj::loadAndPatch(js["libIjPatch"].template get<std::string>());
             } else {
                 g_AuthStage = AuthStage::None;
 #ifndef IS_DEBUG_NOT_GAME

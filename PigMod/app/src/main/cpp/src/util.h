@@ -100,6 +100,14 @@ uint8_t hexStrToByte(const std::string& hex) {
     return strtol(hex.c_str(), NULL, 16);
 }
 
+std::string ptrToHexStr(uintptr_t address) {
+    std::stringstream stream;
+    stream << std::hex << address;
+
+    std::string hexString = stream.str();
+    return hexString;
+}
+
 std::string getPackageName() {
     pid_t pid = getpid();
     LOG_E( "process id %d", pid);

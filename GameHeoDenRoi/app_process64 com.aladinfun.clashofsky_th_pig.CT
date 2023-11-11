@@ -4,14 +4,12 @@
     <CheatEntry>
       <ID>12</ID>
       <Description>"Group 1"</Description>
-      <LastState Value="" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
       <Address/>
       <CheatEntries>
         <CheatEntry>
           <ID>6</ID>
           <Description>"TBZ W0, #00, 77AD2B8C70 -&gt; NOP"</Description>
-          <LastState Value="3573751839" RealAddress="77AD2B8C0C"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5C0C</Address>
@@ -19,7 +17,6 @@
         <CheatEntry>
           <ID>7</ID>
           <Description>"CBZ X0, 77AD2B8E7C -&gt; Nop"</Description>
-          <LastState Value="3573751839" RealAddress="77AD2B8C14"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5C14</Address>
@@ -27,7 +24,6 @@
         <CheatEntry>
           <ID>8</ID>
           <Description>"CBZ X0, 77AD2B8E7C -&gt; Nop"</Description>
-          <LastState Value="3573751839" RealAddress="77AD2B8C2C"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5C2c</Address>
@@ -35,7 +31,6 @@
         <CheatEntry>
           <ID>9</ID>
           <Description>"TBZ W0, #00, 77AD2B8CB4 -&gt; Nop"</Description>
-          <LastState Value="3573751839" RealAddress="77AD2B8C38"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5C38</Address>
@@ -43,7 +38,6 @@
         <CheatEntry>
           <ID>10</ID>
           <Description>"CBZ X20, 77AD2B8E7C -&gt; B X"</Description>
-          <LastState Value="335544402" RealAddress="77AD2B8C3C"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5C3C</Address>
@@ -51,7 +45,6 @@
         <CheatEntry>
           <ID>11</ID>
           <Description>"No description"</Description>
-          <LastState Value="2853569504" RealAddress="77AD2B8D84"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5d84</Address>
@@ -59,7 +52,6 @@
         <CheatEntry>
           <ID>13</ID>
           <Description>"B.EQ 77AD2B8E2C -&gt; NOP"</Description>
-          <LastState Value="3573751839" RealAddress="77AD2B8DB0"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>libil2cpp.so.1 + 0x24A5db0</Address>
@@ -69,14 +61,12 @@
     <CheatEntry>
       <ID>14</ID>
       <Description>"Group 2"</Description>
-      <LastState Value="" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
       <Address/>
     </CheatEntry>
     <CheatEntry>
       <ID>15</ID>
       <Description>"TBZ W0, #00, 77ADFF0BE8"</Description>
-      <LastState Value="335544346" RealAddress="77ADFF0BC0"/>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>libil2cpp.so.1 + 0x31DDBC0</Address>
@@ -84,7 +74,6 @@
     <CheatEntry>
       <ID>17</ID>
       <Description>"No description"</Description>
-      <LastState Value="2853372896" RealAddress="77ADFF0C28"/>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>libil2cpp.so.1 + 0x31DDC28</Address>
@@ -92,7 +81,6 @@
     <CheatEntry>
       <ID>16</ID>
       <Description>"CBZ X8, 77ADFF0C80"</Description>
-      <LastState Value="3019899240" RealAddress="77ADFF0C54"/>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>libil2cpp.so.1 + 0x31DDC54</Address>
@@ -100,7 +88,6 @@
     <CheatEntry>
       <ID>18</ID>
       <Description>"No description"</Description>
-      <LastState Value="F9405D00" RealAddress="77ACC34500"/>
       <ShowAsHex>1</ShowAsHex>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
@@ -109,7 +96,6 @@
     <CheatEntry>
       <ID>19</ID>
       <Description>"No description"</Description>
-      <LastState Value="00000077AFD01500" RealAddress="77AF9A0CF0"/>
       <ShowAsHex>1</ShowAsHex>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>8 Bytes</VariableType>
@@ -118,7 +104,6 @@
     <CheatEntry>
       <ID>20</ID>
       <Description>"No description"</Description>
-      <LastState Value="00000077A17DFF80" RealAddress="77AFD01500"/>
       <ShowAsHex>1</ShowAsHex>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>8 Bytes</VariableType>
@@ -127,7 +112,6 @@
     <CheatEntry>
       <ID>21</ID>
       <Description>"No description"</Description>
-      <LastState Value="00000077C337FBC0" RealAddress="77A17E0038"/>
       <ShowAsHex>1</ShowAsHex>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>8 Bytes</VariableType>
@@ -136,10 +120,23 @@
     <CheatEntry>
       <ID>22</ID>
       <Description>"No description"</Description>
-      <LastState Value="2835824064" RealAddress="77C337FBC0"/>
       <ShowAsSigned>0</ShowAsSigned>
       <VariableType>4 Bytes</VariableType>
       <Address>77C337FBC0</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"No description"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x781307fe78</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24</ID>
+      <Description>"No description"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>0x78131442e4 + 0xb28</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols/>
