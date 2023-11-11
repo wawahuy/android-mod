@@ -15,6 +15,9 @@ namespace AuthRenderer {
         if (g_AuthStage == AuthStage::Doing) {
             ImGui::Text(STR_AUTH_DOING);
         }
+        if (g_AuthStage == AuthStage::WaitIJ) {
+            ImGui::Text(STR_AUTH_WAIT_IJ);
+        }
 
         renderSystemMessage();
         ImGui::Text(STR_INPUT_KEY);
@@ -34,8 +37,8 @@ namespace AuthRenderer {
             setSaveBool(STR_SAVE_AUTO_LOGIN, g_AuthAuto);
         }
 
-        if (g_AuthStage != AuthStage::Doing) {
-            if (ImGui::Button(STR_AUTH_LOGIN)) {
+        if (ImGui::Button(STR_AUTH_LOGIN)) {
+            if (g_AuthStage == AuthStage::None) {
                 Socket::handleLogin();
                 setSaveString(STR_SAVE_KEY, g_AuthKey);
             }

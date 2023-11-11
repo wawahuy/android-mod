@@ -37,6 +37,7 @@ void *hack_thread(void *) {
     g_Il2CppBaseRange = get_libBaseRange("libil2cpp.so");
 #endif
     Socket::init();
+    MenuRenderer::init();
 
 //    void* trampolineSlingshot__OnPointerUp;
 //    Slingshot__OnPointerUpType firstFunc = (Slingshot__OnPointerUpType)(g_Il2CppBase + Slingshot__OnPointerUpOffset);

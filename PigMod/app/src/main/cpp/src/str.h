@@ -10,6 +10,7 @@
 
 #define STR_COMMAND_S_LOGIN "login"
 #define STR_COMMAND_S_GET_MENU "get-menu"
+#define STR_COMMAND_S_GET_LIB_IJ "get-lib-ij"
 #define STR_COMMAND_R_IS_LOGIN "is-login"
 #define STR_COMMAND_R_SYS_MSG "sys-message"
 #define STR_COMMAND_R_MENU "menu"
@@ -23,6 +24,7 @@
 #define STR_AUTH_AUTO "Tu dang nhap"
 #define STR_AUTH_LOGIN "DANG NHAP"
 #define STR_AUTH_DOING "dang xu ly..."
+#define STR_AUTH_WAIT_IJ "dang kiem tra du lieu..."
 #define STR_SOCKET_CONNECTING "Ket noi server..."
 
 #define STR_BUTTON_FLOAT "0x67Huy"

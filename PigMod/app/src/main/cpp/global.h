@@ -38,6 +38,7 @@ bool g_Unprotected = g_UnprotectedDefault;
 enum AuthStage {
     None,
     Doing,
+    WaitIJ,
     Oke
 };
 

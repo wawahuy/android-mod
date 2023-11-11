@@ -55,9 +55,14 @@ namespace Socket {
         void runnable(const json& js, X67HuySocket* sk) {
             auto isLogin = js["isLogin"];
             if (isLogin) {
-                g_AuthStage = AuthStage::Oke;
-                socket->send(STR_COMMAND_S_GET_MENU, json());
-                LibIj::loadAndPatch();
+                if (js.contains("libIjHash")) {
+                    std::string libIjHash = js["libIjHash"].template get<std::string>();
+                    g_AuthStage = AuthStage::WaitIJ;
+                    socket->send(STR_COMMAND_S_GET_LIB_IJ, json());
+                } else {
+                    g_AuthStage = AuthStage::Oke;
+                    socket->send(STR_COMMAND_S_GET_MENU, json());
+                }
             } else {
                 g_AuthStage = AuthStage::None;
 #ifndef IS_DEBUG_NOT_GAME
@@ -93,11 +98,27 @@ namespace Socket {
         }
     };
 
+    class OnLibIJCallback: public X67HuySocketCallback {
+    public:
+        void runnable(const json& js, X67HuySocket* sk) {
+#ifndef IS_DEBUG_NOT_GAME
+            auto data = (char *)js["data"].template get<uintptr_t>();
+            int size = js["size"];
+            LibIj::saveLib(data, size);
+            LibIj::loadLib();
+            g_AuthStage = AuthStage::Oke;
+            socket->send(STR_COMMAND_S_GET_MENU, json());
+#endif
+        }
+    };
+
     void init() {
         socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT, true);
         socket->on(X67_EVENT_OPEN, new OnOpenCallback());
         socket->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
         socket->on(X67_EVENT_CLOSE, new OnCloseCallback());
+        socket->on(X67_EVENT_LIB_IJ, new OnLibIJCallback());
+
         socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
         socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
         socket->on(STR_COMMAND_R_MENU, new OnMenuCallback());

@@ -5,11 +5,7 @@
 
 #define LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, "YUH", __VA_ARGS__);
 
-uint64_t getMs() {
-    return duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()
-    ).count();
-}
+uint64_t (*getMs)();
 
 uintptr_t Slingshot__OnPointerUpOffset = 0x1D475C0;
 uint64_t timeA = 0;
@@ -23,7 +19,13 @@ void Slingshot__OnPointerUp(void* __this, void* eventData, const void* method) {
 }
 
 extern "C" {
+    __attribute__((visibility("default"))) void initMethod(uintptr_t getMsPtr) {
+        getMs = (uint64_t (*)())getMsPtr;
+    }
+
     __attribute__((visibility("default"))) void init(uintptr_t il2CppBase) {
+        LOG_E("==================== OKE ===================");
+        LOG_E("==================== OKE ===================");
         void* trampolineSlingshot__OnPointerUp;
         Slingshot__OnPointerUpType firstFunc = (Slingshot__OnPointerUpType)(il2CppBase + Slingshot__OnPointerUpOffset);
         A64HookFunction((void*)firstFunc, (void*)&Slingshot__OnPointerUp, &trampolineSlingshot__OnPointerUp );

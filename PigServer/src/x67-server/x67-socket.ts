@@ -245,12 +245,7 @@ class X67Socket extends events.EventEmitter {
     this.eventSystem.emit('command', cmd, this);
   }
 
-  sendJson(json: any) {
-    const dataStr = JSON.stringify(json);
-    const data = Buffer.alloc(dataStr.length + 1);
-    data.write(dataStr, 'utf-8');
-    data.writeUInt8(0, dataStr.length);
-
+  sendNative(data: Buffer, opcode: number) {
     const dataLength = data.length;
 
     let f = ByteFin.continue;
@@ -266,7 +261,7 @@ class X67Socket extends events.EventEmitter {
       const iv = Buffer.alloc(ENC_SIZE_IV);
       const header = Buffer.alloc(HeaderSize);
       header[OFFSET_FIN] = f;
-      header[OFFSET_OPCODE] = ByteOpcode.json;
+      header[OFFSET_OPCODE] = opcode;
       header.writeInt16LE(sub.length, OFFSET_SIZE);
 
       for (let i = 0; i < ENC_SIZE_IV; i++) {
@@ -286,6 +281,18 @@ class X67Socket extends events.EventEmitter {
       const encryptedData = cipher.update(sub);
       this._socket.write(encryptedData);
     }
+  }
+
+  sendLibIj(data: Buffer) {
+    this.sendNative(data, ByteOpcode.libij);
+  }
+
+  sendJson(json: any) {
+    const dataStr = JSON.stringify(json);
+    const data = Buffer.alloc(dataStr.length + 1);
+    data.write(dataStr, 'utf-8');
+    data.writeUInt8(0, dataStr.length);
+    this.sendNative(data, ByteOpcode.json);
   }
 
   command<T>(command: string, data: T) {

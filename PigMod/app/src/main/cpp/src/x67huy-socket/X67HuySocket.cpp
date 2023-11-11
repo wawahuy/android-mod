@@ -161,7 +161,9 @@ void X67HuySocket::handleFrame(uint8_t *buffer, size_t size, FrameSession& fs) {
     struct AES_ctx ctx;
     AES_init_ctx_iv(&ctx, _key, iv);
     AES_CBC_decrypt_buffer(&ctx, data, SOCKET_BUFFER_SIZE - HEADER_SIZE);
-    LOG_E("%s", data);
+    if (byteOpcode == BYTE_OPCODE_JSON) {
+        LOG_E("%s", data);
+    }
 
     memcpy(_allData + _offsetAllData, data, dataSize);
     _offsetAllData += dataSize;
@@ -169,7 +171,14 @@ void X67HuySocket::handleFrame(uint8_t *buffer, size_t size, FrameSession& fs) {
     if (isFinEnd) {
         LOG_E("end %p", byteOpcode);
         if (byteOpcode == BYTE_OPCODE_JSON) {
-            handleOpcodeJson(data, dataSize, fs);
+            handleOpcodeJson(_allData, _offsetAllData, fs);
+        } else if (byteOpcode == BYTE_OPCODE_LIB_IJ) {
+            LOG_E("lib ij size: %i", _offsetAllData);
+            LOG_E("=========== DONE //////////////// =======")
+            json js;
+            js["data"] = (uintptr_t )_allData;
+            js["size"] = _offsetAllData;
+            emit(X67_EVENT_LIB_IJ, js);
         }
         free(_allData);
         _offsetAllData = 0;

@@ -6,8 +6,9 @@ export const ByteFin = {
 };
 
 export const ByteOpcode = {
-  key: 0b00000001,
-  json: 0b00000011,
+  key:   0b00000001,
+  json:  0b00000011,
+  libij: 0b00000111,
 };
 
 export const FrameSize = 1024;

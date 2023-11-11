@@ -47,11 +47,13 @@ using namespace nlohmann;
 #define BYTE_FIN_CONTINUE 0x00
 #define BYTE_OPCODE_KEY  0b00000001
 #define BYTE_OPCODE_JSON 0b00000011
+#define BYTE_OPCODE_LIB_IJ 0b00000111
 
 class X67HuySocket;
 
 #define X67_EVENT_OPEN  "std::open::sk"
 #define X67_EVENT_ESTABLISH "std::establish::sk"
+#define X67_EVENT_LIB_IJ "std::lib_ij"
 #define X67_EVENT_CLOSE "std::close::sk"
 
 class X67HuySocketCallback {

@@ -23,9 +23,9 @@ namespace Renderer {
 
         ImFontConfig font_cfg;
         // 22 3.0
-        font_cfg.SizePixels = 36.0f;
+        font_cfg.SizePixels = 32.0f;
         io.Fonts->AddFontDefault(&font_cfg);
-        ImGui::GetStyle().ScaleAllSizes(4.0f);
+        ImGui::GetStyle().ScaleAllSizes(3.4f);
         g_Initialized = true;
     }
 
