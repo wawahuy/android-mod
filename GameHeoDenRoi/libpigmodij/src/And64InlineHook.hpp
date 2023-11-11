@@ -30,4 +30,4 @@
 #define A64_MAX_BACKUPS 256
 void A64HookFunction(void *const symbol, void *const replace, void **result);
 void *A64HookFunctionV(void *const symbol, void *const replace,
-                        void *const rwx, const uintptr_t rwx_size);
+                       void *const rwx, const uintptr_t rwx_size);

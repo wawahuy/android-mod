@@ -9,8 +9,8 @@ adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64
 
 echo f | xcopy /f /Y .\libpigmodij\.build\libpigmodij.so libpigmodij.so
 adb push ./libpigmodij.so /storage/emulated/0/libpigmodij.so
-adb shell "su -c cp /storage/emulated/0/libpigmodij.so /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/"
-adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmodij.so"
+@REM adb shell "su -c cp /storage/emulated/0/libpigmodij.so /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/"
+@REM adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmodij.so"
 
 
 adb shell monkey -p com.aladinfun.clashofsky_th_pig -c android.intent.category.LAUNCHER 1

@@ -476,118 +476,118 @@ static void __fix_instructions(uint32_t *__restrict inp, int32_t count, uint32_t
 
 //-------------------------------------------------------------------------
 
-    static __attribute__((__aligned__(__page_size))) uint32_t __insns_pool[A64_MAX_BACKUPS][A64_MAX_INSTRUCTIONS * 10];
+static __attribute__((__aligned__(__page_size))) uint32_t __insns_pool[A64_MAX_BACKUPS][A64_MAX_INSTRUCTIONS * 10];
 
-    //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
-    class A64HookInit
+class A64HookInit
+{
+public:
+    A64HookInit()
     {
-    public:
-        A64HookInit()
-        {
-            __make_rwx(__insns_pool, sizeof(__insns_pool));
-            A64_LOGI("insns pool initialized.");
-        }
-    };
-    static A64HookInit __init;
+        __make_rwx(__insns_pool, sizeof(__insns_pool));
+        A64_LOGI("insns pool initialized.");
+    }
+};
+static A64HookInit __init;
 
-    //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
-    static uint32_t *FastAllocateTrampoline()
-    {
-        static_assert((A64_MAX_INSTRUCTIONS * 10 * sizeof(uint32_t)) % 8 == 0, "8-byte align");
-        static volatile int32_t __index = -1;
+static uint32_t *FastAllocateTrampoline()
+{
+    static_assert((A64_MAX_INSTRUCTIONS * 10 * sizeof(uint32_t)) % 8 == 0, "8-byte align");
+    static volatile int32_t __index = -1;
 
-        int32_t i = __atomic_increase(&__index);
-        if (__predict_true(i >= 0 && i < __countof(__insns_pool))) {
-            return __insns_pool[i];
+    int32_t i = __atomic_increase(&__index);
+    if (__predict_true(i >= 0 && i < __countof(__insns_pool))) {
+        return __insns_pool[i];
+    } //if
+
+    A64_LOGE("failed to allocate trampoline!");
+    return NULL;
+}
+
+//-------------------------------------------------------------------------
+
+void *A64HookFunctionV(void *const symbol, void *const replace,
+                                     void *const rwx, const uintptr_t rwx_size)
+{
+    static constexpr uint_fast64_t mask = 0x03ffffffu; // 0b00000011111111111111111111111111
+
+    uint32_t *trampoline = static_cast<uint32_t *>(rwx), *original = static_cast<uint32_t *>(symbol);
+
+    static_assert(A64_MAX_INSTRUCTIONS >= 5, "please fix A64_MAX_INSTRUCTIONS!");
+    auto pc_offset = static_cast<int64_t>(__intval(replace) - __intval(symbol)) >> 2;
+    if (llabs(pc_offset) >= (mask >>1)) {
+        int32_t count = (reinterpret_cast<uint64_t>(original + 2) & 7u) != 0u ? 5 : 4;
+        if (trampoline) {
+            if (rwx_size < count * 10u) {
+                A64_LOGE("rwx size is too small to hold %u bytes backup instructions!", count * 10u);
+                return NULL;
+            } //if
+            __fix_instructions(original, count, trampoline);
         } //if
 
-        A64_LOGE("failed to allocate trampoline!");
-        return NULL;
-    }
-
-    //-------------------------------------------------------------------------
-
-    void *A64HookFunctionV(void *const symbol, void *const replace,
-                                         void *const rwx, const uintptr_t rwx_size)
-    {
-        static constexpr uint_fast64_t mask = 0x03ffffffu; // 0b00000011111111111111111111111111
-
-        uint32_t *trampoline = static_cast<uint32_t *>(rwx), *original = static_cast<uint32_t *>(symbol);
-
-        static_assert(A64_MAX_INSTRUCTIONS >= 5, "please fix A64_MAX_INSTRUCTIONS!");
-        auto pc_offset = static_cast<int64_t>(__intval(replace) - __intval(symbol)) >> 2;
-        if (llabs(pc_offset) >= (mask >>1)) {
-            int32_t count = (reinterpret_cast<uint64_t>(original + 2) & 7u) != 0u ? 5 : 4;
-            if (trampoline) {
-                if (rwx_size < count * 10u) {
-                    A64_LOGE("rwx size is too small to hold %u bytes backup instructions!", count * 10u);
-                    return NULL;
-                } //if
-                __fix_instructions(original, count, trampoline);
+        if (__make_rwx(original, 5 * sizeof(uint32_t)) == 0) {
+            if (count == 5) {
+                original[0] = A64_NOP;
+                ++original;
             } //if
+            original[0] = 0x58000051u; // LDR X17, #0x8
+            original[1] = 0xd61f0220u; // BR X17
+            *reinterpret_cast<int64_t *>(original + 2) = __intval(replace);
+            __flush_cache(symbol, 5 * sizeof(uint32_t));
 
-            if (__make_rwx(original, 5 * sizeof(uint32_t)) == 0) {
-                if (count == 5) {
-                    original[0] = A64_NOP;
-                    ++original;
-                } //if
-                original[0] = 0x58000051u; // LDR X17, #0x8
-                original[1] = 0xd61f0220u; // BR X17
-                *reinterpret_cast<int64_t *>(original + 2) = __intval(replace);
-                __flush_cache(symbol, 5 * sizeof(uint32_t));
-
-                A64_LOGI("inline hook %p->%p successfully! %zu bytes overwritten",
-                         symbol, replace, 5 * sizeof(uint32_t));
-            } else {
-                A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
-                         errno, original, 5 * sizeof(uint32_t));
-                trampoline = NULL;
-            } //if
+            A64_LOGI("inline hook %p->%p successfully! %zu bytes overwritten",
+                     symbol, replace, 5 * sizeof(uint32_t));
         } else {
-            if (trampoline) {
-                if (rwx_size < 1u * 10u) {
-                    A64_LOGE("rwx size is too small to hold %u bytes backup instructions!", 1u * 10u);
-                    return NULL;
-                } //if
-                __fix_instructions(original, 1, trampoline);
+            A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
+                     errno, original, 5 * sizeof(uint32_t));
+            trampoline = NULL;
+        } //if
+    } else {
+        if (trampoline) {
+            if (rwx_size < 1u * 10u) {
+                A64_LOGE("rwx size is too small to hold %u bytes backup instructions!", 1u * 10u);
+                return NULL;
             } //if
-
-            if (__make_rwx(original, 1 * sizeof(uint32_t)) == 0) {
-                __sync_cmpswap(original, *original, 0x14000000u | (pc_offset & mask)); // "B" ADDR_PCREL26
-                __flush_cache(symbol, 1 * sizeof(uint32_t));
-
-                A64_LOGI("inline hook %p->%p successfully! %zu bytes overwritten",
-                         symbol, replace, 1 * sizeof(uint32_t));
-            } else {
-                A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
-                         errno, original, 1 * sizeof(uint32_t));
-                trampoline = NULL;
-            } //if
+            __fix_instructions(original, 1, trampoline);
         } //if
 
-        return trampoline;
-    }
+        if (__make_rwx(original, 1 * sizeof(uint32_t)) == 0) {
+            __sync_cmpswap(original, *original, 0x14000000u | (pc_offset & mask)); // "B" ADDR_PCREL26
+            __flush_cache(symbol, 1 * sizeof(uint32_t));
 
-    //-------------------------------------------------------------------------
-
-    void A64HookFunction(void *const symbol, void *const replace, void **result)
-    {
-        void *trampoline = NULL;
-        if (result != NULL) {
-            trampoline = FastAllocateTrampoline();
-            *result = trampoline;
-            if (trampoline == NULL) return;
+            A64_LOGI("inline hook %p->%p successfully! %zu bytes overwritten",
+                     symbol, replace, 1 * sizeof(uint32_t));
+        } else {
+            A64_LOGE("mprotect failed with errno = %d, p = %p, size = %zu",
+                     errno, original, 1 * sizeof(uint32_t));
+            trampoline = NULL;
         } //if
+    } //if
 
-        // fix Android 10 .text segment is read-only by default
-        __make_rwx(symbol, 5 * sizeof(size_t));
+    return trampoline;
+}
 
-        trampoline = A64HookFunctionV(symbol, replace, trampoline, A64_MAX_INSTRUCTIONS * 10u);
-        if (trampoline == NULL && result != NULL) {
-            *result = NULL;
-        } //if
-    }
+//-------------------------------------------------------------------------
+
+void A64HookFunction(void *const symbol, void *const replace, void **result)
+{
+    void *trampoline = NULL;
+    if (result != NULL) {
+        trampoline = FastAllocateTrampoline();
+        *result = trampoline;
+        if (trampoline == NULL) return;
+    } //if
+
+    // fix Android 10 .text segment is read-only by default
+    __make_rwx(symbol, 5 * sizeof(size_t));
+
+    trampoline = A64HookFunctionV(symbol, replace, trampoline, A64_MAX_INSTRUCTIONS * 10u);
+    if (trampoline == NULL && result != NULL) {
+        *result = NULL;
+    } //if
+}
 
 #endif // defined(__aarch64__)

@@ -5,85 +5,39 @@
 #ifndef PIGMOD_LIBIJ_H
 #define PIGMOD_LIBIJ_H
 
-void LibIjContainer() {
-    LOOP_WTF;
-    LOOP_WTF;
-    LOOP_WTF;
-    LOOP_WTF;
-    LOOP_WTF;
-    LOOP_WTF;
-}
-
-struct LibIjData {
-    int abc;
-} g_libIjData;
-
 namespace LibIj {
-
-    int containsPattern(const uint8_t *buffer, int bufferSize, const uint8_t *pattern,
-                    int patternSize)  {
-        for (int i = 0; i < bufferSize - patternSize + 1; ++i) {
-            bool found = true;
-            for (int j = 0; j < patternSize; ++j) {
-                if (buffer[i + j] != pattern[j]) {
-                    found = false;
-                    break;
-                }
-            }
-            if (found) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    void loadAndPatch(std::string patch) {
-        LOG_E("libIjSoData patch %s", patch.c_str());
+    void loadAndPatch() {
         FILE *f = fopen("/storage/emulated/0/libpigmodij.so", "rb");
         fseek(f, 0, SEEK_END);
         long libIjSoSize = ftell(f);
         fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
 
-        unsigned char *libIjSoData = (unsigned char*)malloc(libIjSoSize + 1);
+        unsigned char *libIjSoData = (unsigned char *) malloc(libIjSoSize + 1);
+        LOG_E("libIjSoData addr %p", (uintptr_t) &libIjSoData);
         fread(libIjSoData, libIjSoSize, 1, f);
         fclose(f);
 
-        auto startTestIj = FindSymbol(libIjSoData, "test");
-        LOG_E("libIjSoData test offset %p", startTestIj->st_value);
+        std::string pathLibIj = "/data/data/" + getPackageName() +  "/libpigmodij.so";
+        std::ofstream tempFile(pathLibIj, std::ios::binary);
+        tempFile.write(reinterpret_cast<const char *>(libIjSoData), libIjSoSize);
+        tempFile.close();
 
-        LOG_E("libIjSoData addr %p", (uintptr_t)&libIjSoData);
-        LOG_E("libpigmod addr %p", (uintptr_t) get_libBase("libpigmod.so"));
-        unprotect(((void*)(uintptr_t)get_libBase("libpigmod.so")), ((uintptr_t)&LibIjContainer + 200 * 1024 - (uintptr_t)get_libBase("libpigmod.so")));
-
-        size_t patchByteSize = patch.size() / 2;
-        uint8_t* patchBytes = new uint8_t[patch.size() / 2];
-        for(int i = 0; i < patch.size(); i += 2) {
-            uint8_t byte = hexStrToByte(patch.substr(i, 2));
-            patchBytes[i / 2] = byte;
-            LOG_E("%s %p", patch.substr(i, 2).c_str(), byte);
+        void *handle = dlopen(pathLibIj.c_str(), RTLD_NOW);
+        if (!handle) {
+            LOG_E("Error loading dynamic library: %s", dlerror());
+            return;
         }
 
-        uint8_t patternPatch[] = {
-                0x1f, 0x20, 0x03, 0xd5,
-                0x1f, 0x20, 0x03, 0xd5,
-                0x1f, 0x20, 0x03, 0xd5,
-        };
+        typedef void (*InitFunction)(uintptr_t);
 
-        int indexContains = -1;
-        if ((indexContains = containsPattern(libIjSoData, libIjSoSize, patternPatch, sizeof (patternPatch))) != -1) {
-            LOG_E("Matches %i", indexContains);
-            memcpy((void*)((uintptr_t)libIjSoData + indexContains), patchBytes, patchByteSize);
+        InitFunction initFunction = (InitFunction)dlsym(handle, "init");
+
+        if (!initFunction) {
+            LOG_E("Error locating the 'hello' function: %s", dlerror());
+            dlclose(handle);
+            return;
         }
-        delete[] patchBytes;
-
-        memcpy((void*)(uintptr_t)&LibIjContainer, libIjSoData, libIjSoSize);
-
-
-        uintptr_t (*tt)() = reinterpret_cast<uintptr_t (*)()>(((uintptr_t) &LibIjContainer) + startTestIj->st_value);
-        LOG_E("wtf %p", ((uintptr_t) &LibIjContainer) + startTestIj->st_value);
-        g_libIjData.abc = 111;
-        LOG_E("WTF12 %p %p", tt(), (uintptr_t)&g_libIjData);
-        LOG_E("WTF12 %i", g_libIjData.abc);
+        initFunction(g_Il2CppBase);
     }
 }
 

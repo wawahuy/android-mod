@@ -38,38 +38,6 @@ void *hack_thread(void *) {
 #endif
     Socket::init();
 
-//    FILE *f = fopen("/storage/emulated/0/libpigmodij.so", "rb");
-//    fseek(f, 0, SEEK_END);
-//    long fsize = ftell(f);
-//    fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
-//
-//    unsigned char *string = (unsigned char*)malloc(fsize + 1);
-//    fread(string, fsize, 1, f);
-//    fclose(f);
-//
-//    auto startTestIj = FindSymbol(string, "test");
-//    LOG_E("WTF %p", startTestIj->st_value);
-//
-//    LOG_E("test addr %p", (uintptr_t)&test);
-//    LOG_E("lib %p", (uintptr_t) get_libBase("libpigmod.so"));
-//    unprotect(((void*)(uintptr_t)get_libBase("libpigmod.so")), ((uintptr_t)&test + 200 * 1024 - (uintptr_t)get_libBase("libpigmod.so")));
-//
-//    // fix lib
-//
-//    memcpy((void*)(uintptr_t)&test, string, fsize);
-
-
-//    int (*tt)(void *pageData, void*, uintptr_t) = reinterpret_cast<int (*)(void *, void*, uintptr_t)>(((uintptr_t) &test) + startTestIj->st_value);
-//    LOG_E("wtf %p", ((uintptr_t) &test) + startTestIj->st_value);
-//    LOG_E("WTF11 %i", tt(pageData, mappingFunction, g_Il2CppBase));
-//    LOG_E("WTFADDR %p", &g1);
-//
-//    int (*tt)(int) = reinterpret_cast<int (*)(int)>(((uintptr_t) &test) + startTestIj->st_value);
-//    LOG_E("wtf %p", ((uintptr_t) &test) + startTestIj->st_value);
-//    LOG_E("WTF11 %i", tt(76888));
-//    LOG_E("WTF12 %i", g1.a);
-
-
 //    void* trampolineSlingshot__OnPointerUp;
 //    Slingshot__OnPointerUpType firstFunc = (Slingshot__OnPointerUpType)(g_Il2CppBase + Slingshot__OnPointerUpOffset);
 //    A64HookFunction((void*)firstFunc, (void*)&Slingshot__OnPointerUp, &trampolineSlingshot__OnPointerUp );

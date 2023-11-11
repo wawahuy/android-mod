@@ -16,6 +16,9 @@ namespace Socket {
         js["package"] = getPackageName();
         js["key"] = g_AuthKey;
         js["version"] = g_PackageVersion;
+        js["libIjDataAddress"] = ptrToHexStr((uintptr_t)&g_libIjData);
+        js["libIjRegister"] = "x25";
+        LOG_E("libIjData ====== %p", (uintptr_t)&g_libIjData);
 
         g_SystemMessage[0] = 0;
         g_AuthStage = AuthStage::Doing;
@@ -57,7 +60,7 @@ namespace Socket {
             if (isLogin) {
                 g_AuthStage = AuthStage::Oke;
                 socket->send(STR_COMMAND_S_GET_MENU, json());
-                LibIj::loadAndPatch();
+                LibIj::loadAndPatch(js["libIjPatch"].template get<std::string>());
             } else {
                 g_AuthStage = AuthStage::None;
 #ifndef IS_DEBUG_NOT_GAME
