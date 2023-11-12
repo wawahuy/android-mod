@@ -9,7 +9,6 @@
 
 namespace Socket {
     static bool isOpen = false;
-    static X67HuySocket* socket = nullptr;
 
     void handleLogin() {
         json js;
@@ -19,7 +18,7 @@ namespace Socket {
 
         g_SystemMessage[0] = 0;
         g_AuthStage = AuthStage::Doing;
-        socket->send(STR_COMMAND_S_LOGIN, js);
+        g_Socket->send(STR_COMMAND_S_LOGIN, js);
     }
 
     class OnOpenCallback: public X67HuySocketCallback {
@@ -58,15 +57,15 @@ namespace Socket {
                 if (js.contains("libIjHash")) {
                     std::string libIjHash = js["libIjHash"].template get<std::string>();
                     g_AuthStage = AuthStage::WaitIJ;
-                    socket->send(STR_COMMAND_S_GET_LIB_IJ, json());
+                    g_Socket->send(STR_COMMAND_S_GET_LIB_IJ, json());
                 } else {
                     g_AuthStage = AuthStage::Oke;
-                    socket->send(STR_COMMAND_S_GET_MENU, json());
+                    g_Socket->send(STR_COMMAND_S_GET_MENU, json());
                 }
             } else {
                 g_AuthStage = AuthStage::None;
 #ifndef IS_DEBUG_NOT_GAME
-                Game::release();
+                Menu::release();
 #endif
             }
         }
@@ -91,10 +90,9 @@ namespace Socket {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
 #ifndef IS_DEBUG_NOT_GAME
-//            if (Game::canInit(js)) {
-//                Game::init(js);
-//            }
-            Menu::init(js);
+            if (Menu::canInit(js)) {
+                Menu::init(js);
+            }
 #endif
         }
     };
@@ -108,22 +106,22 @@ namespace Socket {
             LibIj::saveLib(data, size);
             LibIj::loadLib();
             g_AuthStage = AuthStage::Oke;
-            socket->send(STR_COMMAND_S_GET_MENU, json());
+            g_Socket->send(STR_COMMAND_S_GET_MENU, json());
 #endif
         }
     };
 
     void init() {
-        socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT, true);
-        socket->on(X67_EVENT_OPEN, new OnOpenCallback());
-        socket->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
-        socket->on(X67_EVENT_CLOSE, new OnCloseCallback());
-        socket->on(X67_EVENT_LIB_IJ, new OnLibIJCallback());
+        g_Socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT, true);
+        g_Socket->on(X67_EVENT_OPEN, new OnOpenCallback());
+        g_Socket->on(X67_EVENT_ESTABLISH, new OnEstablishCallback());
+        g_Socket->on(X67_EVENT_CLOSE, new OnCloseCallback());
+        g_Socket->on(X67_EVENT_LIB_IJ, new OnLibIJCallback());
 
-        socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
-        socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
-        socket->on(STR_COMMAND_R_MENU, new OnMenuCallback());
-        socket->start();
+        g_Socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
+        g_Socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
+        g_Socket->on(STR_COMMAND_R_MENU, new OnMenuCallback());
+        g_Socket->start();
     }
 }
 

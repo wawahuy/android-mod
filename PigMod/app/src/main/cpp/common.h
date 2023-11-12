@@ -28,7 +28,6 @@
 #include "ImGui/imgui_impl_android.h"
 
 #include "src/str.h"
-#include "src/x67huy-socket/X67HuySocket.h"
 #include "src/util.h"
 #include "src/libij.h"
 #include "src/menu.h"

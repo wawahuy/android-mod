@@ -19,6 +19,7 @@ namespace MenuRenderer {
 
         switch (menuItem->type) {
             case WidgetMenuBaseType::Switch:
+            case WidgetMenuBaseType::ServerSwitch:
             {
                 MenuItemSwitch* mis = (MenuItemSwitch *) menuItem;
                 ImGui::BulletText("%s", mis->label.c_str());
@@ -30,7 +31,7 @@ namespace MenuRenderer {
                 if (ToggleButton(mis->label.c_str(), &active)) {
                     mis->value = active;
                     dataArgs[argName] = mis->value;
-                    LibIj::runAction(fullAction, dataArgs);
+                    Menu::runAction(mis);
                 }
                 break;
             }
@@ -52,7 +53,7 @@ namespace MenuRenderer {
                 int value = mis->value;
                 if (ImGui::InputInt(mis->idImguiVisible.c_str(), &value, mis->valueStep, mis->valueStepFast)) {
                     dataArgs[argName] = mis->value;
-                    LibIj::runAction(fullAction, dataArgs);
+                    Menu::runAction(mis);
                 }
                 ImGui::PopItemWidth();
 
@@ -77,7 +78,7 @@ namespace MenuRenderer {
                 ImGui::PushItemWidth(mis->valueWidth);
                 if (ImGui::SliderFloat(mis->idImguiVisible.c_str(), &mis->value, mis->valueMin, mis->valueMax)) {
                     dataArgs[argName] = mis->value;
-                    LibIj::runAction(fullAction, dataArgs);
+                    Menu::runAction(mis);
                 }
                 ImGui::PopItemWidth();
                 break;
@@ -97,6 +98,8 @@ namespace MenuRenderer {
     }
 
     void Render() {
+        Menu::loopTypeCall();
+
         if (isFloating) {
             RenderFloatButton();
             return;
@@ -112,7 +115,7 @@ namespace MenuRenderer {
 
         ImGui::SameLine();
         if (ImGui::Button(STR_BUTTON_LOGOUT)) {
-            Game::release();
+            Menu::release();
             g_AuthStage = AuthStage::None;
         }
 
@@ -148,7 +151,7 @@ namespace MenuRenderer {
             }
 
             ImGui::Separator();
-            ImGui::Text("%s", Game::menuInfo.hash.c_str());
+            ImGui::Text("%s", Menu::menuInfo.hash.c_str());
 
         } else {
             ImGui::Text(STR_MENU_STARTING);

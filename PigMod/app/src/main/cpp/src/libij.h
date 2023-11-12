@@ -7,7 +7,7 @@
 
 namespace LibIj {
     void runAction(const std::string& action, const json& js) {
-        LOG_E("%s %s", action.c_str(), js.dump().c_str());
+        LOG_E("LIV %s %s", action.c_str(), js.dump().c_str());
     }
 
     void saveLib(char* data, size_t dataSize) {

@@ -75,9 +75,29 @@ enum WidgetMenuItem  {
   Switch = 1,
   InputInt = 2,
   SliderFloat = 3,
+
+  ServerSwitch = 101,
+  Call = 102,
 }
 
 const menu = [
+  {
+    label: 'Nang Luong',
+    action: 'nangluong',
+    items: [
+      {
+        label: 'Auto nhan nang luong',
+        valueDefault: true,
+        type: WidgetMenuItem.ServerSwitch,
+        action: 'autoNanhNangLuong',
+      },
+      {
+        type: WidgetMenuItem.Call,
+        action: 'autoGetData',
+        interval: 10000,
+      },
+    ]
+  },
   {
     label: 'Cay Thong',
     action: 'caythong',
@@ -119,7 +139,7 @@ const menu = [
           },
           {
             arg: 'speed',
-            label: 'Toc do',
+            label: 'Toc do (giay)',
             type: WidgetMenuItem.SliderFloat,
             valueDefault: 0.1,
             valueMin: 0,
@@ -171,6 +191,9 @@ export class X67ServiceService {
     });
     this._server.eventClients.on('get-lib-ij', (data: any, socket: X67Socket) => {
       socket.sendLibIj(fs.readFileSync(path.join(__dirname, '../../../GameHeoDenRoi/libpigmodij/.build/libpigmodij.so')));
+    });
+    this._server.eventClients.on('menu-action', (data: any, socket: X67Socket) => {
+      console.log(data);
     });
   }
 }

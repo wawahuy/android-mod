@@ -8,6 +8,7 @@
 #include <jni.h>
 #include "stdint.h"
 #include "string"
+#include "src/x67huy-socket/X67HuySocket.h"
 
 #define IS_DEBUG true
 //#define IS_DEBUG_NOT_GAME true
@@ -49,6 +50,7 @@ char g_AuthKey[255];
 bool g_AuthAutoDefault = true;
 bool g_AuthAuto = g_AuthAutoDefault;
 bool g_MenuInit = false;
+X67HuySocket* g_Socket = nullptr;
 
 #ifdef IS_DEBUG
 #else
