@@ -1,9 +1,9 @@
 #pragma once
 #include "inc.h"
-#include "And64InlineHook.hpp"
 #include "json.hpp"
 #include "obfuscate.h"
 #include "patch.h"
+#include "And64InlineHook.hpp"
 
 #define JS_THIS "this"
 
