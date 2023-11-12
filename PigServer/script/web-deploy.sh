@@ -39,10 +39,17 @@ echo "Docker installed! version: $dockerVersion"
 # build & push
 runCommandRemote "mkdir -p ~/xhpigmod"
 
+# push libso
+runCommandRemote "rm -rf ~/xhpigmod/libso"
+scp -r "${currentDir}/../libso/" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
+
 imageXhPigModServer="xhpigmod-server:latest"
 fileXhPigModServer="${currentDir}/../data-docker/xhpigmod-server.tar"
 fileXhPigModServerRemote="~/xhpigmod/xhpigmod-server.tar"
 fileXhPigModServerContinue=1
+
+mkdir -p "${currentDir}/../data-docker"
+
 if ssh -q -o ConnectTimeout=10 "${SSH_USERNAME}@${SSH_HOST}" "[ -f ${fileXhPigModServerRemote} ]"; then
     echo "File ${fileXhPigModServerRemote} exists on the remote server."
     read -p "You can overwrite ${fileXhPigModServerRemote}? (y/n): " answer
@@ -75,10 +82,13 @@ fi
 # stop & remove image
 cmdRemoveImage=" \
 cd ~/xhpigmod;
-docker compose -f ./docker-compose.xhpigmod.yaml down; \
+docker compose --env-file ~/xhpigmod/.env.prod -f ./docker-compose.xhpigmod.yaml down; \
 "
 echo "Container Stoping..."
 runCommandRemote "$cmdRemoveImage"
+
+# push env
+scp "${currentDir}/../env/.env.prod" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
 
 # push docker-compose file to remote
 scp "${currentDir}/../docker-compose.xhpigmod.yaml" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
@@ -93,6 +103,6 @@ fi
 # deploy web
 cmdDeploy=" \
 cd ~/xhpigmod;
-docker compose -f ./docker-compose.xhpigmod.yaml up -d --remove-orphans --build --force-recreate; \
+docker compose --env-file ~/xhpigmod/.env.prod -f ./docker-compose.xhpigmod.yaml up -d --remove-orphans --build --force-recreate; \
 "
 runCommandRemote "$cmdDeploy"

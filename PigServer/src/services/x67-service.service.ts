@@ -6,9 +6,9 @@ import { AsmService } from './asm.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import { createHashMd5 } from 'src/utils/ws';
+import { ConfigService } from '@nestjs/config';
 
-
-enum WidgetMenuItem  {
+enum WidgetMenuItem {
   Switch = 1,
   InputInt = 2,
   SliderFloat = 3,
@@ -78,18 +78,18 @@ const menu = [
             arg: 'speed',
             label: 'Toc do (giay)',
             type: WidgetMenuItem.SliderFloat,
-            valueDefault: 0.1,
+            valueDefault: 0.25,
             valueMin: 0,
             valueMax: 1,
             valueStep: 0.1,
             valueStepFast: 0.2,
             valueWidth: 250,
-          }
-        ]
-      }
-    ]
-  }
-]
+          },
+        ],
+      },
+    ],
+  },
+];
 
 const description = {
   versionHash: md5(JSON.stringify(menu)),
@@ -103,8 +103,12 @@ export class X67ServiceService {
 
   constructor(
     private readonly _asmService: AsmService,
+    private readonly _configService: ConfigService,
   ) {
     this.init();
+    fs.readFileSync(
+      path.join(this._configService.get('FOLDER_LIBSO'), 'libpigmodij.so'),
+    );
   }
 
   init() {
@@ -117,19 +121,31 @@ export class X67ServiceService {
       //     msg: "Ma khong chinh xac",
       //     color: [255, 0, 0, 255]
       // });
-      const ijBuffer = fs.readFileSync(path.join(__dirname, '../../../GameHeoDenRoi/libpigmodij/.build/libpigmodij.so'));
+      const ijBuffer = fs.readFileSync(
+        path.join(this._configService.get('FOLDER_LIBSO'), 'libpigmodij.so'),
+      );
       socket.command('is-login', {
         isLogin: true,
-        libIjHash: createHashMd5(ijBuffer)
+        libIjHash: createHashMd5(ijBuffer),
       });
     });
     this._server.eventClients.on('get-menu', (data: any, socket: X67Socket) => {
       socket.command('menu', description);
     });
-    this._server.eventClients.on('get-lib-ij', (data: any, socket: X67Socket) => {
-      socket.sendLibIj(fs.readFileSync(path.join(__dirname, '../../../GameHeoDenRoi/libpigmodij/.build/libpigmodij.so')));
-    });
-    this._server.eventClients.on('menu-action', (data: any, socket: X67Socket) => {
+    this._server.eventClients.on(
+      'get-lib-ij',
+      (data: any, socket: X67Socket) => {
+        socket.sendLibIj(
+          fs.readFileSync(
+            path.join(
+              this._configService.get('FOLDER_LIBSO'),
+              'libpigmodij.so',
+            ),
+          ),
+        );
+      },
+    );
+    this._server.eventClients.on('menu-action', (data: any) => {
       console.log(data);
     });
   }
