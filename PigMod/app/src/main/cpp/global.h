@@ -5,13 +5,11 @@
 #ifndef PIGMOD_GLOBAL_H
 #define PIGMOD_GLOBAL_H
 #pragma once
+#include "inc.h"
 #include <jni.h>
 #include "stdint.h"
 #include "string"
-#include "src/x67huy-socket/X67HuySocket.h"
-
-#define IS_DEBUG true
-//#define IS_DEBUG_NOT_GAME true
+#include "X67HuySocket.h"
 
 #ifdef IS_DEBUG
 #define SOCKET_PORT 1235

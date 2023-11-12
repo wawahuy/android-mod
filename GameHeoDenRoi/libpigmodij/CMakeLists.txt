@@ -29,7 +29,10 @@ project("pigmodij")
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
         src/native-lib.cpp
-        src/And64InlineHook.cpp
+
+        ../../PigMod/app/src/main/cpp/external-lib/AES.cpp
+        ../../PigMod/app/src/main/cpp/src/x67huy-socket/X67HuySocket.cpp
+        ../../PigMod/app/src/main/cpp/src/external-lib/And64InlineHook.cpp
         )
 
 # Specifies libraries CMake should link to your target library. You
@@ -41,5 +44,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log)
 
 
-# target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-#         )
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        ../../PigMod/app/src/main/cpp/external-lib
+        ../../PigMod/app/src/main/cpp/include
+        )

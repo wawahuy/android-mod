@@ -4,7 +4,9 @@
             "name": "Win32",
             "includePath": [
                 "C:/Users/nguye/AppData/Local/Android/Sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include",
-                "C:/Users/nguye/AppData/Local/Android/Sdk/ndk/25.1.8937393/sources/cxx-stl/llvm-libc++/include"
+                "C:/Users/nguye/AppData/Local/Android/Sdk/ndk/25.1.8937393/sources/cxx-stl/llvm-libc++/include",
+                "../../PigMod/app/src/main/cpp/external-lib",
+                "../../PigMod/app/src/main/cpp/include",
             ],
             "defines": [
                 "_DEBUG",

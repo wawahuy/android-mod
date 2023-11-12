@@ -7,14 +7,6 @@
 
 #include "global.h"
 
-#ifdef IS_DEBUG
-#include <android/log.h>
-#define LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, "YUH", __VA_ARGS__);
-#else
-#define LOG_E(...)
-#endif
-
-
 #include <jni.h>
 #include <string>
 #include <vector>

@@ -62,4 +62,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         log)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-        external-lib/)
+        external-lib/
+        include/)

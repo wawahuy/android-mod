@@ -1,9 +1,7 @@
 #include <unistd.h>
-#include <android/log.h>
-#include <chrono>
+#include "inc.h"
 #include "And64InlineHook.hpp"
 
-#define LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, "YUH", __VA_ARGS__);
 
 uint64_t (*getMs)();
 

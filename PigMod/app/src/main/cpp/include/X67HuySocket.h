@@ -5,14 +5,6 @@
 #ifndef PIGMOD_X67_HUY_SOCKET_H
 #define PIGMOD_X67_HUY_SOCKET_H
 
-#define IS_DEBUG true
-#ifdef IS_DEBUG
-#include <android/log.h>
-#define LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, "YUH", __VA_ARGS__);
-#else
-#define LOG_E(...)
-#endif
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -23,6 +15,7 @@
 #include <random>
 #include <netdb.h>
 
+#include "inc.h"
 #include "AES.h"
 #include "json.hpp"
 #include "sha1.h"

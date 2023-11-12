@@ -81,23 +81,23 @@ enum WidgetMenuItem  {
 }
 
 const menu = [
-  {
-    label: 'Nang Luong',
-    action: 'nangluong',
-    items: [
-      {
-        label: 'Auto nhan nang luong',
-        valueDefault: true,
-        type: WidgetMenuItem.ServerSwitch,
-        action: 'autoNanhNangLuong',
-      },
-      {
-        type: WidgetMenuItem.Call,
-        action: 'autoGetData',
-        interval: 10000,
-      },
-    ]
-  },
+  // {
+  //   label: 'Nang Luong',
+  //   action: 'nangluong',
+  //   items: [
+  //     {
+  //       label: 'Auto nhan nang luong',
+  //       valueDefault: true,
+  //       type: WidgetMenuItem.ServerSwitch,
+  //       action: 'autoNanhNangLuong',
+  //     },
+  //     {
+  //       type: WidgetMenuItem.Call,
+  //       action: 'autoGetData',
+  //       interval: 10000,
+  //     },
+  //   ]
+  // },
   {
     label: 'Cay Thong',
     action: 'caythong',
