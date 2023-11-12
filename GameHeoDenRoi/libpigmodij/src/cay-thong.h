@@ -22,6 +22,7 @@ namespace CayThongPatch {
     typedef void (*Slingshot__OnPointerUpType)(void* __this, void* eventData, const void* method);
     void (*Slingshot__OnPointerUpOrigin)(void* __this, void* eventData, const void* method);
     void Slingshot__OnPointerUp(void* __this, void* eventData, const void* method) {
+        LOG_E("test %i", (char)((uintptr_t)__this + 0x133));
         LOG_E("Slingshot__OnPointerUp hook call");
         if (!Slingshot__OnPointerUpActive) {
             Slingshot__OnPointerUpOrigin(__this, eventData, method);
@@ -31,6 +32,9 @@ namespace CayThongPatch {
             LOG_E("Slingshot__OnPointerUp hook wait");
             Slingshot__OnPointerUpTime = m_getMs();
             for (int i = 0; i < Slingshot__OnPointerUpCountCall; i++) {
+                uintptr_t s1 = (uintptr_t)__this + 0x133;
+                auto s2 = (char *)s1;
+                *s2 = 1;
                 Slingshot__OnPointerUpOrigin(__this, eventData, method);
             }
         }
@@ -107,17 +111,17 @@ namespace CayThongPatch {
                 Slingshot__OnPointerUpHooking = true;
             }
 
-            if (!mbNapDanNhanh.isActive()) {
-                m_unprotectIl2cpp();
-                mbNapDanNhanh.execute();
-                m_protectIl2cpp();
-            }
+            // if (!mbNapDanNhanh.isActive()) {
+            //     m_unprotectIl2cpp();
+            //     mbNapDanNhanh.execute();
+            //     m_protectIl2cpp();
+            // }
         } else {
             LOG_E("Restore napDanNhanhAction");
             Slingshot__OnPointerUpActive = false;
-            m_unprotectIl2cpp();
-            mbNapDanNhanh.restore();
-            m_protectIl2cpp();
+            // m_unprotectIl2cpp();
+            // mbNapDanNhanh.restore();
+            // m_protectIl2cpp();
         }
     }
 

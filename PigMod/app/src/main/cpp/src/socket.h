@@ -54,11 +54,13 @@ namespace Socket {
         void runnable(const json& js, X67HuySocket* sk) {
             auto isLogin = js["isLogin"];
             if (isLogin) {
-                if (js.contains("libIjHash")) {
+                if (js.contains("libIjHash") && !LibIj::isLoaded) {
+                    LOG_E("LibIJ wait load");
                     std::string libIjHash = js["libIjHash"].template get<std::string>();
                     g_AuthStage = AuthStage::WaitIJ;
                     g_Socket->send(STR_COMMAND_S_GET_LIB_IJ, json());
                 } else {
+                    LOG_E("LibIJ not need load");
                     g_AuthStage = AuthStage::Oke;
                     g_Socket->send(STR_COMMAND_S_GET_MENU, json());
                 }

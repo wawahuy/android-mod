@@ -8,6 +8,7 @@
 namespace LibIj {
     typedef void (*IjRunActionType)(const std::string& action, const json& js);
     IjRunActionType ijRunAction;
+    bool isLoaded = false;
 
     void runAction(const std::string& action, const json& js) {
         LOG_E("LIV %s %s", action.c_str(), js.dump().c_str());
@@ -51,6 +52,9 @@ namespace LibIj {
             dlclose(handle);
             return;
         }
+
+        LOG_E("Libpigmodij loaded=================");
+        isLoaded = true;
     }
 }
 

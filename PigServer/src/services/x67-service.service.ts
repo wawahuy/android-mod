@@ -59,7 +59,7 @@ const menu = [
       },
       {
         label: 'Nap dan nhanh',
-        valueDefault: false,
+        valueDefault: true,
         type: WidgetMenuItem.Switch,
         action: 'napDanNhanh',
         items: [
