@@ -2,8 +2,8 @@ version: '3.8'
 
 
 x-shared_environment: &shared_environment
-  XH_PIGMOD_MONGO_HOST: xhpigmod-mongo
-  
+  FOLDER_LIBSO: ${FOLDER_LIBSO}
+
 services:
   xhpigmod-gateway:
     image: xhpigmod-dev
@@ -19,6 +19,7 @@ services:
       - "3000:3000"
     volumes:
       - ./:/data/apps
+      - "${FOLDER_LIBSO_HOST}:${FOLDER_LIBSO}"
     networks:
       - all
 

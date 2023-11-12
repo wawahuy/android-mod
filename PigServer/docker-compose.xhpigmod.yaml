@@ -1,8 +1,15 @@
 version: '3.8'
 
+x-shared_environment: &shared_environment
+  FOLDER_LIBSO: ${FOLDER_LIBSO}
+
 services:
   xhpigmod-server:
     image: xhpigmod-server
+    environment:
+      <<: *shared_environment
+    volumes:
+      - "${FOLDER_LIBSO_HOST}:${FOLDER_LIBSO}"
     networks:
       - all
 
