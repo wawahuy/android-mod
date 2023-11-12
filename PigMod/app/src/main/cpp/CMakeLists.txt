@@ -37,7 +37,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 
         external-lib/AES.cpp
 
-        src/x67huy-socket/X67HuySocket.cpp
+        src-common/X67HuySocket.cpp
+        src-common/patch.cpp
 
         src/external-lib/And64InlineHook.cpp
 

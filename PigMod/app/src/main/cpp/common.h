@@ -19,11 +19,12 @@
 #include "ImGui/imgui_impl_opengl3.h"
 #include "ImGui/imgui_impl_android.h"
 
+#include "patch.h"
 #include "src/str.h"
 #include "src/util.h"
+#include "src/game.h"
 #include "src/libij.h"
 #include "src/menu.h"
-#include "src/game.h"
 #include "src/socket.h"
 #ifdef IS_DEBUG
 #endif

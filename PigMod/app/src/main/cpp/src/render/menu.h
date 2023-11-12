@@ -51,14 +51,20 @@ namespace MenuRenderer {
 
                 ImGui::PushItemWidth(mis->valueWidth);
                 int value = mis->value;
+                bool isChange = false;
                 if (ImGui::InputInt(mis->idImguiVisible.c_str(), &value, mis->valueStep, mis->valueStepFast)) {
-                    dataArgs[argName] = mis->value;
-                    Menu::runAction(mis);
+                    isChange = true;
                 }
                 ImGui::PopItemWidth();
 
-                if (value >= mis->valueMin && value <= mis->valueMax) {
+                if (isChange && (value < mis->valueMin || value > mis->valueMax)) {
+                    isChange = false;
+                }
+
+                if (isChange) {
                     mis->value = value;
+                    dataArgs[argName] = mis->value;
+                    Menu::runAction(mis);
                 }
                 break;
             }

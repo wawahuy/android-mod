@@ -6,8 +6,12 @@
 #define PIGMOD_LIBIJ_H
 
 namespace LibIj {
+    typedef void (*IjRunActionType)(const std::string& action, const json& js);
+    IjRunActionType ijRunAction;
+
     void runAction(const std::string& action, const json& js) {
         LOG_E("LIV %s %s", action.c_str(), js.dump().c_str());
+        ijRunAction(action, js);
     }
 
     void saveLib(char* data, size_t dataSize) {
@@ -26,23 +30,27 @@ namespace LibIj {
             return;
         }
 
-        typedef void (*InitMethodFunction)(uintptr_t getMsPtr);
+        typedef void (*InitMethodFunction)(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
         InitMethodFunction initMethodFunction = (InitMethodFunction)dlsym(handle, "initMethod");
         if (!initMethodFunction) {
-            LOG_E("Error locating the 'initMethodFunction' function: %s", dlerror());
+            LOG_E("Error locating the 'initMethod' function: %s", dlerror());
             dlclose(handle);
             return;
         }
-        initMethodFunction((uintptr_t)&getMs);
+        initMethodFunction(
+                g_Il2CppBase,
+                (uintptr_t)&getMs,
+                (uintptr_t)&Game::unprotectIl2cpp,
+                (uintptr_t)&Game::protectIl2cpp
+                );
 
-        typedef void (*InitFunction)(uintptr_t);
-        InitFunction initFunction = (InitFunction)dlsym(handle, "init");
-        if (!initFunction) {
-            LOG_E("Error locating the 'init' function: %s", dlerror());
+
+        ijRunAction = (IjRunActionType)dlsym(handle, "runAction");
+        if (!ijRunAction) {
+            LOG_E("Error locating the 'runAction' function: %s", dlerror());
             dlclose(handle);
             return;
         }
-        initFunction(g_Il2CppBase);
     }
 }
 

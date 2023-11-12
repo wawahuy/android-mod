@@ -7,7 +7,7 @@ adb push ..\PigMod\app\build\intermediates\stripped_native_libs\release\out\lib\
 adb shell "su -c cp /storage/emulated/0/libpigmod.so /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmod.so"
 adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmod.so"
 
-echo f | xcopy /f /Y .\libpigmodij\.build\libpigmodij.so libpigmodij.so
+echo f | xcopy /f /Y .\libpigmodij\.build\libpigmodij-striped.so libpigmodij.so
 adb push ./libpigmodij.so /storage/emulated/0/libpigmodij.so
 @REM adb shell "su -c cp /storage/emulated/0/libpigmodij.so /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/"
 @REM adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmodij.so"

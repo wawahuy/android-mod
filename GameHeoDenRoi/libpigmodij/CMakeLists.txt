@@ -31,8 +31,10 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         src/native-lib.cpp
 
         ../../PigMod/app/src/main/cpp/external-lib/AES.cpp
-        ../../PigMod/app/src/main/cpp/src/x67huy-socket/X67HuySocket.cpp
         ../../PigMod/app/src/main/cpp/src/external-lib/And64InlineHook.cpp
+
+        ../../PigMod/app/src/main/cpp/src-common/X67HuySocket.cpp
+        ../../PigMod/app/src/main/cpp/src-common/patch.cpp
         )
 
 # Specifies libraries CMake should link to your target library. You

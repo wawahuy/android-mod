@@ -11,4 +11,8 @@ cd .build
 
 %CMAKE_MAKE_PROGRAM%
 
+echo f | xcopy /f /Y libpigmodij.so libpigmodij-striped.so
+set STRIP=%ANDROID_HOME%\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin\llvm-strip.exe
+%STRIP% libpigmodij-striped.so --strip-debug 
+
 cd ..

@@ -52,36 +52,6 @@ Il2CppBaseRange get_libBaseRange(const char* libName) {
     return r;
 }
 
-bool unprotect(void*  offset, unsigned  int size) {
-    int result = mprotect(offset, size, PROT_READ | PROT_WRITE | PROT_EXEC);
-    if (result == 0) {
-        LOG_E("unprotect oke");
-        return true;
-    } else {
-#ifdef IS_DEBUG
-        int error = errno;
-        const char* errorMessage = strerror(error);
-        LOG_E("%s", errorMessage);
-#endif
-        return false;
-    }
-}
-
-bool protect(void*  offset, unsigned  int size) {
-    int result = mprotect(offset, size, PROT_READ | PROT_EXEC);
-    if (result == 0) {
-        LOG_E("protect oke");
-        return true;
-    } else {
-#ifdef IS_DEBUG
-        int error = errno;
-        const char* errorMessage = strerror(error);
-        LOG_E("%s", errorMessage);
-#endif
-        return false;
-    }
-}
-
 uint64_t getMs() {
     return duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()

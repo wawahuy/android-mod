@@ -7,69 +7,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { createHashMd5 } from 'src/utils/ws';
 
-// const menu = [
-//   {
-//     name: 'Cay Thong',
-//     items: [
-//       {
-//         name: 'Auto trung',
-//         activeDefault: true,
-//         il2cppPatch: [
-//           {
-//             offset: '223C604',
-//             patch: '05000014',
-//           },
-//           {
-//             offset: '223C64c',
-//             patch: '31000014',
-//           },
-//         ],
-//       },
-//       {
-//         name: 'Ban nhanh',
-//         activeDefault: true,
-//         il2cppPatch: [
-//           {
-//             offset: '1D47d70',
-//             patch: '61000014',
-//           },
-//         ],
-//       },
-//       {
-//         name: 'Ban 1 cham',
-//         activeDefault: true,
-//         il2cppPatch: [
-//           {
-//             offset: '1D4766C',
-//             patch: '1F2003D5', // NOP
-//           },
-//         ],
-//       },
-//       // {
-//       //   name: 'Ban nhanh (8v/1cay)',
-//       //   activeDefault: false,
-//       //   active: false,
-//       //   il2cppPatch: [
-//       //     {
-//       //       offset: '01D47620',
-//       //       patch: '1F2003D5', // NOP
-//       //     },
-//       //   ],
-//       // },
-//       {
-//         name: 'Nap dan nhanh',
-//         activeDefault: false,
-//         active: false,
-//         il2cppPatch: [
-//           {
-//             offset: '1D47618',
-//             patch: '1F2003D5', // NOP
-//           },
-//         ],
-//       },
-//     ],
-//   },
-// ];
 
 enum WidgetMenuItem  {
   Switch = 1,
@@ -100,7 +37,7 @@ const menu = [
   // },
   {
     label: 'Cay Thong',
-    action: 'caythong',
+    action: 'cayThong',
     items: [
       {
         label: 'Auto trung',
