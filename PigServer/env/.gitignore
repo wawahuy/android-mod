@@ -1,3 +1,4 @@
 .env.dev
+.env.win
 .env.host
 .env.prod

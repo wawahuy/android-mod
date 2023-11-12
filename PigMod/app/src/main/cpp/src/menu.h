@@ -160,7 +160,11 @@ namespace Menu {
             case WidgetMenuBaseType::ServerSwitch:
             {
                 auto sm = (MenuItemSwitch *) menuItem;
-                sm->valueDefault = true;
+                if (jsMenuItem.contains("valueDefault")) {
+                    sm->valueDefault = jsMenuItem["valueDefault"].template get<bool>();
+                } else {
+                    sm->valueDefault = false;
+                }
                 sm->value = sm->valueDefault;
                 (*menuArgData)[sm->argName] = sm->value;
                 break;
