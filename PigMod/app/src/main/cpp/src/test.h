@@ -1,0 +1,289 @@
+//
+// Created by nguye on 11/14/2023.
+//
+
+#ifndef PIGMOD_TEST_H
+#define PIGMOD_TEST_H
+
+#define IS_TEST
+#ifdef IS_TEST
+#include "And64InlineHook.hpp"
+#include <wchar.h>
+
+struct System_String_Fields {
+    int32_t m_stringLength;
+    wchar_t m_firstChar[1];
+
+    wchar_t* getPtr() {
+        return m_firstChar;
+    }
+};
+
+struct System_String_o {
+    void *klass;
+    void *monitor;
+    System_String_Fields fields;
+};
+
+
+struct Il2CppObject
+{
+    void *klass;
+    void *monitor;
+};
+
+typedef uintptr_t il2cpp_array_size_t;
+
+struct System_Byte_array {
+    Il2CppObject obj;
+    void *bounds;
+    il2cpp_array_size_t max_length;
+    uint8_t m_Items[65535];
+};
+
+struct System_Uri_Offset_Fields {
+    uint16_t Scheme;
+    uint16_t User;
+    uint16_t Host;
+    uint16_t PortValue;
+    uint16_t Path;
+    uint16_t Query;
+    uint16_t Fragment;
+    uint16_t End;
+};
+
+struct System_Uri_Offset_o {
+    System_Uri_Offset_Fields fields;
+};
+
+struct System_Uri_UriInfo_Fields {
+    struct System_String_o* Host;
+    struct System_String_o* ScopeId;
+    struct System_String_o* String;
+    struct System_Uri_Offset_o Offset;
+    struct System_String_o* DnsSafeHost;
+    void* MoreInfo;
+};
+
+struct System_Uri_UriInfo_o {
+    void *klass;
+    void *monitor;
+    System_Uri_UriInfo_Fields fields;
+};
+
+struct System_Uri_Fields {
+    System_String_o* m_String;
+    System_String_o* m_originalUnicodeString;
+    void* m_Syntax;
+    System_String_o* m_DnsSafeHost;
+    uint64_t m_Flags;
+    System_Uri_UriInfo_o* m_Info;
+    bool m_iriParsing;
+};
+
+struct System_Uri_o {
+    void *klass;
+    void *monitor;
+    System_Uri_Fields fields;
+};
+
+void printByteArray(const uint8_t* array, size_t size) {
+    char buffer[65535];
+    buffer[0] = '\0';
+    for (size_t i = 0; i < size; ++i) {
+        snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "0x%02X, ", array[i]);
+    }
+    LOG_E("%s", buffer);
+}
+
+void logWideString(System_String_o* o) {
+    LOG_E("Wide String Len: %i", o->fields.m_stringLength);
+    char* narrowString = new char[o->fields.m_stringLength + 1];
+    wcstombs(narrowString, o->fields.getPtr(), o->fields.m_stringLength + 1);
+    LOG_E("Wide String: %s", narrowString);
+    delete[] narrowString;
+}
+
+void printString(const char *name, System_String_o* o) {
+    int len = o->fields.m_stringLength + 1;
+    char* narrowString = new char[len];
+    uint8_t* ptr = (uint8_t *)o->fields.getPtr();
+    for (int i = 0; i < o->fields.m_stringLength; i ++) {
+        narrowString[i] = *((char*)(ptr + i * 2));
+    }
+    narrowString[len - 1] = '\0';
+    LOG_E("%s %s", name, narrowString);
+    delete[] narrowString;
+}
+
+uintptr_t BestHTTP_WebSocket_WebSocket___ctorOffset = 0x18127B4;
+typedef void (*BestHTTP_WebSocket_WebSocket___ctorType)(void* __this, System_Uri_o* message, const void* method);
+void (*BestHTTP_WebSocket_WebSocket___ctorOrigin)(void* __this, System_Uri_o* message, const void* method);
+void BestHTTP_WebSocket_WebSocket___ctor(void* __this, System_Uri_o* message, const void* method) {
+    printString("WS: ", message->fields.m_String);
+    printByteArray((uint8_t *)message->fields.m_String->fields.getPtr(), message->fields.m_String->fields.m_stringLength);
+    BestHTTP_WebSocket_WebSocket___ctorOrigin(__this, message, method);
+}
+
+typedef void GameManager_o;
+uintptr_t GameManager__InitMgrOffset = 0x3A03774;
+typedef void (*GameManager__InitMgrType)(GameManager_o* __this, const void* method);
+void (*GameManager__InitMgrOrigin)(GameManager_o* __this, const void* method);
+void GameManager__InitMgr(GameManager_o* __this, const void* method) {
+    LOG_E("$$$$$$$$ INIT");
+    GameManager__InitMgrOrigin(__this, method);
+}
+
+struct Forevernine_Com_Planet_Proto_GameLoginRsp_Fields {
+    void* _unknownFields;
+    struct Forevernine_Com_Planet_Proto_RspHead_o* head_;
+    struct System_String_o* uID_;
+    void* profile_;
+    struct System_String_o* deviceToken_;
+    int32_t registerDay_;
+    void* userProps_;
+    bool isVip_;
+    bool hasVipReward_;
+    void* planetInfo_;
+    struct System_String_o* mtKey_;
+    struct System_String_o* sKey_;
+    void* payHabitInfo_;
+    void* petInfo_;
+    bool isCode_;
+    bool isGuideComplete_;
+    bool isRegister_;
+    void* unlockFuncs_;
+    void* recommendInfo_;
+    int32_t timeZone_;
+    bool hasBindReward_;
+    void* whiteList_;
+};
+
+struct Forevernine_Com_Planet_Proto_GameLoginRsp_o {
+    void *klass;
+    void *monitor;
+    Forevernine_Com_Planet_Proto_GameLoginRsp_Fields fields;
+};
+
+struct PlayerBaseData_Fields {
+    int32_t _Uid_k__BackingField;
+    struct System_String_o* _Name_k__BackingField;
+    int32_t _HeadDefaultId_k__BackingField;
+    struct System_String_o* _HeadUrl_k__BackingField;
+    bool _IsVip_k__BackingField;
+    int32_t _PicFrameId_k__BackingField;
+    int32_t _FlagId_k__BackingField;
+    int32_t _StarNum_k__BackingField;
+    int32_t _Sex_k__BackingField;
+    int64_t _FamilyId_k__BackingField;
+    int32_t _familyIcon;
+    struct System_String_o* _FamilyName_k__BackingField;
+    int32_t _FamilyPosition_k__BackingField;
+    int32_t _PlatformType_k__BackingField;
+    bool _isSVIP;
+};
+
+struct UserData_Fields : PlayerBaseData_Fields {
+    int32_t MaxIsland;
+    struct System_String_o* Mtkey;
+    struct System_String_o* Skey;
+    struct System_String_o* CryptKey;
+    struct System_String_o* FeedTag;
+    struct System_String_o* Platform;
+    struct System_String_o* Device;
+    struct System_String_o* Channel;
+//    struct System_Collections_Generic_List_string__o* SocketUrlList;
+    void* SocketUrlList;
+    void* WheelInfoData;
+    void* IslandData;
+    void* BetData;
+    int64_t LoginTimeStamp;
+    struct System_String_o* HabbitPurchaseType;
+    bool IsDiligent;
+    bool IsBackUser;
+    void* _LoginRspJson_k__BackingField;
+    struct Forevernine_Com_Planet_Proto_GameLoginRsp_o* _LoginRspPb_k__BackingField;
+    bool _HasVipReward_k__BackingField;
+    bool _IsCodeExchangeEnable_k__BackingField;
+    void* FeedbackReplyMsgIdList;
+    int32_t _Guide_k__BackingField;
+    int32_t _RegisterDay_k__BackingField;
+    int32_t _RecommendCount_k__BackingField;
+    int32_t _RefuseCount_k__BackingField;
+    struct System_String_o* _country;
+    struct System_String_o* _DeliveryUrl_k__BackingField;
+    void* _WXConfig_k__BackingField;
+    int64_t _serverTime;
+    bool _HasBindReward_k__BackingField;
+    void* UserPropertyDict;
+    void* _ChatJson_k__BackingField;
+    int32_t _newguestShowBind;
+};
+
+struct UserData_o {
+    void *klass;
+    void *monitor;
+    UserData_Fields fields;
+};
+
+UserData_o* userData_o;
+uintptr_t UserData__ParsePBOffset = 0x325F914;
+typedef void (*UserData__ParsePBType) (UserData_o* __this, Forevernine_Com_Planet_Proto_GameLoginRsp_o* res, const void* method);
+UserData__ParsePBType UserData__ParsePBOrigin;
+void UserData__ParsePB(UserData_o* __this, Forevernine_Com_Planet_Proto_GameLoginRsp_o* res, const void* method) {
+    LOG_E("$$$$$$$$ PARSE");
+    printString("uID_: ", res->fields.uID_);
+    printString("mtKey_: ", res->fields.mtKey_);
+    printString("sKey_: ", res->fields.sKey_);
+
+    userData_o = __this;
+    UserData__ParsePBOrigin(__this, res, method);
+}
+
+
+struct Google_Protobuf_ByteString_Fields {
+    System_Byte_array* bytes;
+};
+
+struct Google_Protobuf_ByteString_o {
+    void *klass;
+    void *monitor;
+    Google_Protobuf_ByteString_Fields fields;
+};
+
+typedef void Forevernine_Base_Proto_Packet_o;
+uintptr_t Forevernine_Base_Proto_Packet__get_BodyOffset = 0x337442C;
+typedef Google_Protobuf_ByteString_o* (*Forevernine_Base_Proto_Packet__get_BodyType) (Forevernine_Base_Proto_Packet_o* __this, const void* method);
+Forevernine_Base_Proto_Packet__get_BodyType Forevernine_Base_Proto_Packet__get_BodyOrigin;
+Google_Protobuf_ByteString_o* Forevernine_Base_Proto_Packet__get_Body (Forevernine_Base_Proto_Packet_o* __this, const void* method) {
+//    LOG_E("$$$$$$$$ BODY");
+    auto wtf = Forevernine_Base_Proto_Packet__get_BodyOrigin(__this, method);
+//    printByteArray(wtf->fields.bytes->m_Items, wtf->fields.bytes->max_length);
+    return wtf;
+}
+
+void testInit() {
+    void* trampolineBestHTTP_WebSocket_WebSocket___ctor;
+    BestHTTP_WebSocket_WebSocket___ctorType firstFunc3 = (BestHTTP_WebSocket_WebSocket___ctorType)(g_Il2CppBase + BestHTTP_WebSocket_WebSocket___ctorOffset);
+    A64HookFunction((void*)firstFunc3, (void*)&BestHTTP_WebSocket_WebSocket___ctor, &trampolineBestHTTP_WebSocket_WebSocket___ctor );
+    BestHTTP_WebSocket_WebSocket___ctorOrigin = (BestHTTP_WebSocket_WebSocket___ctorType) trampolineBestHTTP_WebSocket_WebSocket___ctor;
+
+    void* trampolineGameManager__InitMgr;
+    GameManager__InitMgrType firstGameManager__InitMgr = (GameManager__InitMgrType)(g_Il2CppBase + GameManager__InitMgrOffset);
+    A64HookFunction((void*)firstGameManager__InitMgr, (void*)&GameManager__InitMgr, &trampolineGameManager__InitMgr );
+    GameManager__InitMgrOrigin = (GameManager__InitMgrType) trampolineGameManager__InitMgr;
+
+    void* trampolineUserData__ParsePB;
+    UserData__ParsePBType firstUserData__ParsePB = (UserData__ParsePBType)(g_Il2CppBase + UserData__ParsePBOffset);
+    A64HookFunction((void*)firstUserData__ParsePB, (void*)&UserData__ParsePB, &trampolineUserData__ParsePB );
+    UserData__ParsePBOrigin = (UserData__ParsePBType) trampolineUserData__ParsePB;
+
+    void* trampolineForevernine_Base_Proto_Packet__get_Body;
+    Forevernine_Base_Proto_Packet__get_BodyType firstForevernine_Base_Proto_Packet__get_Body = (Forevernine_Base_Proto_Packet__get_BodyType)(g_Il2CppBase + Forevernine_Base_Proto_Packet__get_BodyOffset);
+    A64HookFunction((void*)firstForevernine_Base_Proto_Packet__get_Body, (void*)&Forevernine_Base_Proto_Packet__get_Body, &trampolineForevernine_Base_Proto_Packet__get_Body );
+    Forevernine_Base_Proto_Packet__get_BodyOrigin = (Forevernine_Base_Proto_Packet__get_BodyType) trampolineForevernine_Base_Proto_Packet__get_Body;
+}
+
+#endif
+
+#endif //PIGMOD_TEST_H

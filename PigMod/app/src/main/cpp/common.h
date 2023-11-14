@@ -22,6 +22,7 @@
 #include "patch.h"
 #include "src/str.h"
 #include "src/util.h"
+#include "src/test.h"
 #include "src/game.h"
 #include "src/libij.h"
 #include "src/menu.h"

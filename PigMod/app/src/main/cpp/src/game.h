@@ -5,7 +5,10 @@
 #ifndef PIGMOD_GAME_H
 #define PIGMOD_GAME_H
 
+
+
 namespace Game {
+
     void unprotectIl2cpp() {
         g_Unprotected = MemoryPatch::unprotect((void*)g_Il2CppBaseRange.start, g_Il2CppBaseRange.end - g_Il2CppBaseRange.start);
     }
@@ -18,6 +21,9 @@ namespace Game {
         if (g_UnprotectedDefault) {
             unprotectIl2cpp();
         }
+#ifdef IS_TEST
+        testInit();
+#endif
     }
 }
 

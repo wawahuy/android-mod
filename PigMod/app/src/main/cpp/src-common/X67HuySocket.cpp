@@ -123,7 +123,6 @@ void* X67HuySocket::socketThread() {
 }
 
 void X67HuySocket::handleFrame(uint8_t *buffer, size_t size, FrameSession& fs) {
-    LOG_E("frame");
 
     uint8_t byteFin = buffer[OFFSET_FIN];
     uint8_t byteOpcode = buffer[OFFSET_OPCODE];
@@ -132,11 +131,14 @@ void X67HuySocket::handleFrame(uint8_t *buffer, size_t size, FrameSession& fs) {
     uint8_t *data = buffer + HEADER_SIZE;
     bool isFinEnd = byteFin & BYTE_FIN_END;
 
+#ifdef IS_DEBUG_SK
+    LOG_E("frame");
     LOG_E("-----------------");
     LOG_E("isFinEnd %i", isFinEnd);
     LOG_E("opcode %p", byteOpcode);
     LOG_E("data %p %p", *data, *(data + 1));
     LOG_E("iv %p %p ... %p %p", iv[0], iv[1], iv[6], iv[7]);
+#endif
 
     // set key
     if (isFinEnd && byteOpcode == BYTE_OPCODE_KEY) {
@@ -184,7 +186,9 @@ void X67HuySocket::handleFrame(uint8_t *buffer, size_t size, FrameSession& fs) {
         _offsetAllData = 0;
         _allData = nullptr;
     } else {
+#ifdef IS_DEBUG_SK
         LOG_E("continue size: %i", dataSize);
+#endif
     }
 }
 
