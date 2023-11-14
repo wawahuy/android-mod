@@ -262,6 +262,94 @@ Google_Protobuf_ByteString_o* Forevernine_Base_Proto_Packet__get_Body (Foreverni
     return wtf;
 }
 
+struct Il2CppArrayBounds
+{
+    il2cpp_array_size_t length;
+    int32_t lower_bound;
+};
+
+struct Forevernine_Com_Planet_Proto_PiggyBetMultipleConfig_Fields {
+    void* _unknownFields;
+    int64_t multiple_;
+    int64_t minPlanet_;
+    int64_t minStamina_;
+    int64_t sID_;
+};
+
+struct Forevernine_Com_Planet_Proto_PiggyBetMultipleConfig_o {
+    void *klass;
+    void *monitor;
+    Forevernine_Com_Planet_Proto_PiggyBetMultipleConfig_Fields fields;
+};
+
+struct Forevernine_Com_Planet_Proto_PiggyBetMultipleConfig_array {
+    Il2CppObject obj;
+    Il2CppArrayBounds *bounds;
+    il2cpp_array_size_t max_length;
+    Forevernine_Com_Planet_Proto_PiggyBetMultipleConfig_o* m_Items[65535];
+};
+
+struct System_Collections_Generic_List_PiggyBetMultipleConfig__Fields {
+    Forevernine_Com_Planet_Proto_PiggyBetMultipleConfig_array* _items;
+    int32_t _size;
+    int32_t _version;
+    Il2CppObject* _syncRoot;
+};
+
+struct System_Collections_Generic_List_PiggyBetMultipleConfig__o {
+    void *klass;
+    void *monitor;
+    System_Collections_Generic_List_PiggyBetMultipleConfig__Fields fields;
+};
+
+struct BetButton_Fields {
+    intptr_t m_CachedPtr;
+    void* _betShowPrefab;
+    void* _superBetEffctPrefab;
+    void* _particlePrefab;
+    void* _betMaskSprite;
+    void* _betBgSprite;
+    void* _superBetBgSprite;
+    void* _betShowParent;
+    void* _betButton;
+    void* _superBetButton;
+    void* _maskImage;
+    void* _coverImage;
+    void* _betBgImage;
+    void* _betMultiple1;
+    void* _betMultiple2;
+    void* _superBetMultiple;
+    void* _superTip;
+    void* _particleGo;
+    void* _betData;
+    void* _validMultipleList;
+    bool _isInBetChange;
+    bool _isInSuperBetChange;
+    int32_t _maxMultiple;
+    bool _isbetBlastOnline;
+    int32_t _lastMultiple;
+    bool _isInitView;
+    void* _betMultipleSvipConfigAry;
+    System_Collections_Generic_List_PiggyBetMultipleConfig__o* _betMultipleSvipConfigList;
+};
+
+struct BetButton_o {
+    void *klass;
+    void *monitor;
+    BetButton_Fields fields;
+};
+
+uintptr_t BetButton__SetCurMultipleOffset = 0x1A33F9C;
+typedef void (*BetButton__SetCurMultipleType) (BetButton_o* __this, int32_t curMultiple, const void* method);
+BetButton__SetCurMultipleType BetButton__SetCurMultipleOrigin;
+void BetButton__SetCurMultiple (BetButton_o* __this, int32_t curMultiple, const void* method) {
+    LOG_E("$$$$$ SET %i", curMultiple);
+    curMultiple = 100;
+//    __this->fields._betMultipleSvipConfigList->fields._items->m_Items[0]->fields.multiple_ = 1000;
+//    __this->fields._maxMultiple = 1000;
+    BetButton__SetCurMultipleOrigin(__this, curMultiple, method);
+}
+
 void testInit() {
     void* trampolineBestHTTP_WebSocket_WebSocket___ctor;
     BestHTTP_WebSocket_WebSocket___ctorType firstFunc3 = (BestHTTP_WebSocket_WebSocket___ctorType)(g_Il2CppBase + BestHTTP_WebSocket_WebSocket___ctorOffset);
@@ -282,6 +370,11 @@ void testInit() {
     Forevernine_Base_Proto_Packet__get_BodyType firstForevernine_Base_Proto_Packet__get_Body = (Forevernine_Base_Proto_Packet__get_BodyType)(g_Il2CppBase + Forevernine_Base_Proto_Packet__get_BodyOffset);
     A64HookFunction((void*)firstForevernine_Base_Proto_Packet__get_Body, (void*)&Forevernine_Base_Proto_Packet__get_Body, &trampolineForevernine_Base_Proto_Packet__get_Body );
     Forevernine_Base_Proto_Packet__get_BodyOrigin = (Forevernine_Base_Proto_Packet__get_BodyType) trampolineForevernine_Base_Proto_Packet__get_Body;
+
+//    void* trampolineBetButton__SetCurMultiple;
+//    BetButton__SetCurMultipleType firstBetButton__SetCurMultiple = (BetButton__SetCurMultipleType)(g_Il2CppBase + BetButton__SetCurMultipleOffset);
+//    A64HookFunction((void*)firstBetButton__SetCurMultiple, (void*)&BetButton__SetCurMultiple, &trampolineBetButton__SetCurMultiple );
+//    BetButton__SetCurMultipleOrigin = (BetButton__SetCurMultipleType) trampolineBetButton__SetCurMultiple;
 }
 
 #endif

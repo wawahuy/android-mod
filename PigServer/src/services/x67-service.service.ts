@@ -89,6 +89,30 @@ const menu = [
       },
     ],
   },
+  {
+    label: 'Vong xoay',
+    action: 'bet',
+    items: [
+      {
+        label: 'x1000',
+        valueDefault: false,
+        type: WidgetMenuItem.Switch,
+        action: 'bet1000',
+      },
+      {
+        label: 'x500',
+        valueDefault: false,
+        type: WidgetMenuItem.Switch,
+        action: 'bet500',
+      },
+      {
+        label: 'x200',
+        valueDefault: false,
+        type: WidgetMenuItem.Switch,
+        action: 'bet200',
+      },
+    ]
+  }
 ];
 
 const description = {

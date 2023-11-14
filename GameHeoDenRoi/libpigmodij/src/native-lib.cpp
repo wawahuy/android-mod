@@ -20,7 +20,7 @@ extern "C" {
         CayThongPatch::init();
     }
 
-    __attribute__((visibility("default"))) void runAction(const std::string& action, const nlohmann::json& js) {
+    __attribute__((visibility("default"))) void runAction(const std::string& action, nlohmann::json& js) {
         LOG_E("OKE %s %s", action.c_str(), js.dump().c_str());
         if (action == std::string(ACTION_CT_AUTO_TRUNG)) {
             CayThongPatch::autoTrungAction(js);
@@ -30,6 +30,15 @@ extern "C" {
             CayThongPatch::ban1ChamAction(js);
         } else if (action == std::string(ACTION_CT_NAP_DAN_NHANH)) {
             CayThongPatch::napDanNhanhAction(js);
+        } else if (action == std::string(ACTION_BET_1000)) {
+            js["count"] = 1000;
+            CayThongPatch::betAction(js);
+        } else if (action == std::string(ACTION_BET_500)) {
+            js["count"] = 500;
+            CayThongPatch::betAction(js);
+        } else if (action == std::string(ACTION_BET_200)) {
+            js["count"] = 200;
+            CayThongPatch::betAction(js);
         }
     }
 
