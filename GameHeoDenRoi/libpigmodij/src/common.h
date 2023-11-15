@@ -14,3 +14,4 @@ void (*m_protectIl2cpp)();
 uintptr_t g_il2CppBase;
 
 #include "cay-thong.h"
+#include "bet.h"

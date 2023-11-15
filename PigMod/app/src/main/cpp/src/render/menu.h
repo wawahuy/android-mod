@@ -22,7 +22,9 @@ namespace MenuRenderer {
             case WidgetMenuBaseType::ServerSwitch:
             {
                 MenuItemSwitch* mis = (MenuItemSwitch *) menuItem;
-                ImGui::BulletText("%s", mis->label.c_str());
+                if (!mis->label.empty()) {
+                    ImGui::BulletText("%s", mis->label.c_str());
+                }
                 if (!mis->isNewLine) {
                     ImGui::SameLine();
                 }
@@ -35,6 +37,14 @@ namespace MenuRenderer {
                 }
                 break;
             }
+            case WidgetMenuBaseType::Button:
+            {
+                MenuItemSwitch* mis = (MenuItemSwitch *) menuItem;
+                if (ImGui::Button(mis->label.c_str())) {
+                    Menu::runAction(mis);
+                }
+                break;
+            }
             case WidgetMenuBaseType::InputInt:
             {
                 MenuItemInputInt* mis = (MenuItemInputInt *) menuItem;
@@ -42,7 +52,9 @@ namespace MenuRenderer {
                     float y = ImGui::GetCursorPosY();
                     ImGui::SetCursorPosY(y + 10.0f);
                 }
-                ImGui::BulletText("%s", mis->label.c_str());
+                if (!mis->label.empty()) {
+                    ImGui::BulletText("%s", mis->label.c_str());
+                }
                 if (!mis->isNewLine) {
                     ImGui::SameLine();
                     float y = ImGui::GetCursorPosY();
@@ -75,7 +87,9 @@ namespace MenuRenderer {
                     float y = ImGui::GetCursorPosY();
                     ImGui::SetCursorPosY(y + 10.0f);
                 }
-                ImGui::BulletText("%s", mis->label.c_str());
+                if (!mis->label.empty()) {
+                    ImGui::BulletText("%s", mis->label.c_str());
+                }
                 if (!mis->isNewLine) {
                     ImGui::SameLine();
                     float y = ImGui::GetCursorPosY();
@@ -89,6 +103,33 @@ namespace MenuRenderer {
                 ImGui::PopItemWidth();
                 break;
             }
+            case WidgetMenuBaseType::SliderInt:
+            {
+                MenuItemSliderInt* mis = (MenuItemSliderInt *) menuItem;
+                if (!mis->isNewLine) {
+                    float y = ImGui::GetCursorPosY();
+                    ImGui::SetCursorPosY(y + 10.0f);
+                }
+                if (!mis->label.empty()) {
+                    ImGui::BulletText("%s", mis->label.c_str());
+                }
+                if (!mis->isNewLine) {
+                    ImGui::SameLine();
+                    float y = ImGui::GetCursorPosY();
+                    ImGui::SetCursorPosY(y - 10.0f);
+                }
+                ImGui::PushItemWidth(mis->valueWidth);
+                if (ImGui::SliderInt(mis->idImguiVisible.c_str(), &mis->value, mis->valueMin, mis->valueMax)) {
+                    dataArgs[argName] = mis->value;
+                    Menu::runAction(mis);
+                }
+                ImGui::PopItemWidth();
+                break;
+            }
+        }
+
+        if (menuItem->isSameLine) {
+            ImGui::SameLine();
         }
     }
 

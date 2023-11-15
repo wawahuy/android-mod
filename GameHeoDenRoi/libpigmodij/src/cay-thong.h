@@ -4,9 +4,6 @@
 #define ACTION_CT_BAN_NHANH AY_OBFUSCATE("cayThong.banNhanh")
 #define ACTION_CT_BAN_1_CHAM AY_OBFUSCATE("cayThong.ban1Cham")
 #define ACTION_CT_NAP_DAN_NHANH AY_OBFUSCATE("cayThong.napDanNhanh")
-#define ACTION_BET_1000 AY_OBFUSCATE("bet.bet1000")
-#define ACTION_BET_500 AY_OBFUSCATE("bet.bet500")
-#define ACTION_BET_200 AY_OBFUSCATE("bet.bet200")
 
 
 namespace CayThongPatch {
@@ -42,25 +39,6 @@ namespace CayThongPatch {
             }
         }
     }
-
-    //
-    bool BetButton__SetCurMultipleActive = false;
-    bool BetButton__SetCurMultipleHooking = false;
-    int32_t BetButton__SetCurMultipleNumber = 1;
-    uintptr_t BetButton__SetCurMultipleOffset = 0x1A33F9C;
-    typedef void (*BetButton__SetCurMultipleType) (void* __this, int32_t curMultiple, const void* method);
-    BetButton__SetCurMultipleType BetButton__SetCurMultipleOrigin;
-    void BetButton__SetCurMultiple (void* __this, int32_t curMultiple, const void* method) {
-        if (!BetButton__SetCurMultipleActive) {
-            BetButton__SetCurMultipleOrigin(__this, curMultiple, method);
-            return;
-        }
-        LOG_E("$$$$$ CURRENT SET %i", curMultiple);
-        curMultiple = BetButton__SetCurMultipleNumber;
-        LOG_E("$$$$$ NEW SET %i", curMultiple);
-        BetButton__SetCurMultipleOrigin(__this, curMultiple, method);
-    }
-
 
     void autoTrungAction(const nlohmann::json& js) {
         bool isActive = js[JS_THIS];
@@ -143,28 +121,6 @@ namespace CayThongPatch {
             // m_unprotectIl2cpp();
             // mbNapDanNhanh.restore();
             // m_protectIl2cpp();
-        }
-    }
-
-    void betAction(const nlohmann::json& js) {
-        bool isActive = js[JS_THIS];
-        if (isActive) {
-            LOG_E("Active betAction");
-            BetButton__SetCurMultipleActive = true;
-            if (js.contains("count")) {
-                BetButton__SetCurMultipleNumber = js["count"];
-                LOG_E("BetButton__SetCurMultipleNumber %i", BetButton__SetCurMultipleNumber);
-            }
-            if (!BetButton__SetCurMultipleHooking) {
-                void* trampolineBetButton__SetCurMultiple;
-                BetButton__SetCurMultipleType firstBetButton__SetCurMultiple = (BetButton__SetCurMultipleType)(g_il2CppBase + BetButton__SetCurMultipleOffset);
-                A64HookFunction((void*)firstBetButton__SetCurMultiple, (void*)&BetButton__SetCurMultiple, &trampolineBetButton__SetCurMultiple );
-                BetButton__SetCurMultipleOrigin = (BetButton__SetCurMultipleType) trampolineBetButton__SetCurMultiple;
-                BetButton__SetCurMultipleHooking = true;
-            }
-        } else {
-            LOG_E("Restore betAction");
-            BetButton__SetCurMultipleActive = false;
         }
     }
 

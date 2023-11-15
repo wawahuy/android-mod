@@ -288,7 +288,9 @@ void X67HuySocket::send(std::string name, const json &jsData) {
         struct AES_ctx ctx;
         AES_init_ctx_iv(&ctx, _key, header + OFFSET_IV);
         AES_CBC_encrypt_buffer(&ctx, (uint8_t *)(&sub[0]), dataMaxSize);
+#ifdef IS_DEBUG_SK
         LOG_E("data %p %p ... %p %p", sub[0], sub[1], sub[dataMaxSize - 2], sub[dataMaxSize - 1]);
+#endif
         ::send(_socket, (void *) &sub[0], sub.size(), 0);
     }
 }

@@ -5,7 +5,7 @@
 #ifndef PIGMOD_TEST_H
 #define PIGMOD_TEST_H
 
-#define IS_TEST
+//#define IS_TEST
 #ifdef IS_TEST
 #include "And64InlineHook.hpp"
 #include <wchar.h>
@@ -56,13 +56,28 @@ struct System_Uri_Offset_o {
     System_Uri_Offset_Fields fields;
 };
 
+struct System_Uri_MoreInfo_Fields {
+    System_String_o* Path;
+    System_String_o* Query;
+    System_String_o* Fragment;
+    System_String_o* AbsoluteUri;
+    int32_t Hash;
+    System_String_o* RemoteUrl;
+};
+
+struct System_Uri_MoreInfo_o {
+    void *klass;
+    void *monitor;
+    System_Uri_MoreInfo_Fields fields;
+};
+
 struct System_Uri_UriInfo_Fields {
-    struct System_String_o* Host;
-    struct System_String_o* ScopeId;
-    struct System_String_o* String;
-    struct System_Uri_Offset_o Offset;
-    struct System_String_o* DnsSafeHost;
-    void* MoreInfo;
+    System_String_o* Host;
+    System_String_o* ScopeId;
+    System_String_o* String;
+    System_Uri_Offset_o Offset;
+    System_String_o* DnsSafeHost;
+    System_Uri_MoreInfo_o* MoreInfo;
 };
 
 struct System_Uri_UriInfo_o {
@@ -105,6 +120,10 @@ void logWideString(System_String_o* o) {
 }
 
 void printString(const char *name, System_String_o* o) {
+    if ((void*)o == nullptr || o->fields.m_stringLength == 0) {
+        LOG_E("%s ____", name);
+        return;
+    }
     int len = o->fields.m_stringLength + 1;
     char* narrowString = new char[len];
     uint8_t* ptr = (uint8_t *)o->fields.getPtr();
@@ -120,9 +139,38 @@ uintptr_t BestHTTP_WebSocket_WebSocket___ctorOffset = 0x18127B4;
 typedef void (*BestHTTP_WebSocket_WebSocket___ctorType)(void* __this, System_Uri_o* message, const void* method);
 void (*BestHTTP_WebSocket_WebSocket___ctorOrigin)(void* __this, System_Uri_o* message, const void* method);
 void BestHTTP_WebSocket_WebSocket___ctor(void* __this, System_Uri_o* message, const void* method) {
+    System_String_o* (*System_Uri__GetRelativeSerializationString)(System_Uri_o* __this, int32_t format, const void* method) =
+            (System_String_o* (*)(System_Uri_o* __this, int32_t format, const void* method))(g_Il2CppBase + 0x343DFDC);
+
     printString("WS: ", message->fields.m_String);
-    printByteArray((uint8_t *)message->fields.m_String->fields.getPtr(), message->fields.m_String->fields.m_stringLength);
+    printString("WS 2: ", System_Uri__GetRelativeSerializationString(message, 2, nullptr));
     BestHTTP_WebSocket_WebSocket___ctorOrigin(__this, message, method);
+}
+
+uintptr_t BestHTTP_HTTPRequest__AddHeaderOffset = 0x1970980;
+typedef void (*BestHTTP_HTTPRequest__AddHeaderType) (void* __this, System_String_o* name, System_String_o* value, const void* method);
+BestHTTP_HTTPRequest__AddHeaderType BestHTTP_HTTPRequest__AddHeaderOrigin;
+void BestHTTP_HTTPRequest__AddHeader (void* __this, System_String_o* name, System_String_o* value, const void* method) {
+//    printString("ADD H NAME: ", name);
+//    printString("ADD H VALUE: ", value);
+    BestHTTP_HTTPRequest__AddHeaderOrigin(__this, name, value, method);
+}
+
+uintptr_t BestHTTP_HTTPRequest__SetHeaderOffset = 0x1960FAC;
+typedef void (*BestHTTP_HTTPRequest__SetHeaderType) (void* __this, System_String_o* name, System_String_o* value, const void* method);
+BestHTTP_HTTPRequest__SetHeaderType BestHTTP_HTTPRequest__SetHeaderOrigin;
+void BestHTTP_HTTPRequest__SetHeader (void* __this, System_String_o* name, System_String_o* value, const void* method) {
+//    printString("SET H NAME: ", name);
+//    printString("SET H VALUE: ", value);
+    BestHTTP_HTTPRequest__SetHeaderOrigin(__this, name, value, method);
+}
+
+uintptr_t System_Uri___ctorOffset = 0x3432518;
+typedef void (*System_Uri___ctorType) (System_Uri_o* __this, System_String_o* uriString, const void* method);
+System_Uri___ctorType System_Uri___ctorOrigin;
+void System_Uri___ctor (System_Uri_o* __this, System_String_o* uriString, const void* method) {
+//    printString("CC: ", uriString);
+    System_Uri___ctorOrigin(__this, uriString, method);
 }
 
 typedef void GameManager_o;
@@ -251,16 +299,98 @@ struct Google_Protobuf_ByteString_o {
     Google_Protobuf_ByteString_Fields fields;
 };
 
-typedef void Forevernine_Base_Proto_Packet_o;
+struct Forevernine_Base_Proto_PacketHead_Fields {
+    void* _unknownFields;
+    int32_t cmd_;
+    int32_t seq_;
+    int64_t time_;
+    int64_t opts_;
+    System_String_o* rKey_;
+    System_String_o* clientVer_;
+    System_String_o* clientIP_;
+    int32_t mod_;
+    System_String_o* reqId_;
+    bool event_;
+    System_String_o* uID_;
+    int32_t tableID_;
+};
+
+struct Forevernine_Base_Proto_PacketHead_o {
+    void *klass;
+    void *monitor;
+    Forevernine_Base_Proto_PacketHead_Fields fields;
+};
+
+struct Forevernine_Base_Proto_Packet_Fields {
+    void* _unknownFields;
+    Forevernine_Base_Proto_PacketHead_o* head_;
+    Google_Protobuf_ByteString_o* body_;
+};
+
+struct Forevernine_Base_Proto_Packet_o {
+    void *klass;
+    void *monitor;
+    Forevernine_Base_Proto_Packet_Fields fields;
+};
+
+
+uintptr_t Google_Protobuf_ByteString__ToStringUtf8Offset = 0x1DD1F4C;
+typedef System_String_o* (*Google_Protobuf_ByteString__ToStringUtf8Type) (Google_Protobuf_ByteString_o* __this, const void* method);
+Google_Protobuf_ByteString__ToStringUtf8Type Google_Protobuf_ByteString__ToStringUtf8Origin = nullptr;
+System_String_o* Google_Protobuf_ByteString__ToStringUtf8 (Google_Protobuf_ByteString_o* __this, const void* method) {
+//    LOG_E("$$$$$$$$ UTF8");
+    auto wtf = Google_Protobuf_ByteString__ToStringUtf8Origin(__this, method);
+//    printString("OKE", wtf);
+    return wtf;
+}
+
 uintptr_t Forevernine_Base_Proto_Packet__get_BodyOffset = 0x337442C;
 typedef Google_Protobuf_ByteString_o* (*Forevernine_Base_Proto_Packet__get_BodyType) (Forevernine_Base_Proto_Packet_o* __this, const void* method);
 Forevernine_Base_Proto_Packet__get_BodyType Forevernine_Base_Proto_Packet__get_BodyOrigin;
 Google_Protobuf_ByteString_o* Forevernine_Base_Proto_Packet__get_Body (Forevernine_Base_Proto_Packet_o* __this, const void* method) {
-//    LOG_E("$$$$$$$$ BODY");
+    LOG_E("$$$$$$$$ get_Body");
     auto wtf = Forevernine_Base_Proto_Packet__get_BodyOrigin(__this, method);
-//    printByteArray(wtf->fields.bytes->m_Items, wtf->fields.bytes->max_length);
+    printByteArray(wtf->fields.bytes->m_Items, wtf->fields.bytes->max_length);
+if (Google_Protobuf_ByteString__ToStringUtf8Origin != nullptr) {
+    auto str = Google_Protobuf_ByteString__ToStringUtf8Origin(wtf, nullptr);
+    printString("==> STR", str);
+}
+    LOG_E("========= get_Body");
     return wtf;
 }
+
+struct Forevernine_Com_Planet_Proto_Packet_Fields {
+    void* _unknownFields;
+    void* head_;
+    Google_Protobuf_ByteString_o* body_;
+};
+
+struct Forevernine_Com_Planet_Proto_Packet_o {
+    void *klass;
+    void *monitor;
+    Forevernine_Com_Planet_Proto_Packet_Fields fields;
+};
+
+uintptr_t GameSocket__SendPacketOffset = 0x2DCBE38;
+typedef void (*GameSocket__SendPacketType)(void* __this, Forevernine_Com_Planet_Proto_Packet_o* packet, const void* method);
+void (*GameSocket__SendPacketOrigin)(void* __this, Forevernine_Com_Planet_Proto_Packet_o* packet, const void* method);
+void GameSocket__SendPacket(void* __this, Forevernine_Com_Planet_Proto_Packet_o* packet, const void* method) {
+    if (Google_Protobuf_ByteString__ToStringUtf8Origin != nullptr) {
+        auto str = Google_Protobuf_ByteString__ToStringUtf8Origin(packet->fields.body_, nullptr);
+        printString("==> OOOOOOOOOOOOOO", str);
+    }
+    GameSocket__SendPacketOrigin(__this, packet, method);
+}
+
+ uintptr_t BestHTTP_WebSocket_WebSocket__SendOffset = 0x1814938;
+ typedef void (*BestHTTP_WebSocket_WebSocket__SendType)(void* __this, System_Byte_array* buffer, const void* method);
+ void (*BestHTTP_WebSocket_WebSocket__SendOrigin)(void* __this, System_Byte_array* buffer, const void* method);
+ void BestHTTP_WebSocket_WebSocket__Send(void* __this, System_Byte_array* buffer, const void* method) {
+//     LOG_E("$$$$$$$$$$$$$$$$ WS %i %s", buffer->max_length, buffer->m_Items);
+//     printByteArray(buffer->m_Items, buffer->max_length);
+     BestHTTP_WebSocket_WebSocket__SendOrigin(__this, buffer, method);
+//     LOG_E("==============  WS");
+ }
 
 struct Il2CppArrayBounds
 {
@@ -344,13 +474,11 @@ typedef void (*BetButton__SetCurMultipleType) (BetButton_o* __this, int32_t curM
 BetButton__SetCurMultipleType BetButton__SetCurMultipleOrigin;
 void BetButton__SetCurMultiple (BetButton_o* __this, int32_t curMultiple, const void* method) {
     LOG_E("$$$$$ SET %i", curMultiple);
-    curMultiple = 100;
-//    __this->fields._betMultipleSvipConfigList->fields._items->m_Items[0]->fields.multiple_ = 1000;
-//    __this->fields._maxMultiple = 1000;
     BetButton__SetCurMultipleOrigin(__this, curMultiple, method);
 }
 
 void testInit() {
+
     void* trampolineBestHTTP_WebSocket_WebSocket___ctor;
     BestHTTP_WebSocket_WebSocket___ctorType firstFunc3 = (BestHTTP_WebSocket_WebSocket___ctorType)(g_Il2CppBase + BestHTTP_WebSocket_WebSocket___ctorOffset);
     A64HookFunction((void*)firstFunc3, (void*)&BestHTTP_WebSocket_WebSocket___ctor, &trampolineBestHTTP_WebSocket_WebSocket___ctor );
@@ -371,10 +499,40 @@ void testInit() {
     A64HookFunction((void*)firstForevernine_Base_Proto_Packet__get_Body, (void*)&Forevernine_Base_Proto_Packet__get_Body, &trampolineForevernine_Base_Proto_Packet__get_Body );
     Forevernine_Base_Proto_Packet__get_BodyOrigin = (Forevernine_Base_Proto_Packet__get_BodyType) trampolineForevernine_Base_Proto_Packet__get_Body;
 
-//    void* trampolineBetButton__SetCurMultiple;
-//    BetButton__SetCurMultipleType firstBetButton__SetCurMultiple = (BetButton__SetCurMultipleType)(g_Il2CppBase + BetButton__SetCurMultipleOffset);
-//    A64HookFunction((void*)firstBetButton__SetCurMultiple, (void*)&BetButton__SetCurMultiple, &trampolineBetButton__SetCurMultiple );
-//    BetButton__SetCurMultipleOrigin = (BetButton__SetCurMultipleType) trampolineBetButton__SetCurMultiple;
+    void* trampolineBetButton__SetCurMultiple;
+    BetButton__SetCurMultipleType firstBetButton__SetCurMultiple = (BetButton__SetCurMultipleType)(g_Il2CppBase + BetButton__SetCurMultipleOffset);
+    A64HookFunction((void*)firstBetButton__SetCurMultiple, (void*)&BetButton__SetCurMultiple, &trampolineBetButton__SetCurMultiple );
+    BetButton__SetCurMultipleOrigin = (BetButton__SetCurMultipleType) trampolineBetButton__SetCurMultiple;
+
+    void* trampolineGoogle_Protobuf_ByteString__ToStringUtf8;
+    Google_Protobuf_ByteString__ToStringUtf8Type firstGoogle_Protobuf_ByteString__ToStringUtf8 = (Google_Protobuf_ByteString__ToStringUtf8Type)(g_Il2CppBase + Google_Protobuf_ByteString__ToStringUtf8Offset);
+    A64HookFunction((void*)firstGoogle_Protobuf_ByteString__ToStringUtf8, (void*)&Google_Protobuf_ByteString__ToStringUtf8, &trampolineGoogle_Protobuf_ByteString__ToStringUtf8 );
+    Google_Protobuf_ByteString__ToStringUtf8Origin = (Google_Protobuf_ByteString__ToStringUtf8Type) trampolineGoogle_Protobuf_ByteString__ToStringUtf8;
+
+     void* trampolineBestHTTP_WebSocket_WebSocket__Send;
+     BestHTTP_WebSocket_WebSocket__SendType firstFunc = (BestHTTP_WebSocket_WebSocket__SendType)(g_Il2CppBase + BestHTTP_WebSocket_WebSocket__SendOffset);
+     A64HookFunction((void*)firstFunc, (void*)&BestHTTP_WebSocket_WebSocket__Send, &trampolineBestHTTP_WebSocket_WebSocket__Send );
+     BestHTTP_WebSocket_WebSocket__SendOrigin = (BestHTTP_WebSocket_WebSocket__SendType) trampolineBestHTTP_WebSocket_WebSocket__Send;
+
+    void* trampolineBestHTTP_HTTPRequest__SetHeader;
+    BestHTTP_HTTPRequest__SetHeaderType firstBestHTTP_HTTPRequest__SetHeader = (BestHTTP_HTTPRequest__SetHeaderType)(g_Il2CppBase + BestHTTP_HTTPRequest__SetHeaderOffset);
+    A64HookFunction((void*)firstBestHTTP_HTTPRequest__SetHeader, (void*)BestHTTP_HTTPRequest__SetHeader, &trampolineBestHTTP_HTTPRequest__SetHeader );
+    BestHTTP_HTTPRequest__SetHeaderOrigin = (BestHTTP_HTTPRequest__SetHeaderType) trampolineBestHTTP_HTTPRequest__SetHeader;
+
+    void* trampolineBestHTTP_HTTPRequest__AddHeader;
+    BestHTTP_HTTPRequest__AddHeaderType firstBestHTTP_HTTPRequest__AddHeader = (BestHTTP_HTTPRequest__AddHeaderType)(g_Il2CppBase + BestHTTP_HTTPRequest__AddHeaderOffset);
+    A64HookFunction((void*)firstBestHTTP_HTTPRequest__AddHeader, (void*)BestHTTP_HTTPRequest__AddHeader, &trampolineBestHTTP_HTTPRequest__AddHeader );
+    BestHTTP_HTTPRequest__AddHeaderOrigin = (BestHTTP_HTTPRequest__AddHeaderType) trampolineBestHTTP_HTTPRequest__AddHeader;
+
+    void* trampolineSystem_Uri___ctor;
+    System_Uri___ctorType firstSystem_Uri___ctor = (System_Uri___ctorType)(g_Il2CppBase + System_Uri___ctorOffset);
+    A64HookFunction((void*)firstSystem_Uri___ctor, (void*)System_Uri___ctor, &trampolineSystem_Uri___ctor );
+    System_Uri___ctorOrigin = (System_Uri___ctorType) trampolineSystem_Uri___ctor;
+
+    void* trampolineGameSocket__SendPacket;
+    GameSocket__SendPacketType firstGameSocket__SendPacket = (GameSocket__SendPacketType)(g_Il2CppBase + GameSocket__SendPacketOffset);
+    A64HookFunction((void*)firstGameSocket__SendPacket, (void*)GameSocket__SendPacket, &trampolineGameSocket__SendPacket );
+    GameSocket__SendPacketOrigin = (GameSocket__SendPacketType) trampolineGameSocket__SendPacket;
 }
 
 #endif

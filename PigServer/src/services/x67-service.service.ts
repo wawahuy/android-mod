@@ -5,6 +5,7 @@ import X67Socket from 'src/x67-server/x67-socket';
 import { AsmService } from './asm.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as ws from  'ws';
 import { createHashMd5 } from 'src/utils/ws';
 import { ConfigService } from '@nestjs/config';
 
@@ -12,10 +13,19 @@ enum WidgetMenuItem {
   Switch = 1,
   InputInt = 2,
   SliderFloat = 3,
+  SliderInt = 4,
+  Button = 5,
 
   ServerSwitch = 101,
   Call = 102,
 }
+
+enum ArgDataPushType {
+  No = 0,
+  First = 1,
+  Focus = 2,
+  Always = 3,
+};
 
 const menu = [
   // {
@@ -94,23 +104,62 @@ const menu = [
     action: 'bet',
     items: [
       {
-        label: 'x1000',
-        valueDefault: false,
+        label: 'Vong xoay',
+        valueDefault: true,
         type: WidgetMenuItem.Switch,
-        action: 'bet1000',
-      },
-      {
-        label: 'x500',
-        valueDefault: false,
-        type: WidgetMenuItem.Switch,
-        action: 'bet500',
-      },
-      {
-        label: 'x200',
-        valueDefault: false,
-        type: WidgetMenuItem.Switch,
-        action: 'bet200',
-      },
+        action: 'vongXoay',
+        items: [
+          {
+            type: WidgetMenuItem.SliderInt,
+            arg: 'count',
+            valueDefault: 1,
+            valueMin: 1,
+            valueMax: 2000,
+            valueStep: 10,
+            valueStepFast: 50,
+            valueWidth: 400,
+            hashId: "vongXoay.count.slider",
+          },
+          {
+            label: 'x100',
+            valueDefault: false,
+            type: WidgetMenuItem.Button,
+            pushArgs: [
+              ['count', 100]
+            ],
+            pushArgsType: ArgDataPushType.Always,
+            callReMapArgsHashId: [
+              "vongXoay.count.slider"
+            ],
+            sameLine: true,
+          },
+          {
+            label: 'x500',
+            valueDefault: false,
+            type: WidgetMenuItem.Button,
+            pushArgs: [
+              ['count', 500]
+            ],
+            pushArgsType: ArgDataPushType.Always,
+            callReMapArgsHashId: [
+              "vongXoay.count.slider"
+            ],
+            sameLine: true,
+          },
+          {
+            label: 'x1000',
+            valueDefault: false,
+            type: WidgetMenuItem.Button,
+            pushArgs: [
+              ['count', 1000]
+            ],
+            pushArgsType: ArgDataPushType.Always,
+            callReMapArgsHashId: [
+              "vongXoay.count.slider"
+            ],
+          },
+        ]
+      }
     ]
   }
 ];
