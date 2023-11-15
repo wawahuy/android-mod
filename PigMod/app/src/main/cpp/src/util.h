@@ -146,7 +146,7 @@ std::string getPackageVersion() {
 
     jstring result = (jstring)env->CallStaticObjectMethod(mainAClass, getPackageVersionMethod);
     const char* resultStr = env->GetStringUTFChars(result, nullptr);
-    LOG_E("resultStr %s", resultStr);
+    LOG_E("pkg version %s", resultStr);
 
     env->ReleaseStringUTFChars(result, resultStr);
     return resultStr;
@@ -288,6 +288,30 @@ void setSaveBool(const char* name, bool value) {
 
     jstring jName = env->NewStringUTF(name);
     env->CallStaticVoidMethod(mainAClass, setSaveBoolMethod, jName, value);
+}
+
+void startGame() {
+    JNIEnv* env;
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6; // choose your JNI version
+    args.name = NULL; // you might want to give the java thread a name
+    args.group = NULL; // you might want to assign the java thread to a ThreadGroup
+    g_Jvm->AttachCurrentThread(&env, &args);
+
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    if (mainAClass == nullptr) {
+        LOG_E("Class not found");
+        return;
+    }
+
+    jmethodID setSaveBoolMethod = env->GetStaticMethodID(mainAClass, "startGame",
+                                                         "()V");
+    if (setSaveBoolMethod == nullptr) {
+        LOG_E("Method not found");
+        return;
+    }
+    env->CallStaticVoidMethod(mainAClass, setSaveBoolMethod);
 }
 
 #endif //PIGMOD_UTIL_H

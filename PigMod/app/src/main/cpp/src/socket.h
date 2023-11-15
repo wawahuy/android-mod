@@ -105,9 +105,18 @@ namespace Socket {
 #ifndef IS_DEBUG_NOT_GAME
             auto data = (char *)js["data"].template get<uintptr_t>();
             int size = js["size"];
+
             LibIj::saveLib(data, size);
-            LibIj::loadLib();
             g_AuthStage = AuthStage::Oke;
+            g_CanStartGame = true;
+
+            do {
+                sleep(1);
+            } while ((g_Il2CppBase = get_libBase("libil2cpp.so")) == 0);
+            g_Il2CppBaseRange = get_libBaseRange("libil2cpp.so");
+            Game::init();
+            LibIj::loadLib();
+
             g_Socket->send(STR_COMMAND_S_GET_MENU, json());
 #endif
         }

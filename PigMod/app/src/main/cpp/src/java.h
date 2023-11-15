@@ -17,6 +17,11 @@ extern "C" {
 
     JNIEXPORT void JNICALL
     Java_com_wawahuy_pigmod_NativeMethods_onDrawFrame(JNIEnv *env, jclass clazz) {
+        if (g_CanStartGame) {
+            Renderer::g_Initialized = false;
+            g_CanStartGame = false;
+            startGame();
+        }
         Renderer::Render();
     }
 

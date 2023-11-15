@@ -7,6 +7,7 @@
 
 namespace Renderer {
     static bool g_Initialized = false;
+    static bool g_Scale = false;
 
     void SetupRenderer(int w, int  h) {
         g_ScreenWidth = w;
@@ -21,11 +22,15 @@ namespace Renderer {
         ImGui_ImplAndroid_Init(nullptr);
         ImGui_ImplOpenGL3_Init("#version 300 es");
 
-        ImFontConfig font_cfg;
-        // 22 3.0
-        font_cfg.SizePixels = 32.0f;
-        io.Fonts->AddFontDefault(&font_cfg);
-        ImGui::GetStyle().ScaleAllSizes(3.4f);
+        if (!g_Scale) {
+            ImFontConfig font_cfg;
+            // 22 3.0
+            font_cfg.SizePixels = 32.0f;
+            io.Fonts->AddFontDefault(&font_cfg);
+            ImGui::GetStyle().ScaleAllSizes(3.4f);
+            g_Scale = true;
+        }
+
         g_Initialized = true;
     }
 

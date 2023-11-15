@@ -343,11 +343,10 @@ namespace Menu {
         }
         menu.clear();
         hashIdItems.clear();
+        g_MenuInit = false;
     }
 
     void init(const json& data) {
-        g_MenuInit = true;
-
         release();
 
         if (data.contains("versionHash")) {
@@ -398,6 +397,8 @@ namespace Menu {
 
             menu.push_back(menuGroup);
         }
+
+        g_MenuInit = true;
     }
 }
 #endif //PIGMOD_MENU_H
