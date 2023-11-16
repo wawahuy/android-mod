@@ -18,6 +18,7 @@ extern "C" {
         m_protectIl2cpp = (void (*)())protectIl2cpp;
 
         CayThongPatch::init();
+        BetPatch::init();
     }
 
     __attribute__((visibility("default"))) void runAction(const std::string& action, nlohmann::json& js) {

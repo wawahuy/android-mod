@@ -37,13 +37,12 @@ public class MainActivity extends Activity {
 
     public static GLViewWrapper glViewWrapper;
 
-    public static void startGame() {
+    public static void startGame(String packageName, String className) {
         Activity activity = (Activity)contextCurrent;
         WindowManager windowManager = activity.getWindowManager();
         windowManager.removeView(glViewWrapper);
-
         Intent intent = new Intent();
-        intent.setClassName("com.aladinfun.clashofsky_th_pig", "com.aladinfun.piggyboom.MainAppActivity");
+        intent.setClassName(packageName, className);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         activity.startActivity(intent);
         activity.overridePendingTransition(0, 0);

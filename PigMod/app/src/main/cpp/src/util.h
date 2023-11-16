@@ -290,7 +290,7 @@ void setSaveBool(const char* name, bool value) {
     env->CallStaticVoidMethod(mainAClass, setSaveBoolMethod, jName, value);
 }
 
-void startGame() {
+void startGame(std::string packageName, std::string className) {
     JNIEnv* env;
 
     JavaVMAttachArgs args;
@@ -306,12 +306,16 @@ void startGame() {
     }
 
     jmethodID setSaveBoolMethod = env->GetStaticMethodID(mainAClass, "startGame",
-                                                         "()V");
+                                                         "(Ljava/lang/String;Ljava/lang/String;)V");
     if (setSaveBoolMethod == nullptr) {
         LOG_E("Method not found");
         return;
     }
-    env->CallStaticVoidMethod(mainAClass, setSaveBoolMethod);
+
+    jstring jPackageName = env->NewStringUTF(packageName.c_str());
+    jstring jClassName = env->NewStringUTF(className.c_str());
+
+    env->CallStaticVoidMethod(mainAClass, setSaveBoolMethod, jPackageName, jClassName);
 }
 
 #endif //PIGMOD_UTIL_H

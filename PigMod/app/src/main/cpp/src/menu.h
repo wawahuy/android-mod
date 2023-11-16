@@ -221,6 +221,7 @@ namespace Menu {
             menuItem->argDataPush = jsMenuItem["pushArgs"];
             if (type == ArgDataPushType::Always || type == ArgDataPushType::First) {
                 handlePushArgs2ArgData(menuItem);
+                handleCallReMapArgsHashId(menuItem);
             }
         }
         if (jsMenuItem.contains("hashId")) {

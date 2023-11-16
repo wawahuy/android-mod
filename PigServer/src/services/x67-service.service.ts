@@ -112,7 +112,7 @@ const menu = [
           {
             type: WidgetMenuItem.SliderInt,
             arg: 'count',
-            valueDefault: 1,
+            valueDefault: 10,
             valueMin: 1,
             valueMax: 2000,
             valueStep: 10,
@@ -127,7 +127,7 @@ const menu = [
             pushArgs: [
               ['count', 100]
             ],
-            pushArgsType: ArgDataPushType.Always,
+            pushArgsType: ArgDataPushType.Focus,
             callReMapArgsHashId: [
               "vongXoay.count.slider"
             ],
@@ -140,7 +140,7 @@ const menu = [
             pushArgs: [
               ['count', 500]
             ],
-            pushArgsType: ArgDataPushType.Always,
+            pushArgsType: ArgDataPushType.Focus,
             callReMapArgsHashId: [
               "vongXoay.count.slider"
             ],
@@ -153,7 +153,7 @@ const menu = [
             pushArgs: [
               ['count', 1000]
             ],
-            pushArgsType: ArgDataPushType.Always,
+            pushArgsType: ArgDataPushType.Focus,
             callReMapArgsHashId: [
               "vongXoay.count.slider"
             ],
