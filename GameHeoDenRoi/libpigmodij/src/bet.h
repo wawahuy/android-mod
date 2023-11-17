@@ -2,22 +2,10 @@
 
 #define ACTION_BET_X AY_OBFUSCATE("bet.vongXoay")
 
-#include "pthread.h"
-
 typedef void BetButton_o;
 
 
 namespace BetPatch {
-    //
-    uintptr_t BetButton__OnBetButtonClickedOffset = 0x1A36244;
-    typedef void (*BetButton__OnBetButtonClickedType) (BetButton_o* __this, const void* method);
-    BetButton__OnBetButtonClickedType BetButton__OnBetButtonClickedOrigin;
-    void BetButton__OnBetButtonClicked(BetButton_o* __this, const void* method) {
-        LOG_E("Clicked");
-        BetButton__OnBetButtonClickedOrigin(__this, method);
-        LOG_E("Clicked End");
-    }
-
     //
     uintptr_t BetButton__SetNextMultipleOffset = 0x1A356D0;
     typedef void (*BetButton__SetNextMultipleType) (BetButton_o* __this, const void* method);
@@ -56,6 +44,13 @@ namespace BetPatch {
         BetButton__SetCurMultipleOrigin(__this, curMultiple, method);
     }
 
+    void *BetButton__SetNextMultipleThread(void *) {
+        void* t = il2cpp_thread_attach(il2cpp_domain_get());
+        BetButton__SetNextMultiple(betButton_o, nullptr);
+        il2cpp_thread_detach(t);
+        pthread_exit(nullptr);
+    }
+
     void betXAction(const nlohmann::json& js) {
         bool isActive = js[JS_THIS];
         if (isActive) {
@@ -72,10 +67,10 @@ namespace BetPatch {
                 BetButton__SetCurMultipleOrigin = (BetButton__SetCurMultipleType) trampolineBetButton__SetCurMultiple;
                 BetButton__SetCurMultipleHooking = true;
             }
-
-            // if (betButton_o != nullptr) {
-            //     BetButton__OnBetButtonClicked(betButton_o, nullptr);
-            // }
+            if (betButton_o != nullptr) {
+                pthread_t id;
+                pthread_create(&id, nullptr, BetButton__SetNextMultipleThread, nullptr);;
+            }
         } else {
             LOG_E("Restore betAction");
             BetButton__SetCurMultipleActive = false;
@@ -87,11 +82,6 @@ namespace BetPatch {
         BetButton___ctorType firstBetButton___ctor = (BetButton___ctorType)(g_il2CppBase + BetButton___ctorOffset);
         A64HookFunction((void*)firstBetButton___ctor, (void*)&BetButton___ctor, &trampolineBetButton___ctor );
         BetButton___ctorOrigin = (BetButton___ctorType) trampolineBetButton___ctor;
-
-        void* trampolineBetButton__OnBetButtonClicked;
-        BetButton__OnBetButtonClickedType firstBetButton__OnBetButtonClicked = (BetButton__OnBetButtonClickedType)(g_il2CppBase + BetButton__OnBetButtonClickedOffset);
-        A64HookFunction((void*)firstBetButton__OnBetButtonClicked, (void*)&BetButton__OnBetButtonClicked, &trampolineBetButton__OnBetButtonClicked );
-        BetButton__OnBetButtonClickedOrigin = (BetButton__OnBetButtonClickedType) trampolineBetButton__OnBetButtonClicked;
 
         void* trampolineBetButton__SetNextMultiple;
         BetButton__SetNextMultipleType firstBetButton__SetNextMultiple = (BetButton__SetNextMultipleType)(g_il2CppBase + BetButton__SetNextMultipleOffset);

@@ -1,8 +1,6 @@
 #include "common.h"
 
 
-
-
 extern "C" {
     __attribute__((visibility("default"))) void initMethod(
         uintptr_t il2CppBase,
@@ -16,6 +14,13 @@ extern "C" {
         m_getMs = (uint64_t (*)())getMs;
         m_unprotectIl2cpp = (void (*)())unprotectIl2cpp;
         m_protectIl2cpp = (void (*)())protectIl2cpp;
+
+        uintptr_t il2cpp_domain_getOffset = 0x10b0f10; 
+        uintptr_t il2cpp_thread_detachOffset = 0x10b1398;
+        uintptr_t il2cpp_thread_attachOffset = 0x10b1394;
+        il2cpp_thread_detach = (void (*)(void *))(g_il2CppBase + il2cpp_thread_detachOffset);
+        il2cpp_thread_attach = (void* (*)(void *))(g_il2CppBase + il2cpp_thread_attachOffset);
+        il2cpp_domain_get = (void* (*)())(g_il2CppBase + il2cpp_domain_getOffset);
 
         CayThongPatch::init();
         BetPatch::init();
