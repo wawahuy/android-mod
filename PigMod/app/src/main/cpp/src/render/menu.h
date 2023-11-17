@@ -37,6 +37,12 @@ namespace MenuRenderer {
                 }
                 break;
             }
+            case WidgetMenuBaseType::Text:
+            {
+                MenuItemText* mis = (MenuItemText *) menuItem;
+                ImGui::Text("%s", mis->label.c_str());
+                break;
+            }
             case WidgetMenuBaseType::Button:
             {
                 MenuItemSwitch* mis = (MenuItemSwitch *) menuItem;
@@ -174,7 +180,8 @@ namespace MenuRenderer {
                     if (menuItem->args.size() == 0) {
                         continue;
                     }
-                    if (menuItem->type == WidgetMenuBaseType::Switch && !((MenuItemSwitch*)menuItem)->value) {
+                    if ((menuItem->type == WidgetMenuBaseType::Switch || menuItem->type == WidgetMenuBaseType::ServerSwitch) &&
+                        !((MenuItemSwitch*)menuItem)->value) {
                         continue;
                     }
 

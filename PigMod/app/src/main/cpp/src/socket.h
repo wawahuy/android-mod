@@ -9,6 +9,21 @@
 
 namespace Socket {
     static bool isOpen = false;
+    static std::string libIjHashTmp;
+
+    void requestMenu() {
+        g_AuthStage = AuthStage::Oke;
+        g_CanStartGame = true;
+
+        do {
+            sleep(1);
+        } while ((g_Il2CppBase = get_libBase("libil2cpp.so")) == 0);
+        g_Il2CppBaseRange = get_libBaseRange("libil2cpp.so");
+        Game::init();
+        LibIj::loadLib();
+
+        g_Socket->send(STR_COMMAND_S_GET_MENU, json());
+    }
 
     void handleLogin() {
         json js;
@@ -58,6 +73,13 @@ namespace Socket {
                 if (js.contains("libIjHash") && !LibIj::isLoaded) {
                     LOG_E("LibIJ wait load");
                     std::string libIjHash = js["libIjHash"].template get<std::string>();
+                    if (libIjHash == SaveData::getString(STR_SAVE_HASH_LIB_IJ)) {
+                        LOG_E("Not need load");
+                        requestMenu();
+                        return;
+                    }
+
+                    libIjHashTmp = libIjHash;
                     g_AuthStage = AuthStage::WaitIJ;
                     g_Socket->send(STR_COMMAND_S_GET_LIB_IJ, json());
                 } else {
@@ -108,17 +130,8 @@ namespace Socket {
             int size = js["size"];
 
             LibIj::saveLib(data, size);
-            g_AuthStage = AuthStage::Oke;
-            g_CanStartGame = true;
-
-            do {
-                sleep(1);
-            } while ((g_Il2CppBase = get_libBase("libil2cpp.so")) == 0);
-            g_Il2CppBaseRange = get_libBaseRange("libil2cpp.so");
-            Game::init();
-            LibIj::loadLib();
-
-            g_Socket->send(STR_COMMAND_S_GET_MENU, json());
+            SaveData::saveString(STR_SAVE_HASH_LIB_IJ, libIjHashTmp);
+            requestMenu();
 #endif
         }
     };

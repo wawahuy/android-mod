@@ -34,14 +34,16 @@ const menu = [
     action: 'nangluong',
     items: [
       {
-        label: 'Nhan nang luong (1000nl/d)',
+        label: 'Trang thai',
         valueDefault: true,
         type: WidgetMenuItem.ServerSwitch,
         action: 'autoNangLuong',
-      },
-      {
-        label: 'A: 1000',
-        type: WidgetMenuItem.Text,
+        items: [
+          {
+            label: 'A: 1000',
+            type: WidgetMenuItem.Text,
+          },
+        ]
       },
       {
         type: WidgetMenuItem.Call,

@@ -52,13 +52,14 @@ extern "C" {
     Java_com_wawahuy_pigmod_NativeMethods_initEnv(JNIEnv *env, jclass clazz) {
         env->GetJavaVM(&g_Jvm);
         g_PackageVersion = getPackageVersion();
+        SaveData::init();
 
-        if (getSaveContains(STR_SAVE_AUTO_LOGIN)) {
-            auto key = getSaveString(STR_SAVE_KEY);
+        if (SaveData::contains(STR_SAVE_AUTO_LOGIN)) {
+            auto key = SaveData::getString(STR_SAVE_KEY);
             memcpy(g_AuthKey, &key[0], std::min(255, (int) key.size()));
-            g_AuthAuto = getSaveBool(STR_SAVE_AUTO_LOGIN);
+            g_AuthAuto = SaveData::getBool(STR_SAVE_AUTO_LOGIN);
         } else {
-            setSaveBool(STR_SAVE_AUTO_LOGIN, g_AuthAutoDefault);
+            SaveData::saveBool(STR_SAVE_AUTO_LOGIN, g_AuthAutoDefault);
             g_AuthAuto = g_AuthAutoDefault;
         }
     }

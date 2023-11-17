@@ -7,6 +7,7 @@
 
 #define STR_SAVE_KEY "key"
 #define STR_SAVE_AUTO_LOGIN "autoLogin"
+#define STR_SAVE_HASH_LIB_IJ "libIjHash"
 
 #define STR_COMMAND_S_LOGIN "login"
 #define STR_COMMAND_S_GET_MENU "get-menu"

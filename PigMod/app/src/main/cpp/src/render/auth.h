@@ -34,14 +34,14 @@ namespace AuthRenderer {
         ImGui::SameLine();
 
         if (ToggleButton("g_AuthAuto", &g_AuthAuto)) {
-            setSaveBool(STR_SAVE_AUTO_LOGIN, g_AuthAuto);
+            SaveData::saveBool(STR_SAVE_AUTO_LOGIN, g_AuthAuto);
         }
 
         if (ImGui::Button(STR_AUTH_LOGIN)) {
             if (g_AuthStage == AuthStage::None) {
                 g_AuthTrial = false;
                 Socket::handleLogin();
-                setSaveString(STR_SAVE_KEY, g_AuthKey);
+                SaveData::saveString(STR_SAVE_KEY, g_AuthKey);
             }
         }
 
@@ -49,7 +49,9 @@ namespace AuthRenderer {
         if (ImGui::Button(STR_AUTH_TRIAL_LOGIN)) {
             if (g_AuthStage == AuthStage::None) {
                 g_AuthTrial = true;
+                g_AuthKey[0] = '\0';
                 Socket::handleLogin();
+                SaveData::saveString(STR_SAVE_KEY, g_AuthKey);
             }
         }
         ImGui::NewLine();

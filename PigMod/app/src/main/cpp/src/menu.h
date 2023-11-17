@@ -11,6 +11,7 @@ enum WidgetMenuBaseType {
     SliderFloat = 3,
     SliderInt = 4,
     Button = 5,
+    Text = 6,
 
     ServerSwitch = 101,
     Call = 102,
@@ -65,6 +66,7 @@ struct MenuItemTemplate: MenuItemBase, MenuValueBaseTemplate<T> {
 
 struct MenuItemSwitch: MenuItemTemplate<bool> {};
 struct MenuItemButton: MenuItemTemplate<bool> {};
+struct MenuItemText: MenuItemTemplate<bool> {};
 struct MenuItemInputInt: MenuItemTemplate<int>, MenuMaxMinBaseTemplate<int> {};
 struct MenuItemSliderFloat: MenuItemTemplate<float>, MenuMaxMinBaseTemplate<float> {};
 struct MenuItemSliderInt: MenuItemTemplate<int>, MenuMaxMinBaseTemplate<int> {};
@@ -178,6 +180,9 @@ namespace Menu {
             case WidgetMenuBaseType::Button:
                 menuItem = new MenuItemButton;
                 break;
+            case WidgetMenuBaseType::Text:
+                menuItem = new MenuItemText;
+                break;
             case WidgetMenuBaseType::InputInt:
                 menuItem = new MenuItemInputInt;
                 break;
@@ -248,6 +253,7 @@ namespace Menu {
                 break;
             }
             case WidgetMenuBaseType::Button:
+            case WidgetMenuBaseType::Text:
             {
                 break;
             }

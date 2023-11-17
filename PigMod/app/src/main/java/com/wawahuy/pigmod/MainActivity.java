@@ -71,35 +71,6 @@ public class MainActivity extends Activity {
         return version;
     }
 
-    public static boolean getSaveContains(String name) {
-        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
-        return settings.contains(name);
-    }
-
-    public static boolean getSaveBool(String name) {
-        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
-        return settings.getBoolean(name, false);
-    }
-
-    public static String getSaveString(String name) {
-        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
-        return settings.getString(name, "");
-    }
-
-    public static void setSaveString(String name, String value) {
-        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(name, value);
-        editor.apply();
-    }
-
-    public static void setSaveBool(String name, boolean value) {
-        SharedPreferences settings = contextCurrent.getApplicationContext().getSharedPreferences("pigmod", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(name, value);
-        editor.apply();
-    }
-
     public static void startMain(Context context) {
         contextCurrent = context;
 

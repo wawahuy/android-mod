@@ -57,7 +57,7 @@ namespace UserDataPatch {
     }
 
     void userDataRequest(const nlohmann::json& js) {
-        LOG_E("Call userDataRequest");
+        LOG_E("Call userDataRequest 2");
         m_sendCommand("wtf", userData);
     }
 
