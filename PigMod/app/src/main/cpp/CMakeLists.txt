@@ -39,6 +39,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 
         src-common/X67HuySocket.cpp
         src-common/patch.cpp
+        src-common/il2cpp.cpp
 
         src/external-lib/And64InlineHook.cpp
 

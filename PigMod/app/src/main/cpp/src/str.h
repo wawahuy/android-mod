@@ -24,6 +24,7 @@
 #define STR_INPUT_KEY_PASTE "Dan Key"
 #define STR_AUTH_AUTO "Tu dang nhap"
 #define STR_AUTH_LOGIN "DANG NHAP"
+#define STR_AUTH_TRIAL_LOGIN "DUNG THU"
 #define STR_AUTH_DOING "dang xu ly..."
 #define STR_AUTH_WAIT_IJ "dang kiem tra du lieu..."
 #define STR_SOCKET_CONNECTING "Ket noi server..."

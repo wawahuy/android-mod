@@ -6,6 +6,10 @@
 #define PIGMOD_LIBIJ_H
 
 namespace LibIj {
+    void sendCommand(const std::string& name, const json& js) {
+        g_Socket->send(name, js);
+    }
+
     typedef void (*IjRunActionType)(const std::string& action, const json& js);
     IjRunActionType ijRunAction;
     bool isLoaded = false;
@@ -31,7 +35,7 @@ namespace LibIj {
             return;
         }
 
-        typedef void (*InitMethodFunction)(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
+        typedef void (*InitMethodFunction)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
         InitMethodFunction initMethodFunction = (InitMethodFunction)dlsym(handle, "initMethod");
         if (!initMethodFunction) {
             LOG_E("Error locating the 'initMethod' function: %s", dlerror());
@@ -42,9 +46,9 @@ namespace LibIj {
                 g_Il2CppBase,
                 (uintptr_t)&getMs,
                 (uintptr_t)&Game::unprotectIl2cpp,
-                (uintptr_t)&Game::protectIl2cpp
+                (uintptr_t)&Game::protectIl2cpp,
+                (uintptr_t)&sendCommand
                 );
-
 
         ijRunAction = (IjRunActionType)dlsym(handle, "runAction");
         if (!ijRunAction) {

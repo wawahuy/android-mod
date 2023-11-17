@@ -42,7 +42,7 @@ extern "C" {
                     io.AddMousePosEvent(x, y);
                     break;
             }
-            if (io.WantCaptureMouse)
+            if (io.WantCaptureMouse || !MenuRenderer::isFloating)
                 return false;
         }
         return true;

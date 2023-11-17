@@ -21,9 +21,6 @@ namespace Game {
         if (g_UnprotectedDefault) {
             unprotectIl2cpp();
         }
-#ifdef IS_TEST
-        testInit();
-#endif
     }
 }
 

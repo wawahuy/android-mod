@@ -15,6 +15,7 @@ namespace Socket {
         js["package"] = getPackageName();
         js["key"] = g_AuthKey;
         js["version"] = g_PackageVersion;
+        js["trial"] = g_AuthTrial;
 
         g_SystemMessage[0] = 0;
         g_AuthStage = AuthStage::Doing;

@@ -15,6 +15,7 @@ enum WidgetMenuItem {
   SliderFloat = 3,
   SliderInt = 4,
   Button = 5,
+  Text = 6,
 
   ServerSwitch = 101,
   Call = 102,
@@ -28,23 +29,27 @@ enum ArgDataPushType {
 };
 
 const menu = [
-  // {
-  //   label: 'Nang Luong',
-  //   action: 'nangluong',
-  //   items: [
-  //     {
-  //       label: 'Auto nhan nang luong',
-  //       valueDefault: true,
-  //       type: WidgetMenuItem.ServerSwitch,
-  //       action: 'autoNanhNangLuong',
-  //     },
-  //     {
-  //       type: WidgetMenuItem.Call,
-  //       action: 'autoGetData',
-  //       interval: 10000,
-  //     },
-  //   ]
-  // },
+  {
+    label: 'Nang Luong',
+    action: 'nangluong',
+    items: [
+      {
+        label: 'Nhan nang luong (1000nl/d)',
+        valueDefault: true,
+        type: WidgetMenuItem.ServerSwitch,
+        action: 'autoNangLuong',
+      },
+      {
+        label: 'A: 1000',
+        type: WidgetMenuItem.Text,
+      },
+      {
+        type: WidgetMenuItem.Call,
+        action: 'userData',
+        delay: 10000,
+      },
+    ]
+  },
   {
     label: 'Cay Thong',
     action: 'cayThong',
@@ -105,7 +110,7 @@ const menu = [
     items: [
       {
         label: 'Vong xoay',
-        valueDefault: true,
+        valueDefault: false,
         type: WidgetMenuItem.Switch,
         action: 'vongXoay',
         items: [
@@ -219,6 +224,9 @@ export class X67ServiceService {
       },
     );
     this._server.eventClients.on('menu-action', (data: any) => {
+      console.log(data);
+    });
+    this._server.eventClients.on('wtf', (data: any) => {
       console.log(data);
     });
   }

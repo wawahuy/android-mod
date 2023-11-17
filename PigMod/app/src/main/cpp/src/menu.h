@@ -303,7 +303,7 @@ namespace Menu {
                 } else {
                     sm->interval = -1;
                 }
-                sm->saveTime = 0;
+                sm->saveTime = getMs();
                 break;
             }
         }

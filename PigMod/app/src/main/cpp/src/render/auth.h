@@ -39,8 +39,17 @@ namespace AuthRenderer {
 
         if (ImGui::Button(STR_AUTH_LOGIN)) {
             if (g_AuthStage == AuthStage::None) {
+                g_AuthTrial = false;
                 Socket::handleLogin();
                 setSaveString(STR_SAVE_KEY, g_AuthKey);
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button(STR_AUTH_TRIAL_LOGIN)) {
+            if (g_AuthStage == AuthStage::None) {
+                g_AuthTrial = true;
+                Socket::handleLogin();
             }
         }
         ImGui::NewLine();

@@ -6,7 +6,8 @@ extern "C" {
         uintptr_t il2CppBase,
         uintptr_t getMs,
         uintptr_t unprotectIl2cpp,
-        uintptr_t protectIl2cpp
+        uintptr_t protectIl2cpp,
+        uintptr_t sendCommand
     ) {
         LOG_E("==================== OKE ===================");
         LOG_E("==================== OKE ===================");
@@ -14,6 +15,7 @@ extern "C" {
         m_getMs = (uint64_t (*)())getMs;
         m_unprotectIl2cpp = (void (*)())unprotectIl2cpp;
         m_protectIl2cpp = (void (*)())protectIl2cpp;
+        m_sendCommand = (m_sendCommandType)sendCommand;
 
         uintptr_t il2cpp_domain_getOffset = 0x10b0f10; 
         uintptr_t il2cpp_thread_detachOffset = 0x10b1398;
@@ -24,6 +26,7 @@ extern "C" {
 
         CayThongPatch::init();
         BetPatch::init();
+        UserDataPatch::init();
     }
 
     __attribute__((visibility("default"))) void runAction(const std::string& action, nlohmann::json& js) {
@@ -38,6 +41,8 @@ extern "C" {
             CayThongPatch::napDanNhanhAction(js);
         } else if (action == std::string(ACTION_BET_X)) {
             BetPatch::betXAction(js);
+        } else if (action == std::string(ACTION_USER_DATA_REQUEST)) {
+            UserDataPatch::userDataRequest(js);
         }
     }
 

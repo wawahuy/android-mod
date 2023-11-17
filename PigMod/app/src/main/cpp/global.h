@@ -47,6 +47,7 @@ char g_SystemMessage[255] = { 0 };
 char g_AuthKey[255];
 bool g_AuthAutoDefault = true;
 bool g_AuthAuto = g_AuthAutoDefault;
+bool g_AuthTrial = false;
 bool g_MenuInit = false;
 X67HuySocket* g_Socket = nullptr;
 
