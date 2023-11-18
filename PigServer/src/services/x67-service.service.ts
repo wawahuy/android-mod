@@ -2,12 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as md5 from 'md5';
 import { X67Server } from 'src/x67-server/x67-server';
 import X67Socket from 'src/x67-server/x67-socket';
-import { AsmService } from './asm.service';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ws from  'ws';
 import { createHashMd5 } from 'src/utils/ws';
 import { ConfigService } from '@nestjs/config';
+import { TelegramService } from './telegram.service';
 
 enum WidgetMenuItem {
   Switch = 1,
@@ -26,7 +25,7 @@ enum ArgDataPushType {
   First = 1,
   Focus = 2,
   Always = 3,
-};
+}
 
 const menu = [
   {
@@ -43,14 +42,14 @@ const menu = [
             label: 'A: 1000',
             type: WidgetMenuItem.Text,
           },
-        ]
+        ],
       },
       {
         type: WidgetMenuItem.Call,
         action: 'userData',
         delay: 10000,
       },
-    ]
+    ],
   },
   {
     label: 'Cay Thong',
@@ -125,50 +124,38 @@ const menu = [
             valueStep: 10,
             valueStepFast: 50,
             valueWidth: 400,
-            hashId: "vongXoay.count.slider",
+            hashId: 'vongXoay.count.slider',
           },
           {
             label: 'x100',
             valueDefault: false,
             type: WidgetMenuItem.Button,
-            pushArgs: [
-              ['count', 100]
-            ],
+            pushArgs: [['count', 100]],
             pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: [
-              "vongXoay.count.slider"
-            ],
+            callReMapArgsHashId: ['vongXoay.count.slider'],
             sameLine: true,
           },
           {
             label: 'x500',
             valueDefault: false,
             type: WidgetMenuItem.Button,
-            pushArgs: [
-              ['count', 500]
-            ],
+            pushArgs: [['count', 500]],
             pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: [
-              "vongXoay.count.slider"
-            ],
+            callReMapArgsHashId: ['vongXoay.count.slider'],
             sameLine: true,
           },
           {
             label: 'x1000',
             valueDefault: false,
             type: WidgetMenuItem.Button,
-            pushArgs: [
-              ['count', 1000]
-            ],
+            pushArgs: [['count', 1000]],
             pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: [
-              "vongXoay.count.slider"
-            ],
+            callReMapArgsHashId: ['vongXoay.count.slider'],
           },
-        ]
-      }
-    ]
-  }
+        ],
+      },
+    ],
+  },
 ];
 
 const description = {
@@ -182,8 +169,8 @@ export class X67ServiceService {
   _server: X67Server;
 
   constructor(
-    private readonly _asmService: AsmService,
     private readonly _configService: ConfigService,
+    private readonly _telegramService: TelegramService,
   ) {
     this.init();
     fs.readFileSync(
