@@ -6,12 +6,14 @@ import { TelegramConfig } from 'src/configs/telegram.config';
 import { SchemaModule } from 'src/schema/schema.module';
 import { UploadConfig } from 'src/configs/upload.config';
 import { UploadService } from './upload.service';
+import { PackageHdrService } from './package-hdr.service';
 
 const services = [
   X67ServiceService,
   TelegramService,
   AsmService,
   UploadService,
+  PackageHdrService,
 ];
 
 const serviceImport = [TelegramConfig, UploadConfig];
