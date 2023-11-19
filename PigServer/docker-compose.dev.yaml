@@ -1,8 +1,11 @@
 version: '3.8'
 
-
 x-shared_environment: &shared_environment
   FOLDER_LIBSO: ${FOLDER_LIBSO}
+  TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+  MONGO_HOST: ${MONGO_HOST}
+  MONGO_PORT: ${MONGO_PORT}
+  MONGO_DB: ${MONGO_DB}
 
 services:
   xhpigmod-gateway:
@@ -17,19 +20,47 @@ services:
       <<: *shared_environment
     ports:
       - "3000:3000"
+      - "1235:1235"
     volumes:
       - ./:/data/apps
       - "${FOLDER_LIBSO_HOST}:${FOLDER_LIBSO}"
     networks:
       - all
-
-  xhpigmod-cloudflare:
-    image: cloudflare/cloudflared
-    command: tunnel run
+      
+  xhpigmod-redis:
+    image: redis:7.2.3-alpine3.18
     environment:
-      - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiZWNmZjk1N2MtNzUyNC00MTA3LTlmMjktMGJiMjM1ZGUyZGI2IiwicyI6Ill6RTJNekF4WkdJdE56bGlZaTAwWXpFeUxXSTBNMll0TldOak5UWXpOamN5TXprMyJ9
+      <<: *shared_environment
+    ports:
+      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./conf/dev/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/redis:/data
     networks:
       - all
+
+  xhpigmod-mongo:
+    image: mongo:7.0.3
+    command: mongod --quiet --logpath /dev/null
+    environment:
+      <<: *shared_environment
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./conf/dev/mongod.conf:/etc/mongodb.conf
+      - ./data/mongo/log:/var/log/mongodb/
+      - ./data/mongo/data:/data/db
+    networks:
+      - all
+
+  # xhpigmod-cloudflare:
+  #   image: cloudflare/cloudflared
+  #   command: tunnel run
+  #   environment:
+  #     - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiZWNmZjk1N2MtNzUyNC00MTA3LTlmMjktMGJiMjM1ZGUyZGI2IiwicyI6Ill6RTJNekF4WkdJdE56bGlZaTAwWXpFeUxXSTBNMll0TldOak5UWXpOamN5TXprMyJ9
+  #   networks:
+  #     - all
 
 networks:
   all:

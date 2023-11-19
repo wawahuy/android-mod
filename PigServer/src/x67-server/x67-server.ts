@@ -4,7 +4,15 @@ import * as net from 'net';
 import X67Socket from './x67-socket';
 import { X67Command } from './x67-command';
 
-export class X67Server {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+declare interface X67Server {
+  once(event: 'connection', listener: (socket: X67Socket) => void): this;
+  on(event: string, listener: any): this;
+  once(event: string, listener: any): this;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+class X67Server extends events.EventEmitter {
   private _logger = new Logger('X67Socket');
   private _port: number;
   private _server: net.Server;
@@ -13,6 +21,7 @@ export class X67Server {
   readonly eventClients = new events.EventEmitter();
 
   constructor(private isWebsocketHybird: boolean = true) {
+    super();
     this._server = net.createServer();
     this._server.on('close', this.onClose.bind(this));
     this._server.on('error', this.onError.bind(this));
@@ -44,6 +53,7 @@ export class X67Server {
       delete this._clients[client.id];
     });
     this._clients[client.id] = client;
+    this.emit('connection', socket);
   }
 
   onClientCommand(command: X67Command<any>, socket: X67Socket) {
@@ -56,3 +66,5 @@ export class X67Server {
     }
   }
 }
+
+export default X67Server;

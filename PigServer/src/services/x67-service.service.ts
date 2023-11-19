@@ -1,189 +1,34 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as md5 from 'md5';
-import { X67Server } from 'src/x67-server/x67-server';
-import X67Socket from 'src/x67-server/x67-socket';
-import { AsmService } from './asm.service';
+import X67Server from 'src/x67-server/x67-server';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ws from  'ws';
-import { createHashMd5 } from 'src/utils/ws';
+import * as moment from 'moment';
+import { validate } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
-
-enum WidgetMenuItem {
-  Switch = 1,
-  InputInt = 2,
-  SliderFloat = 3,
-  SliderInt = 4,
-  Button = 5,
-  Text = 6,
-
-  ServerSwitch = 101,
-  Call = 102,
-}
-
-enum ArgDataPushType {
-  No = 0,
-  First = 1,
-  Focus = 2,
-  Always = 3,
-};
-
-const menu = [
-  {
-    label: 'Nang Luong',
-    action: 'nangluong',
-    items: [
-      {
-        label: 'Trang thai',
-        valueDefault: true,
-        type: WidgetMenuItem.ServerSwitch,
-        action: 'autoNangLuong',
-        items: [
-          {
-            label: 'A: 1000',
-            type: WidgetMenuItem.Text,
-          },
-        ]
-      },
-      {
-        type: WidgetMenuItem.Call,
-        action: 'userData',
-        delay: 10000,
-      },
-    ]
-  },
-  {
-    label: 'Cay Thong',
-    action: 'cayThong',
-    items: [
-      {
-        label: 'Auto trung',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'autoTrung',
-      },
-      {
-        label: 'Ban nhanh',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'banNhanh',
-      },
-      {
-        label: 'Ban 1 cham',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'ban1Cham',
-      },
-      {
-        label: 'Nap dan nhanh',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'napDanNhanh',
-        items: [
-          {
-            arg: 'count',
-            label: 'So luong (vien/1 lan)',
-            type: WidgetMenuItem.InputInt,
-            valueDefault: 1,
-            valueMin: 1,
-            valueMax: 8,
-            valueStep: 1,
-            valueStepFast: 2,
-            valueWidth: 250,
-          },
-          {
-            arg: 'speed',
-            label: 'Toc do (giay)',
-            type: WidgetMenuItem.SliderFloat,
-            valueDefault: 0.25,
-            valueMin: 0,
-            valueMax: 1,
-            valueStep: 0.1,
-            valueStepFast: 0.2,
-            valueWidth: 250,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Vong xoay',
-    action: 'bet',
-    items: [
-      {
-        label: 'Vong xoay',
-        valueDefault: false,
-        type: WidgetMenuItem.Switch,
-        action: 'vongXoay',
-        items: [
-          {
-            type: WidgetMenuItem.SliderInt,
-            arg: 'count',
-            valueDefault: 10,
-            valueMin: 1,
-            valueMax: 2000,
-            valueStep: 10,
-            valueStepFast: 50,
-            valueWidth: 400,
-            hashId: "vongXoay.count.slider",
-          },
-          {
-            label: 'x100',
-            valueDefault: false,
-            type: WidgetMenuItem.Button,
-            pushArgs: [
-              ['count', 100]
-            ],
-            pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: [
-              "vongXoay.count.slider"
-            ],
-            sameLine: true,
-          },
-          {
-            label: 'x500',
-            valueDefault: false,
-            type: WidgetMenuItem.Button,
-            pushArgs: [
-              ['count', 500]
-            ],
-            pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: [
-              "vongXoay.count.slider"
-            ],
-            sameLine: true,
-          },
-          {
-            label: 'x1000',
-            valueDefault: false,
-            type: WidgetMenuItem.Button,
-            pushArgs: [
-              ['count', 1000]
-            ],
-            pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: [
-              "vongXoay.count.slider"
-            ],
-          },
-        ]
-      }
-    ]
-  }
-];
-
-const description = {
-  versionHash: md5(JSON.stringify(menu)),
-  menu,
-};
+import { TelegramService } from './telegram.service';
+import X67Socket from 'src/x67-server/x67-socket';
+import { CommandLoginRequest } from 'src/dtos/x67-server.dto';
+import { IGamePackage } from 'src/interfaces/game-package';
+import { PackageHdrService } from './package-hdr.service';
+import { GameKey, GameKeyDocument } from 'src/schema/game-key.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class X67ServiceService {
   _logger = new Logger('X67ServiceService');
   _server: X67Server;
+  _packageMapping: {
+    [key: string]: IGamePackage;
+  } = {};
 
   constructor(
-    private readonly _asmService: AsmService,
     private readonly _configService: ConfigService,
+    private readonly _telegramService: TelegramService,
+    private readonly _packageHdrService: PackageHdrService,
+    @InjectModel(GameKey.name)
+    private _gameKeyModel: Model<GameKeyDocument>,
   ) {
     this.init();
     fs.readFileSync(
@@ -195,41 +40,104 @@ export class X67ServiceService {
     const port = 1235;
     this._server = new X67Server();
     this._server.listen(port);
-    this._server.eventClients.on('login', (data: any, socket: X67Socket) => {
-      // socket.command("is-login", false);
-      // socket.command("sys-message", {
-      //     msg: "Ma khong chinh xac",
-      //     color: [255, 0, 0, 255]
-      // });
-      const ijBuffer = fs.readFileSync(
-        path.join(this._configService.get('FOLDER_LIBSO'), 'libpigmodij.so'),
-      );
-      socket.command('is-login', {
-        isLogin: true,
-        libIjHash: createHashMd5(ijBuffer),
+
+    // package mapping
+    this._packageMapping = {
+      [PackageHdrService.packageName]: this._packageHdrService,
+    };
+
+    // route
+    this._server.eventClients.on('login', this.onLogin.bind(this));
+  }
+
+  private async onLogin(data: CommandLoginRequest, socket: X67Socket) {
+    data = plainToClass(CommandLoginRequest, data);
+    const errors = await validate(data);
+    if (errors && errors.length) {
+      const msg = Object.values(errors[0]?.constraints)?.[0];
+      this.sendLoginFailed(socket, msg || 'Internal');
+      this._logger.error(errors);
+      return;
+    }
+
+    const telegramMsg = [
+      `${data.package} (LOGIN)`,
+      `Key: ${data.key}`,
+      `IsTrial: ${data.trial}`,
+      `Version: ${data.version}`,
+      `MAC: ${data.mac}`,
+    ];
+
+    const pkg = data.package;
+    if (!pkg) {
+      this._logger.error('package not found!');
+      return;
+    }
+
+    let msgError: string | null;
+    let needUpdate = false;
+    let gameKey: GameKeyDocument;
+    if (!data.trial) {
+      gameKey = await this._gameKeyModel.findOne({
+        key: data.key,
+        package: data.package,
       });
+
+      if (!gameKey) {
+        msgError = 'Key khong ton tai';
+      } else if (gameKey.expiredAt && moment().isAfter(gameKey.expiredAt)) {
+        msgError = 'Key het han';
+      } else {
+        let newDevice = false;
+        const devices = (gameKey.devices = gameKey.devices || []);
+        if (!devices.includes(data.mac)) {
+          newDevice = true;
+        }
+        if (newDevice) {
+          if (devices.length < gameKey.maximumDevice) {
+            devices.push(data.mac);
+            needUpdate = true;
+            telegramMsg.push(`Push devices: ${data.mac}`);
+          } else {
+            msgError = 'So luong thiet bi toi da';
+          }
+        }
+      }
+    }
+
+    if (!msgError) {
+      if (gameKey && !gameKey.expiredAt) {
+        needUpdate = true;
+        gameKey.expiredAt = moment().add(gameKey.amountSec, 'second').toDate();
+        telegramMsg.push(`Expired at: ${moment(gameKey.expiredAt).format()}`);
+      }
+    } else {
+      telegramMsg.push(msgError);
+    }
+
+    if (gameKey && needUpdate) {
+      await gameKey.save();
+    }
+
+    if (!data.re) {
+      this._telegramService.sendMessage(telegramMsg.join('\r\n'));
+    }
+
+    if (!msgError) {
+      const service = this._packageMapping[pkg];
+      service.onLogin(data, socket);
+    } else {
+      this.sendLoginFailed(socket, msgError);
+    }
+  }
+
+  sendLoginFailed(socket: X67Socket, msg: string) {
+    socket.command('is-login', {
+      isLogin: false,
     });
-    this._server.eventClients.on('get-menu', (data: any, socket: X67Socket) => {
-      socket.command('menu', description);
-    });
-    this._server.eventClients.on(
-      'get-lib-ij',
-      (data: any, socket: X67Socket) => {
-        socket.sendLibIj(
-          fs.readFileSync(
-            path.join(
-              this._configService.get('FOLDER_LIBSO'),
-              'libpigmodij.so',
-            ),
-          ),
-        );
-      },
-    );
-    this._server.eventClients.on('menu-action', (data: any) => {
-      console.log(data);
-    });
-    this._server.eventClients.on('wtf', (data: any) => {
-      console.log(data);
+    socket.command('sys-message', {
+      msg,
+      color: [255, 0, 0, 255],
     });
   }
 }
