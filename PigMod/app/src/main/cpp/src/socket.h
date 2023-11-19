@@ -31,6 +31,8 @@ namespace Socket {
         js["key"] = g_AuthKey;
         js["version"] = g_PackageVersion;
         js["trial"] = g_AuthTrial;
+        js["mac"] = g_AndroidID;
+        js["re"] = g_AuthRe;
 
         g_SystemMessage[0] = 0;
         g_AuthStage = AuthStage::Doing;
@@ -70,6 +72,7 @@ namespace Socket {
         void runnable(const json& js, X67HuySocket* sk) {
             auto isLogin = js["isLogin"];
             if (isLogin) {
+                g_AuthRe = true;
                 if (js.contains("libIjHash") && !LibIj::isLoaded) {
                     LOG_E("LibIJ wait load");
                     std::string libIjHash = js["libIjHash"].template get<std::string>();
@@ -88,6 +91,7 @@ namespace Socket {
                     g_Socket->send(STR_COMMAND_S_GET_MENU, json());
                 }
             } else {
+                g_AuthRe = false;
                 g_AuthStage = AuthStage::None;
 #ifndef IS_DEBUG_NOT_GAME
                 Menu::release();

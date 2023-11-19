@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <chrono>
 #include <sstream>
+#include <net/if.h>
 
 uintptr_t get_libBase(const char* libName) {
     uintptr_t addr = 0;
@@ -149,6 +150,23 @@ std::string getPackageVersion() {
     LOG_E("pkg version %s", resultStr);
 
     env->ReleaseStringUTFChars(result, resultStr);
+    return resultStr;
+}
+
+std::string getAndroidID(JNIEnv* env) {
+    jclass mainAClass = env->FindClass("com/wawahuy/pigmod/MainActivity");
+    jfieldID currentContextField = env->GetStaticFieldID(mainAClass, "contextCurrent", "Landroid/content/Context;");
+    jobject context = env->GetStaticObjectField(mainAClass, currentContextField);
+    jclass contextClass = env->GetObjectClass(context);
+    jmethodID getContentResolver = env->GetMethodID(contextClass, "getContentResolver", "()Landroid/content/ContentResolver;");
+    jobject contentResolver = env->CallObjectMethod(context, getContentResolver);
+    jclass settingsSecureClass = env->FindClass("android/provider/Settings$Secure");
+    jmethodID getString = env->GetStaticMethodID(settingsSecureClass, "getString", "(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;");
+    jstring androidIdKey = env->NewStringUTF("android_id");
+    jstring androidId = static_cast<jstring>(env->CallStaticObjectMethod(settingsSecureClass, getString, contentResolver, androidIdKey));
+    const char* resultStr = env->GetStringUTFChars(androidId, nullptr);
+    env->DeleteLocalRef(androidIdKey);
+    env->DeleteLocalRef(settingsSecureClass);
     return resultStr;
 }
 

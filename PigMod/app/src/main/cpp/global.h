@@ -48,10 +48,12 @@ char g_AuthKey[255];
 bool g_AuthAutoDefault = true;
 bool g_AuthAuto = g_AuthAutoDefault;
 bool g_AuthTrial = false;
+bool g_AuthRe = false;
 bool g_MenuInit = false;
 X67HuySocket* g_Socket = nullptr;
 
 bool g_CanStartGame = false;
+std::string g_AndroidID;
 
 #ifdef IS_DEBUG
 #else
