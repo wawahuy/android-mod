@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import X67Server from 'src/x67-server/x67-server';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as moment from 'moment';
+import { validate } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import { TelegramService } from './telegram.service';
 import X67Socket from 'src/x67-server/x67-socket';
@@ -11,6 +13,7 @@ import { PackageHdrService } from './package-hdr.service';
 import { GameKey, GameKeyDocument } from 'src/schema/game-key.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class X67ServiceService {
@@ -47,19 +50,23 @@ export class X67ServiceService {
     this._server.eventClients.on('login', this.onLogin.bind(this));
   }
 
-  private onLogin(data: CommandLoginRequest, socket: X67Socket) {
-    console.log(data.mac);
-    if (!data.re) {
-      this._telegramService.sendMessage(
-        [
-          `${data.package} (LOGIN)`,
-          `Key: ${data.key}`,
-          `IsTrial: ${data.trial}`,
-          `Version: ${data.version}`,
-          `MAC: ${data.mac}`,
-        ].join('\r\n'),
-      );
+  private async onLogin(data: CommandLoginRequest, socket: X67Socket) {
+    data = plainToClass(CommandLoginRequest, data);
+    const errors = await validate(data);
+    if (errors && errors.length) {
+      const msg = Object.values(errors[0]?.constraints)?.[0];
+      this.sendLoginFailed(socket, msg || 'Internal');
+      this._logger.error(errors);
+      return;
     }
+
+    const telegramMsg = [
+      `${data.package} (LOGIN)`,
+      `Key: ${data.key}`,
+      `IsTrial: ${data.trial}`,
+      `Version: ${data.version}`,
+      `MAC: ${data.mac}`,
+    ];
 
     const pkg = data.package;
     if (!pkg) {
@@ -67,18 +74,70 @@ export class X67ServiceService {
       return;
     }
 
+    let msgError: string | null;
+    let needUpdate = false;
+    let gameKey: GameKeyDocument;
     if (!data.trial) {
-      socket.command('is-login', {
-        isLogin: false,
+      gameKey = await this._gameKeyModel.findOne({
+        key: data.key,
+        package: data.package,
       });
-      socket.command('sys-message', {
-        msg: 'Ma khong chinh xac',
-        color: [255, 0, 0, 255],
-      });
-      return;
+
+      if (!gameKey) {
+        msgError = 'Key khong ton tai';
+      } else if (gameKey.expiredAt && moment().isAfter(gameKey.expiredAt)) {
+        msgError = 'Key het han';
+      } else {
+        let newDevice = false;
+        const devices = (gameKey.devices = gameKey.devices || []);
+        if (!devices.includes(data.mac)) {
+          newDevice = true;
+        }
+        if (newDevice) {
+          if (devices.length < gameKey.maximumDevice) {
+            devices.push(data.mac);
+            needUpdate = true;
+            telegramMsg.push(`Push devices: ${data.mac}`);
+          } else {
+            msgError = 'So luong thiet bi toi da';
+          }
+        }
+      }
     }
 
-    const service = this._packageMapping[pkg];
-    service.onLogin(data, socket);
+    if (!msgError) {
+      if (gameKey && !gameKey.expiredAt) {
+        needUpdate = true;
+        gameKey.expiredAt = moment().add(gameKey.amountSec, 'second').toDate();
+        telegramMsg.push(`Expired at: ${moment(gameKey.expiredAt).format()}`);
+      }
+    } else {
+      telegramMsg.push(msgError);
+    }
+
+    if (gameKey && needUpdate) {
+      await gameKey.save();
+    }
+
+    if (!data.re) {
+      this._telegramService.sendMessage(telegramMsg.join('\r\n'));
+    }
+
+    if (!msgError) {
+      const service = this._packageMapping[pkg];
+      service.onLogin(data, socket);
+    } else {
+      this.sendLoginFailed(socket, msgError);
+    }
+  }
+
+  sendLoginFailed(socket: X67Socket, msg: string) {
+    socket.command('is-login', {
+      isLogin: false,
+    });
+    socket.command('sys-message', {
+      msg,
+      color: [255, 0, 0, 255],
+    });
   }
 }
