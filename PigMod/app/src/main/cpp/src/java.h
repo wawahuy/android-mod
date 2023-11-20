@@ -52,6 +52,7 @@ extern "C" {
     Java_com_wawahuy_pigmod_NativeMethods_initEnv(JNIEnv *env, jclass clazz) {
         env->GetJavaVM(&g_Jvm);
         g_PackageVersion = getPackageVersion();
+        g_AndroidID = getAndroidID(env);
         SaveData::init();
 
         if (SaveData::contains(STR_SAVE_AUTO_LOGIN)) {
