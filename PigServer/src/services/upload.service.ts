@@ -25,4 +25,8 @@ export class UploadService {
   getLibIjStream(strPackage: string) {
     return fs.createReadStream(this.getLibIjPath(strPackage));
   }
+
+  getLibIjBuffer(strPackage: string) {
+    return fs.readFileSync(this.getLibIjPath(strPackage));
+  }
 }

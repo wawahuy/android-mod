@@ -19,3 +19,8 @@ export class CommandLoginRequest {
   @IsBoolean()
   re: boolean;
 }
+
+export class CommandLoginSuccessResponse {
+  isLogin: boolean;
+  libIjHash: string;
+}

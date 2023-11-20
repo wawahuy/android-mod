@@ -14,10 +14,14 @@ import { GameKey, GameKeyDocument } from 'src/schema/game-key.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { plainToClass } from 'class-transformer';
+import { X67SenderService } from './x67-sender.service';
+import { X67SessionService } from './x67-session.service';
+import { UploadService } from './upload.service';
+import { createHashMd5 } from 'src/utils/ws';
 
 @Injectable()
-export class X67ServiceService {
-  _logger = new Logger('X67ServiceService');
+export class X67GatewayService {
+  _logger = new Logger('X67GatewayService');
   _server: X67Server;
   _packageMapping: {
     [key: string]: IGamePackage;
@@ -26,14 +30,14 @@ export class X67ServiceService {
   constructor(
     private readonly _configService: ConfigService,
     private readonly _telegramService: TelegramService,
+    private readonly _sender: X67SenderService,
+    private readonly _session: X67SessionService,
+    private readonly _uploadService: UploadService,
     private readonly _packageHdrService: PackageHdrService,
     @InjectModel(GameKey.name)
     private _gameKeyModel: Model<GameKeyDocument>,
   ) {
     this.init();
-    fs.readFileSync(
-      path.join(this._configService.get('FOLDER_LIBSO'), 'libpigmodij.so'),
-    );
   }
 
   init() {
@@ -47,15 +51,19 @@ export class X67ServiceService {
     };
 
     // route
-    this._server.eventClients.on('login', this.onLogin.bind(this));
+    const onAuthorizatedBinded = this.onAuthorizated.bind(this);
+    const listener = this._server.eventClients;
+    listener.on('login', this.onLogin.bind(this));
+    listener.on('get-menu', onAuthorizatedBinded(this.onGetMenu));
+    listener.on('get-lib-ij', onAuthorizatedBinded(this.onGetLibIj));
+    listener.on('menu-action', onAuthorizatedBinded(this.onMenuAction));
   }
 
   private async onLogin(data: CommandLoginRequest, socket: X67Socket) {
     data = plainToClass(CommandLoginRequest, data);
     const errors = await validate(data);
     if (errors && errors.length) {
-      const msg = Object.values(errors[0]?.constraints)?.[0];
-      this.sendLoginFailed(socket, msg || 'Internal');
+      this._sender.sendMessageValidationError(socket, errors[0]);
       this._logger.error(errors);
       return;
     }
@@ -124,20 +132,43 @@ export class X67ServiceService {
     }
 
     if (!msgError) {
-      const service = this._packageMapping[pkg];
-      service.onLogin(data, socket);
+      const buffer = this._uploadService.getLibIjBuffer(data.package);
+      const libIjHash = createHashMd5(buffer);
+      this._session.set(socket, 'package', data.package);
+      this._sender.sendLoginSuccess(socket, {
+        isLogin: true,
+        libIjHash,
+      });
     } else {
-      this.sendLoginFailed(socket, msgError);
+      this._sender.sendLoginFailed(socket, msgError);
     }
   }
 
-  sendLoginFailed(socket: X67Socket, msg: string) {
-    socket.command('is-login', {
-      isLogin: false,
-    });
-    socket.command('sys-message', {
-      msg,
-      color: [255, 0, 0, 255],
-    });
+  private onAuthorizated(
+    next: (data: CommandLoginRequest, socket: X67Socket) => void,
+  ) {
+    const _next = next.bind(this);
+    return (data: CommandLoginRequest, socket: X67Socket) => {
+      if (this._session.has(socket)) {
+        _next(data, socket);
+      }
+    };
   }
+
+  private async onGetMenu(data: any, socket: X67Socket) {
+    const pkg = this._session.get(socket, 'package');
+    const service = this._packageMapping[pkg];
+    if (service) {
+      this._sender.sendMenu(socket, service.getMenuDescription());
+    }
+  }
+
+  private async onGetLibIj(data: any, socket: X67Socket) {
+    const pkg = this._session.get(socket, 'package');
+    const buffer = this._uploadService.getLibIjBuffer(pkg);
+    socket.sendLibIj(buffer);
+    this._telegramService.sendMessage(`Send libij ${pkg}`);
+  }
+
+  private async onMenuAction(data: any, socket: X67Socket) {}
 }
