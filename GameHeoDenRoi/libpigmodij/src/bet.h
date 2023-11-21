@@ -7,7 +7,7 @@ typedef void BetButton_o;
 
 namespace BetPatch {
     //
-    uintptr_t BetButton__SetNextMultipleOffset = 0x1A356D0;
+    uintptr_t BetButton__SetNextMultipleOffset = 0x2CA1840;
     typedef void (*BetButton__SetNextMultipleType) (BetButton_o* __this, const void* method);
     BetButton__SetNextMultipleType BetButton__SetNextMultipleOrigin;
     void BetButton__SetNextMultiple(BetButton_o* __this, const void* method) {
@@ -18,7 +18,7 @@ namespace BetPatch {
 
     //
     BetButton_o* betButton_o = nullptr;
-    uintptr_t BetButton___ctorOffset = 0x1A364DC;
+    uintptr_t BetButton___ctorOffset = 0x2CA264C;
     typedef void (*BetButton___ctorType)(BetButton_o* __this, const void* method);
     BetButton___ctorType BetButton___ctorOrigin;
     void BetButton___ctor(BetButton_o* __this, const void* method) {
@@ -30,7 +30,7 @@ namespace BetPatch {
     bool BetButton__SetCurMultipleActive = false;
     bool BetButton__SetCurMultipleHooking = false;
     int32_t BetButton__SetCurMultipleNumber = 1;
-    uintptr_t BetButton__SetCurMultipleOffset = 0x1A33F9C;
+    uintptr_t BetButton__SetCurMultipleOffset = 0x2CA010C;
     typedef void (*BetButton__SetCurMultipleType) (BetButton_o* __this, int32_t curMultiple, const void* method);
     BetButton__SetCurMultipleType BetButton__SetCurMultipleOrigin;
     void BetButton__SetCurMultiple (BetButton_o* __this, int32_t curMultiple, const void* method) {

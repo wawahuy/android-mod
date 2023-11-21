@@ -62,9 +62,9 @@ namespace UserDataPatch {
     }
 
     void init() {
-        void* trampolineUserData__ParsePB;
-        UserData__ParsePBType firstUserData__ParsePB = (UserData__ParsePBType)(g_il2CppBase + UserData__ParsePBOffset);
-        A64HookFunction((void*)firstUserData__ParsePB, (void*)&UserData__ParsePB, &trampolineUserData__ParsePB );
-        UserData__ParsePBOrigin = (UserData__ParsePBType) trampolineUserData__ParsePB;
+        // void* trampolineUserData__ParsePB;
+        // UserData__ParsePBType firstUserData__ParsePB = (UserData__ParsePBType)(g_il2CppBase + UserData__ParsePBOffset);
+        // A64HookFunction((void*)firstUserData__ParsePB, (void*)&UserData__ParsePB, &trampolineUserData__ParsePB );
+        // UserData__ParsePBOrigin = (UserData__ParsePBType) trampolineUserData__ParsePB;
     }
 }

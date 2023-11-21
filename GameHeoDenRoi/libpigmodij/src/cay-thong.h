@@ -10,7 +10,6 @@ namespace CayThongPatch {
     std::vector<MemoryPatch> mbAutoTrungs;
     MemoryPatch mbBanNhanh;
     MemoryPatch mbBan1Cham;
-    MemoryPatch mbNapDanNhanh;
 
     //
     bool Slingshot__OnPointerUpActive = false;
@@ -18,11 +17,10 @@ namespace CayThongPatch {
     uint64_t Slingshot__OnPointerUpTime = 0;
     int Slingshot__OnPointerUpCountCall = 1;
     int Slingshot__OnPointerUpSpeed = 100;
-    uintptr_t Slingshot__OnPointerUpOffset = 0x1D475C0;
+    uintptr_t Slingshot__OnPointerUpOffset = 0x2EE16B0;
     typedef void (*Slingshot__OnPointerUpType)(void* __this, void* eventData, const void* method);
     void (*Slingshot__OnPointerUpOrigin)(void* __this, void* eventData, const void* method);
     void Slingshot__OnPointerUp(void* __this, void* eventData, const void* method) {
-        LOG_E("test %p", (char)((uintptr_t)__this + 0x133));
         LOG_E("Slingshot__OnPointerUp hook call");
         if (!Slingshot__OnPointerUpActive) {
             Slingshot__OnPointerUpOrigin(__this, eventData, method);
@@ -32,6 +30,9 @@ namespace CayThongPatch {
             LOG_E("Slingshot__OnPointerUp hook wait");
             Slingshot__OnPointerUpTime = m_getMs();
             for (int i = 0; i < Slingshot__OnPointerUpCountCall; i++) {
+                // ----------------------
+                // 0x133
+                // ----------------------
                 uintptr_t s1 = (uintptr_t)__this + 0x133;
                 auto s2 = (char *)s1;
                 *s2 = 0xb3;
@@ -109,28 +110,47 @@ namespace CayThongPatch {
                 Slingshot__OnPointerUpOrigin = (Slingshot__OnPointerUpType) trampolineSlingshot__OnPointerUp;
                 Slingshot__OnPointerUpHooking = true;
             }
-
-            // if (!mbNapDanNhanh.isActive()) {
-            //     m_unprotectIl2cpp();
-            //     mbNapDanNhanh.execute();
-            //     m_protectIl2cpp();
-            // }
         } else {
             LOG_E("Restore napDanNhanhAction");
             Slingshot__OnPointerUpActive = false;
-            // m_unprotectIl2cpp();
-            // mbNapDanNhanh.restore();
-            // m_protectIl2cpp();
         }
     }
 
     void init() {
+        // PineTree$$CalculateHitResult
         mbAutoTrungs = std::vector<MemoryPatch> {
-            MemoryPatch(g_il2CppBase + 0x223C604, { 0x05, 0x00, 0x00, 0x14 }),
-            MemoryPatch(g_il2CppBase + 0x223C64c, { 0x31, 0x00, 0x00, 0x14 })
+            // do {
+            //   if ((int)*(uint *)(...     <------ TARGET
+            // -------------------------------------------
+            // | B ??
+            // -------------------------------------------
+            MemoryPatch(g_il2CppBase + 0x2F9796C, { 0x05, 0x00, 0x00, 0x14 }),
+            
+            // if ((uVar2 & 1) != 0) {     <------- TARGET
+            //   if (((*(long *)(param_4 + 0x38...
+            // -------------------------------------------
+            // | B ??
+            // -------------------------------------------
+            MemoryPatch(g_il2CppBase + 0x2F979B4, { 0x31, 0x00, 0x00, 0x14 })
         };
-        mbBanNhanh = MemoryPatch(g_il2CppBase + 0x1D47d70, { 0x61, 0x00, 0x00, 0x14 });
-        mbBan1Cham = MemoryPatch(g_il2CppBase + 0x1D4766C, { 0x1F, 0x20, 0x03, 0xD5 });
-        mbNapDanNhanh = MemoryPatch(g_il2CppBase + 0x1D47620, { 0x1F, 0x20, 0x03, 0xD5 });
+
+        // Slingshot$$Shot
+        // uVar7 = DG.Tweening.DOTween$$Sequence(0);
+        // ...  <-------------- TARGET (0x1D47d70)
+        //          |
+        // uVar7 = DG.Tweening.TweenSettingsExtensions$$AppendInterval(0x3d75c28f,uVar7,0); (0x1D47ef4)
+        // uVar8 = thunk_FUN_011e88b8(DG.Tweening.TweenCallback_TypeInfo);
+        // -----------------------------------------------
+        // | 0x1D47ef4 - 0x1D47d70 = 184 -> B 61
+        // -----------------------------------------------
+        mbBanNhanh = MemoryPatch(g_il2CppBase + 0x2ee1e60, { 0x61, 0x00, 0x00, 0x14 });
+        
+        // Slingshot$$OnPointerUp
+        // uVar1 = Slingshot$$CheckShotOrNot(fVar3,param_1);
+        // if ((uVar1 & 1) != 0)            <------ TARGET
+        // -----------------------------------------------
+        // | NOP
+        // -----------------------------------------------
+        mbBan1Cham = MemoryPatch(g_il2CppBase + 0x2ee175c, { 0x1F, 0x20, 0x03, 0xD5 });
     }
 }

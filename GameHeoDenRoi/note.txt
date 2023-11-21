@@ -10,6 +10,11 @@ return p1
 :cond_1
 
 
+
+-----------------------
+.method protected onCreate(Landroid/os/Bundle;)V
+    .locals 2
+
 invoke-static {p0}, Lcom/wawahuy/pigmod/MainActivity;->startMain(Landroid/content/Context;)V
 
 
@@ -26,4 +31,12 @@ com/facebook/login/LoginClient
     invoke-virtual {v1}, Lcom/facebook/login/LoginBehavior;->allowsCustomTabAuth()Z
 -->
 
+    .line 172
+    invoke-virtual {p1}, Lcom/facebook/login/LoginClient$Request;->getLoginBehavior()Lcom/facebook/login/LoginBehavior;
+
+    move-result-object v1
+
 goto :cond_3
+
+
+---------------
