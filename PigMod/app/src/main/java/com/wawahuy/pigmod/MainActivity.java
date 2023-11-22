@@ -21,31 +21,65 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     static {
         System.loadLibrary("pigmod");
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        startMain(this);
-    }
-
     public static Context contextCurrent;
 
     public static GLViewWrapper glViewWrapper;
+
+    private static final int REQUEST_CODE = 1;
+
+    boolean canExit = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (contextCurrent == null) {
+            startMain(this);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!canExit) {
+            canExit = true;
+            Toast.makeText(this, "Press exit", Toast.LENGTH_LONG).show();
+            return;
+        }
+        super.onBackPressed();
+        System.exit(0);
+    }
 
     public static void startGame(String packageName, String className) {
         Activity activity = (Activity)contextCurrent;
         WindowManager windowManager = activity.getWindowManager();
         windowManager.removeView(glViewWrapper);
+
+//        Intent intent = new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+
         Intent intent = new Intent();
         intent.setClassName(packageName, className);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, REQUEST_CODE);
         activity.overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK || resultCode == RESULT_CANCELED) {
+                finish();
+                System.exit(0);
+            }
+        }
     }
 
     public static String getClipboard() {
