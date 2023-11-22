@@ -40,8 +40,8 @@ echo "Docker installed! version: $dockerVersion"
 runCommandRemote "mkdir -p ~/xhpigmod"
 
 # push libso
-runCommandRemote "rm -rf ~/xhpigmod/libso"
-scp -r "${currentDir}/../libso/" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
+# runCommandRemote "rm -rf ~/xhpigmod/libso"
+# scp -r "${currentDir}/../libso/" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
 
 imageXhPigModServer="xhpigmod-server:latest"
 fileXhPigModServer="${currentDir}/../data-docker/xhpigmod-server.tar"

@@ -2,6 +2,10 @@ version: '3.8'
 
 x-shared_environment: &shared_environment
   FOLDER_LIBSO: ${FOLDER_LIBSO}
+  TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+  MONGO_HOST: ${MONGO_HOST}
+  MONGO_PORT: ${MONGO_PORT}
+  MONGO_DB: ${MONGO_DB}
 
 services:
   xhpigmod-server:
@@ -18,6 +22,20 @@ services:
     command: tunnel --protocol http2 --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiOTFkMjBkYTEtYWZhNy00NWM1LWFjODAtNTMyNDA5YTEwOTkyIiwicyI6Ik1UUTJaRGxrWVdFdFpUUXhZaTAwTVdJNExXSTFPRFF0TnprMllXWXhOell5WWpjeiJ9
+    networks:
+      - all
+
+  xhpigmod-mongo:
+    image: mongo:7.0.3
+    command: mongod --quiet --logpath /dev/null
+    environment:
+      <<: *shared_environment
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - ./conf/dev/mongod.conf:/etc/mongodb.conf
+      - ./data/mongo/log:/var/log/mongodb/
+      - ./data/mongo/data:/data/db
     networks:
       - all
 
