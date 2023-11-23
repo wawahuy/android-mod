@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
     static final String endpoint = "http://192.168.1.21:3000";
     static final String libraryHashUrl = endpoint + "/libpigmod/hash";
     static final String libraryUrl = endpoint + "/libpigmod/down";
-    static final String libraryName = "pigmod";
+    static final String libraryName = "libpigmod.so";
     static final String packageGame = "com.aladinfun.clashofsky_th_pig";
 
     public static Context contextCurrent;
@@ -75,11 +75,12 @@ public class MainActivity extends Activity {
                     Log.e("YUH", "library hash new: " + md5Remote);
 
                     String folderData = "/data/data/" + packageGame + "/";
-                    String fileName = "lib" + libraryName + ".so";
+                    postToast("Welcome [X67Huy]!", Toast.LENGTH_LONG);
+
                     if (!md5Old.equals(md5Remote)) {
                         // download library
                         postToast("Download menu...", Toast.LENGTH_LONG);
-                        downloadLibrary(libraryUrl, folderData, fileName);
+                        downloadLibrary(libraryUrl, folderData, libraryName);
 
                         // save hash
                         SharedPreferences.Editor editor = settings.edit();
@@ -88,14 +89,14 @@ public class MainActivity extends Activity {
                     }
 
                     // load library
-                    loadLibrary(folderData + fileName, libraryName);
+                    System.load(folderData + libraryName);
 
                     // run app
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(() -> {
                         MainActivity.startMain(MainActivity.this);
                     });
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.e("YUH", "run: ", e);
                     postToast("Error Server", Toast.LENGTH_LONG);
                     try {
@@ -235,10 +236,6 @@ public class MainActivity extends Activity {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
         }
-    }
-
-    public static void loadLibrary(String localLibraryPath, String libraryName) throws IOException {
-        System.load(localLibraryPath);
     }
 
 
