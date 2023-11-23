@@ -8,7 +8,11 @@ adb shell "su -c cp /storage/emulated/0/libpigmod.so /data/app/com.aladinfun.cla
 adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmod.so"
 
 echo f | xcopy /f /Y .\libpigmodij\.build\libpigmodij-striped.so libpigmodij.so
-adb push ./libpigmodij.so /storage/emulated/0/libpigmodij.so
+
+pscp -pw adadad libpigmodij.so yuh@10.8.0.3:/home/yuh/android-mod/PigServer/data/libso/com.aladinfun.clashofsky_th_pig
+pscp -pw adadad libpigmod.so yuh@10.8.0.3:/home/yuh/android-mod/PigServer/data/libso/libpigmod.so
+
+@REM adb push ./libpigmodij.so /storage/emulated/0/libpigmodij.so
 @REM adb shell "su -c cp /storage/emulated/0/libpigmodij.so /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/"
 @REM adb shell "su -c chmod 755 /data/app/com.aladinfun.clashofsky_th_pig-*/lib/arm64/libpigmodij.so"
 

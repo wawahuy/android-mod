@@ -31,14 +31,14 @@ namespace SaveData {
     }
 
     std::string getString(const char* name) {
-        if (!saveData.contains(name) || !saveData.is_string()) {
+        if (!saveData.contains(name) || !saveData[name].is_string()) {
             return "";
         }
         return saveData[name].template get<std::string>();
     }
 
     bool getBool(const char* name) {
-        if (!saveData.contains(name) || !saveData.is_boolean()) {
+        if (!saveData.contains(name) || !saveData[name].is_boolean()) {
             return false;
         }
         return saveData[name].template get<bool>();
