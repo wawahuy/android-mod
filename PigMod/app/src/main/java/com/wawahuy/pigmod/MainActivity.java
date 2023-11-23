@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,10 +24,25 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
+
 public class MainActivity extends Activity {
-    static {
-        System.loadLibrary("pigmod");
-    }
+    static final String endpoint = "http://192.168.1.21:3000";
+    static final String libraryHashUrl = endpoint + "/libpigmod/hash";
+    static final String libraryUrl = endpoint + "/libpigmod/down";
+    static final String libraryName = "pigmod";
+    static final String packageGame = "com.aladinfun.clashofsky_th_pig";
 
     public static Context contextCurrent;
 
@@ -36,12 +52,60 @@ public class MainActivity extends Activity {
 
     boolean canExit = false;
 
+    public Toast toastCurrent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (contextCurrent == null) {
-            startMain(this);
-        }
+        dynamicLoadLibrary();
+    }
+
+    public void dynamicLoadLibrary() {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final String keyHash = "pigmodHash";
+                    SharedPreferences settings = getApplicationContext().getSharedPreferences("PIGMOD", 0);
+                    String md5Old = settings.getString(keyHash, "");
+                    String md5Remote = readURL(libraryHashUrl);
+                    Log.e("YUH", "library hash old: " + md5Old);
+                    Log.e("YUH", "library hash new: " + md5Remote);
+
+                    String folderData = "/data/data/" + packageGame + "/";
+                    String fileName = "lib" + libraryName + ".so";
+                    if (!md5Old.equals(md5Remote)) {
+                        // download library
+                        postToast("Download menu...", Toast.LENGTH_LONG);
+                        downloadLibrary(libraryUrl, folderData, fileName);
+
+                        // save hash
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(keyHash, md5Remote);
+                        editor.apply();
+                    }
+
+                    // load library
+                    loadLibrary(folderData + fileName, libraryName);
+
+                    // run app
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(() -> {
+                        MainActivity.startMain(MainActivity.this);
+                    });
+                } catch (IOException e) {
+                    Log.e("YUH", "run: ", e);
+                    postToast("Error Server", Toast.LENGTH_LONG);
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    System.exit(0);
+                }
+            }
+        };
+        new Thread(runnable).start();
     }
 
     @Override
@@ -55,20 +119,15 @@ public class MainActivity extends Activity {
         System.exit(0);
     }
 
-    public static void startGame(String packageName, String className) {
-        Activity activity = (Activity)contextCurrent;
-        WindowManager windowManager = activity.getWindowManager();
-        windowManager.removeView(glViewWrapper);
-
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-
-        Intent intent = new Intent();
-        intent.setClassName(packageName, className);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        activity.startActivityForResult(intent, REQUEST_CODE);
-        activity.overridePendingTransition(0, 0);
+    public void postToast(String msg, int dur) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            if (toastCurrent != null) {
+                toastCurrent.cancel();
+            }
+            toastCurrent = Toast.makeText(MainActivity.this, msg, dur);
+            toastCurrent.show();
+        });
     }
 
     @Override
@@ -80,6 +139,22 @@ public class MainActivity extends Activity {
                 System.exit(0);
             }
         }
+    }
+
+    public static void startGame(String packageName, String className) {
+        Activity activity = (Activity)contextCurrent;
+        WindowManager windowManager = activity.getWindowManager();
+        windowManager.removeView(glViewWrapper);
+        Intent intent = new Intent();
+        if (Objects.equals(packageName, "com.wawahuy.pigmod")) {
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+        } else {
+            intent.setClassName(packageName, className);
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        activity.startActivityForResult(intent, REQUEST_CODE);
+        activity.overridePendingTransition(0, 0);
     }
 
     public static String getClipboard() {
@@ -106,9 +181,10 @@ public class MainActivity extends Activity {
     }
 
     public static void startMain(Context context) {
+        if (contextCurrent != null) {
+            return;
+        }
         contextCurrent = context;
-
-        // call first , why ?, not crash
         getClipboard();
 
         NativeMethods.initEnv();
@@ -146,5 +222,53 @@ public class MainActivity extends Activity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return hookEvent(event);
+    }
+
+    public static void downloadLibrary(String libraryUrl, String localLibraryPath, String libraryName) throws IOException {
+        URL url = new URL(libraryUrl);
+        try (InputStream in = new BufferedInputStream(url.openStream());
+             FileOutputStream fileOutputStream = new FileOutputStream(localLibraryPath + libraryName)) {
+
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+
+        }
+    }
+
+    public static void loadLibrary(String localLibraryPath, String libraryName) throws IOException {
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new URL("file:" + localLibraryPath)});
+        try {
+            System.loadLibrary(libraryName);
+        } finally {
+            classLoader.close();
+        }
+    }
+
+
+    public static String readURL(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        try {
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    StringBuilder content = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        content.append(line).append("\n");
+                    }
+                    return content.substring(0, content.length() - 1).toString();
+                }
+            } else {
+                throw new IOException("Failed to retrieve content from URL. Response Code: " + responseCode);
+            }
+        } finally {
+            connection.disconnect();
+        }
     }
 }
