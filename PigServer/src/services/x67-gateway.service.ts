@@ -133,15 +133,20 @@ export class X67GatewayService {
 
     if (!msgError) {
       const buffer = this._uploadService.getLibIjBuffer(data.package);
-      const libIjHash = createHashMd5(buffer);
-      this._session.set(socket, 'package', data.package);
-      this._sender.sendLoginSuccess(socket, {
-        isLogin: true,
-        libIjHash,
-      });
-    } else {
-      this._sender.sendLoginFailed(socket, msgError);
+      if (buffer) {
+        const libIjHash = createHashMd5(buffer);
+        this._session.set(socket, 'package', data.package);
+        this._sender.sendLoginSuccess(socket, {
+          isLogin: true,
+          libIjHash,
+        });
+        return;
+      }
+
+      msgError = 'Loi file!';
     }
+
+    this._sender.sendLoginFailed(socket, msgError);
   }
 
   private onAuthorizated(
