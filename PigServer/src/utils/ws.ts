@@ -11,5 +11,5 @@ export function generateWebSocketAcceptKey(clientWebSocketKey: string) {
 }
 
 export function createHashMd5(buffer: Buffer) {
-  return crypto.createHash("md5").update(buffer).digest("hex");
+  return crypto.createHash('md5').update(buffer).digest('hex');
 }
