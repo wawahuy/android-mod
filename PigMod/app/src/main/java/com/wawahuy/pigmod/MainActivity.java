@@ -57,7 +57,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dynamicLoadLibrary();
+        if (contextCurrent != null) {
+            dynamicLoadLibrary();
+        }
     }
 
     public void dynamicLoadLibrary() {
@@ -181,9 +183,6 @@ public class MainActivity extends Activity {
     }
 
     public static void startMain(Context context) {
-        if (contextCurrent != null) {
-            return;
-        }
         contextCurrent = context;
         getClipboard();
 
@@ -235,17 +234,11 @@ public class MainActivity extends Activity {
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-
         }
     }
 
     public static void loadLibrary(String localLibraryPath, String libraryName) throws IOException {
-        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new URL("file:" + localLibraryPath)});
-        try {
-            System.loadLibrary(libraryName);
-        } finally {
-            classLoader.close();
-        }
+        System.load(localLibraryPath);
     }
 
 
