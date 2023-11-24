@@ -72,6 +72,9 @@
         "utility": "cpp",
         "valarray": "cpp",
         "iostream": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "fstream": "cpp",
+        "random": "cpp",
+        "sstream": "cpp"
     }
 }

@@ -24,5 +24,6 @@ struct System_String_o {
 };
 
 std::string System_String_o_ToString(System_String_o* o);
+void StringToSystem_String_o(std::string str, System_String_o* o);
 
 #endif //PIGMOD_IL2CPP_H

@@ -63,6 +63,10 @@ extern "C" {
             SaveData::saveBool(STR_SAVE_AUTO_LOGIN, g_AuthAutoDefault);
             g_AuthAuto = g_AuthAutoDefault;
         }
+
+        if (g_AuthAuto && strlen(g_AuthKey) > 0 && g_AuthStage == AuthStage::None && Socket::isOpen) {
+            Socket::handleLogin();
+        }
     }
 }
 #endif //PIGMOD_JAVA_H

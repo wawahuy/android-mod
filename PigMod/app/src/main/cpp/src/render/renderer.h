@@ -27,6 +27,8 @@ namespace Renderer {
             // 22 3.0
             font_cfg.SizePixels = 32.0f;
             io.Fonts->AddFontDefault(&font_cfg);
+//            auto fontPath = "/data/data/" + getPackageName() + "/font.ttf";
+
             ImGui::GetStyle().ScaleAllSizes(3.4f);
             g_Scale = true;
         }

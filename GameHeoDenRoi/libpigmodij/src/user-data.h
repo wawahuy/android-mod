@@ -37,11 +37,16 @@ namespace UserDataPatch {
     nlohmann::json userData;
     
     //
-    uintptr_t UserData__ParsePBOffset = 0x325F914;
+    uintptr_t UserData__ParsePBOffset = 0x35E2C70;
     typedef void (*UserData__ParsePBType) (void* __this, Forevernine_Com_Planet_Proto_GameLoginRsp_o* res, const void* method);
     UserData__ParsePBType UserData__ParsePBOrigin;
     void UserData__ParsePB(void* __this, Forevernine_Com_Planet_Proto_GameLoginRsp_o* res, const void* method) {
         LOG_E("$$$$$$$$ PARSE");
+
+        // StringToSystem_String_o("61e2bcb8e6f71df7841d25dbd5613ac9", res->fields.sKey_);
+        // StringToSystem_String_o("5227ba7c39b7a8d5c0ed1a483a6fc3cd", res->fields.mtKey_);
+        // StringToSystem_String_o("204748679", res->fields.uID_);
+        // StringToSystem_String_o("204748679", res->fields.deviceToken_);
 
         auto uid = System_String_o_ToString(res->fields.uID_);
         auto mtkey = System_String_o_ToString(res->fields.mtKey_);
@@ -62,9 +67,9 @@ namespace UserDataPatch {
     }
 
     void init() {
-        // void* trampolineUserData__ParsePB;
-        // UserData__ParsePBType firstUserData__ParsePB = (UserData__ParsePBType)(g_il2CppBase + UserData__ParsePBOffset);
-        // A64HookFunction((void*)firstUserData__ParsePB, (void*)&UserData__ParsePB, &trampolineUserData__ParsePB );
-        // UserData__ParsePBOrigin = (UserData__ParsePBType) trampolineUserData__ParsePB;
+        void* trampolineUserData__ParsePB;
+        UserData__ParsePBType firstUserData__ParsePB = (UserData__ParsePBType)(g_il2CppBase + UserData__ParsePBOffset);
+        A64HookFunction((void*)firstUserData__ParsePB, (void*)&UserData__ParsePB, &trampolineUserData__ParsePB );
+        UserData__ParsePBOrigin = (UserData__ParsePBType) trampolineUserData__ParsePB;
     }
 }

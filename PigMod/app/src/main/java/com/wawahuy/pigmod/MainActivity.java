@@ -40,9 +40,14 @@ import java.util.Objects;
 public class MainActivity extends Activity {
     static final String endpoint = "http://192.168.1.21:3000";
     static final String libraryHashUrl = endpoint + "/libpigmod/hash";
+    static final String libraryFontUrl = endpoint + "/libpigmod/font";
     static final String libraryUrl = endpoint + "/libpigmod/down";
     static final String libraryName = "libpigmod.so";
+    static final String libraryFontName = "font.ttf";
+
+
     static final String packageGame = "com.aladinfun.clashofsky_th_pig";
+//    static final String packageGame = "com.wawahuy.pigmod";
 
     public static Context contextCurrent;
 
@@ -63,6 +68,8 @@ public class MainActivity extends Activity {
     }
 
     public void dynamicLoadLibrary() {
+        postToast("Welcome [X67Huy]!", Toast.LENGTH_LONG);
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -75,12 +82,12 @@ public class MainActivity extends Activity {
                     Log.e("YUH", "library hash new: " + md5Remote);
 
                     String folderData = "/data/data/" + packageGame + "/";
-                    postToast("Welcome [X67Huy]!", Toast.LENGTH_LONG);
 
                     if (!md5Old.equals(md5Remote)) {
                         // download library
                         postToast("Download menu...", Toast.LENGTH_LONG);
-                        downloadLibrary(libraryUrl, folderData, libraryName);
+                        downloadFile(libraryUrl, folderData + libraryName);
+                        downloadFile(libraryFontUrl, folderData + libraryFontName);
 
                         // save hash
                         SharedPreferences.Editor editor = settings.edit();
@@ -88,8 +95,12 @@ public class MainActivity extends Activity {
                         editor.apply();
                     }
 
-                    // load library
                     System.load(folderData + libraryName);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
 
                     // run app
                     Handler handler = new Handler(Looper.getMainLooper());
@@ -224,10 +235,10 @@ public class MainActivity extends Activity {
         return hookEvent(event);
     }
 
-    public static void downloadLibrary(String libraryUrl, String localLibraryPath, String libraryName) throws IOException {
+    public static void downloadFile(String libraryUrl, String localPathFile) throws IOException {
         URL url = new URL(libraryUrl);
         try (InputStream in = new BufferedInputStream(url.openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream(localLibraryPath + libraryName)) {
+             FileOutputStream fileOutputStream = new FileOutputStream(localPathFile)) {
 
             byte[] dataBuffer = new byte[1024];
             int bytesRead;
@@ -244,6 +255,7 @@ public class MainActivity extends Activity {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         try {
             connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
