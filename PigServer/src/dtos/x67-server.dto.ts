@@ -1,10 +1,12 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsString, Matches } from 'class-validator';
 
 export class CommandLoginRequest {
   @IsString()
+  @Matches(/^[\._\-a-zA-Z0-9]+$/gm)
   key: string;
 
   @IsString()
+  @Matches(/^[\._\-a-zA-Z0-9]+$/gm)
   package: string;
 
   @IsBoolean()

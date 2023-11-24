@@ -3,6 +3,11 @@ import { ModelDefinition, MongooseModule } from '@nestjs/mongoose';
 import { MongoConfig } from '../configs/mongo.config';
 import { TelegramBot, TelegramBotSchema } from './telegram.schema';
 import { GameKey, GameKeySchema } from './game-key.schema';
+import { PkgHdrAccount, PkgHdrAccountSchema } from './pkg-hdr-account.schema';
+import {
+  PkgHdrAccountActive,
+  PkgHdrAccountActiveSchema,
+} from './pkg-hdr-account-active.schema';
 
 export const features: ModelDefinition[] = [
   {
@@ -12,6 +17,14 @@ export const features: ModelDefinition[] = [
   {
     name: GameKey.name,
     schema: GameKeySchema,
+  },
+  {
+    name: PkgHdrAccount.name,
+    schema: PkgHdrAccountSchema,
+  },
+  {
+    name: PkgHdrAccountActive.name,
+    schema: PkgHdrAccountActiveSchema,
   },
 ];
 

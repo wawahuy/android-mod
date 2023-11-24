@@ -23,10 +23,18 @@ export class UploadService {
   }
 
   getLibIjStream(strPackage: string) {
-    return fs.createReadStream(this.getLibIjPath(strPackage));
+    const p = this.getLibIjPath(strPackage);
+    if (!fs.existsSync(p)) {
+      return null;
+    }
+    return fs.createReadStream(p);
   }
 
   getLibIjBuffer(strPackage: string) {
-    return fs.readFileSync(this.getLibIjPath(strPackage));
+    const p = this.getLibIjPath(strPackage);
+    if (!fs.existsSync(p)) {
+      return null;
+    }
+    return fs.readFileSync(p);
   }
 }
