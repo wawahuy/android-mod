@@ -20,6 +20,9 @@ export class PkgHdrAccount {
   uid: string;
 
   @Prop()
+  trialExpired: Date;
+
+  @Prop()
   stsAllTili: number;
 
   @Prop()

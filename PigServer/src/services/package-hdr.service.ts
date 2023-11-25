@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as md5 from 'md5';
 import { IGamePackage } from 'src/interfaces/game-package';
 import { WidgetMenuItem, ArgDataPushType } from 'src/x67-menu/config';
@@ -7,6 +7,14 @@ import { TelegramService } from './telegram.service';
 import X67Socket from 'src/x67-server/x67-socket';
 import { X67SessionService } from './x67-session.service';
 import { X67SenderService } from './x67-sender.service';
+import { HdrUserDataRequest } from 'src/dtos/pkg-hdr.dto';
+import {
+  PkgHdrAccount,
+  PkgHdrAccountDocument,
+} from 'src/schema/pkg-hdr-account.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import * as moment from 'moment';
 
 const globalMenuTrial = [
   {
@@ -156,12 +164,17 @@ const globalMenu = [
 export class PackageHdrService implements IGamePackage {
   static readonly packageName = 'com.aladinfun.clashofsky_th_pig';
   static readonly className = 'com.aladinfun.piggyboom.MainAppActivity';
+  readonly trialSecond = 3 * 24 * 60 * 60;
+
+  _logger = new Logger('PackageHdrService');
 
   constructor(
     private readonly _uploadService: UploadService,
     private readonly _telegramService: TelegramService,
     private readonly _session: X67SessionService,
     private readonly _sender: X67SenderService,
+    @InjectModel(PkgHdrAccount.name)
+    private _pkgHdrAccountModel: Model<PkgHdrAccountDocument>,
   ) {}
 
   canTrial() {
@@ -173,6 +186,7 @@ export class PackageHdrService implements IGamePackage {
       () => {
         this._sender.sendDestroy(socket);
         this._session.remove(socket, 'timeoutTrial');
+        this._session.delete(socket);
       },
       30 * 60 * 1000,
     );
@@ -202,18 +216,57 @@ export class PackageHdrService implements IGamePackage {
     };
   }
 
-  actionUserData(data: any, socket: X67Socket) {
+  async actionUserData(data: HdrUserDataRequest, socket: X67Socket) {
+    const telegramMsg: string[] = [];
+    let allowTrial = false;
+    let hdrAccount = await this._pkgHdrAccountModel.findOne({
+      uid: data.uid,
+    });
+    if (!hdrAccount) {
+      allowTrial = true;
+      hdrAccount = await this._pkgHdrAccountModel.create({});
+      hdrAccount.uid = data.uid;
+      telegramMsg.push(`New HDR account: ${data.uid}`);
+    } else {
+      if (
+        !hdrAccount.trialExpired ||
+        moment(hdrAccount.trialExpired).isAfter(moment())
+      ) {
+        allowTrial = true;
+      }
+    }
+    hdrAccount.mtkey = data.mtkey;
+    hdrAccount.skey = data.skey;
+
     const isTrial = this._session.get(socket, 'trial');
     if (isTrial) {
       const timeoutTrial = this._session.get(socket, 'timeoutTrial');
       if (timeoutTrial) {
-        console.log('clear timeout');
         clearTimeout(timeoutTrial);
         this._session.remove(socket, 'timeoutTrial');
-        this._sender.sendMenu(socket, this.buildMenu(globalMenu));
+
+        if (!hdrAccount.trialExpired) {
+          telegramMsg.push(`Start trial HDR account: ${data.uid}`);
+          hdrAccount.trialExpired = moment()
+            .add(this.trialSecond, 'second')
+            .toDate();
+        }
+
+        if (allowTrial) {
+          this._sender.sendMenu(socket, this.buildMenu(globalMenu));
+        } else {
+          telegramMsg.push(`Denide trial HDR account: ${data.uid}`);
+          this._sender.sendMessageError(socket, 'Ban da het han dung thu');
+          this._sender.sendDestroy(socket);
+          this._session.delete(socket);
+        }
       }
     }
-    console.log(data);
+
+    hdrAccount.save();
+    if (telegramMsg.length) {
+      this._telegramService.sendMessage(telegramMsg.join('\r\n'));
+    }
   }
 
   private buildMenu(menu: any) {
