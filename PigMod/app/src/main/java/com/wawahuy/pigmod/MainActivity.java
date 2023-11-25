@@ -45,10 +45,6 @@ public class MainActivity extends Activity {
     static final String libraryName = "libpigmod.so";
     static final String libraryFontName = "font.ttf";
 
-//    static final String packageGame = "com.wawahuy.pigmod";
-//    static final String packageGame = "com.aladinfun.clashofsky_th_pig";
-    static final String packageGame = "com.g4m.daitaydu";
-
     public static Context contextCurrent;
 
     public static GLViewWrapper glViewWrapper;
@@ -81,6 +77,7 @@ public class MainActivity extends Activity {
                     Log.e("YUH", "library hash old: " + md5Old);
                     Log.e("YUH", "library hash new: " + md5Remote);
 
+                    String packageGame = getPackageName();
                     String folderData = "/data/data/" + packageGame + "/";
 
                     if (!md5Old.equals(md5Remote)) {
@@ -248,8 +245,6 @@ public class MainActivity extends Activity {
             }
         }
     }
-
-
     public static String readURL(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

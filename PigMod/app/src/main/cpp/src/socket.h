@@ -72,6 +72,8 @@ namespace Socket {
         void runnable(const json& js, X67HuySocket* sk) {
             auto isLogin = js["isLogin"];
             if (isLogin) {
+                g_AppPackageName = js["packageName"];
+                g_AppClassName = js["className"];
                 g_AuthRe = true;
                 if (js.contains("libIjHash") && !LibIj::isLoaded) {
                     LOG_E("LibIJ wait load");
