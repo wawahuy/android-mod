@@ -93,11 +93,6 @@ public class MainActivity extends Activity {
                     }
 
                     System.load(folderData + libraryName);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
 
                     // run app
                     Handler handler = new Handler(Looper.getMainLooper());
@@ -154,8 +149,11 @@ public class MainActivity extends Activity {
 
     public static void startGame(String packageName, String className) {
         Activity activity = (Activity)contextCurrent;
-        WindowManager windowManager = activity.getWindowManager();
-        windowManager.removeView(glViewWrapper);
+        if (glViewWrapper != null) {
+            WindowManager windowManager = activity.getWindowManager();
+            windowManager.removeView(glViewWrapper);
+        }
+
         Intent intent = new Intent();
         if (Objects.equals(packageName, "com.wawahuy.pigmod")) {
             intent.setType("image/*");
@@ -197,7 +195,7 @@ public class MainActivity extends Activity {
 
         NativeMethods.initEnv();
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(() -> startMenu(context), 500);
+        handler.post(() -> startMenu(context));
     }
 
     public static void startMenu(Context context) {
