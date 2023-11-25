@@ -25,4 +25,6 @@ export class CommandLoginRequest {
 export class CommandLoginSuccessResponse {
   isLogin: boolean;
   libIjHash: string;
+  packageName: string;
+  className: string;
 }
