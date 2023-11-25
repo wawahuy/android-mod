@@ -21,7 +21,8 @@ extern "C" {
         if (g_CanStartGame) {
             Renderer::g_Initialized = false;
             g_CanStartGame = false;
-            startGame("com.aladinfun.clashofsky_th_pig", "com.aladinfun.piggyboom.MainAppActivity");
+//            startGame("com.aladinfun.clashofsky_th_pig", "com.aladinfun.piggyboom.MainAppActivity");
+            startGame("com.g4m.daitaydu", "com.unity3d.player.UnityPlayerActivity");
         }
     }
 

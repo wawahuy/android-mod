@@ -45,9 +45,9 @@ public class MainActivity extends Activity {
     static final String libraryName = "libpigmod.so";
     static final String libraryFontName = "font.ttf";
 
-
-    static final String packageGame = "com.aladinfun.clashofsky_th_pig";
 //    static final String packageGame = "com.wawahuy.pigmod";
+//    static final String packageGame = "com.aladinfun.clashofsky_th_pig";
+    static final String packageGame = "com.g4m.daitaydu";
 
     public static Context contextCurrent;
 
