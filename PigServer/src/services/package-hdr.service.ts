@@ -144,11 +144,20 @@ const description = {
 @Injectable()
 export class PackageHdrService implements IGamePackage {
   static readonly packageName = 'com.aladinfun.clashofsky_th_pig';
+  static readonly className = 'com.aladinfun.piggyboom.MainAppActivity';
 
   constructor(
     private readonly _uploadService: UploadService,
     private readonly _telegramService: TelegramService,
   ) {}
+
+  getPackageName(): string {
+    return PackageHdrService.packageName;
+  }
+
+  getClassName(): string {
+    return PackageHdrService.className;
+  }
 
   getMenuDescription() {
     return description;

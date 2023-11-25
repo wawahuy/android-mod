@@ -18,6 +18,7 @@ import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
 import { UploadService } from './upload.service';
 import { createHashMd5 } from 'src/utils/ws';
+import { PackageDtdService } from './package-dtd.service';
 
 @Injectable()
 export class X67GatewayService {
@@ -34,6 +35,7 @@ export class X67GatewayService {
     private readonly _session: X67SessionService,
     private readonly _uploadService: UploadService,
     private readonly _packageHdrService: PackageHdrService,
+    private readonly _packageDtdService: PackageDtdService,
     @InjectModel(GameKey.name)
     private _gameKeyModel: Model<GameKeyDocument>,
   ) {
@@ -48,6 +50,7 @@ export class X67GatewayService {
     // package mapping
     this._packageMapping = {
       [PackageHdrService.packageName]: this._packageHdrService,
+      [PackageDtdService.packageName]: this._packageDtdService,
     };
 
     // route
@@ -134,11 +137,14 @@ export class X67GatewayService {
     if (!msgError) {
       const buffer = this._uploadService.getLibIjBuffer(data.package);
       if (buffer) {
+        const service = this._packageMapping[data.package];
         const libIjHash = createHashMd5(buffer);
         this._session.set(socket, 'package', data.package);
         this._sender.sendLoginSuccess(socket, {
           isLogin: true,
           libIjHash,
+          packageName: service.getPackageName(),
+          className: service.getClassName(),
         });
         return;
       }

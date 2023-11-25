@@ -9,6 +9,7 @@ import { UploadService } from './upload.service';
 import { PackageHdrService } from './package-hdr.service';
 import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
+import { PackageDtdService } from './package-dtd.service';
 
 const services = [
   X67GatewayService,
@@ -18,6 +19,7 @@ const services = [
   AsmService,
   UploadService,
   PackageHdrService,
+  PackageDtdService,
 ];
 
 const serviceImport = [TelegramConfig, UploadConfig];
