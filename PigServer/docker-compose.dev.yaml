@@ -6,6 +6,10 @@ x-shared_environment: &shared_environment
   MONGO_HOST: ${MONGO_HOST}
   MONGO_PORT: ${MONGO_PORT}
   MONGO_DB: ${MONGO_DB}
+  REDIS_HOST: ${REDIS_HOST}
+  REDIS_PORT: ${REDIS_PORT}
+  XH_SUPER_USER: ${XH_SUPER_USER}
+  XH_SUPER_PWD: ${XH_SUPER_PWD}
 
 services:
   xhpigmod-gateway:
