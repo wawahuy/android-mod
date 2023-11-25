@@ -54,6 +54,8 @@ X67HuySocket* g_Socket = nullptr;
 
 bool g_CanStartGame = false;
 std::string g_AndroidID;
+std::string g_AppPackageName;
+std::string g_AppClassName;
 
 #ifdef IS_DEBUG
 #else

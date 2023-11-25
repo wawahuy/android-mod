@@ -13,3 +13,10 @@ std::string System_String_o_ToString(System_String_o* o) {
     }
     return str;
 }
+
+void StringToSystem_String_o(std::string str, System_String_o* o) {
+    uint8_t* ptr = (uint8_t *)o->fields.getPtr();
+    for (int i = 0; i < o->fields.m_stringLength; i ++) {
+        *((char*)(ptr + i * 2)) = str[i];
+    }
+}

@@ -21,7 +21,7 @@ extern "C" {
         if (g_CanStartGame) {
             Renderer::g_Initialized = false;
             g_CanStartGame = false;
-            startGame("com.aladinfun.clashofsky_th_pig", "com.aladinfun.piggyboom.MainAppActivity");
+            startGame(g_AppPackageName, g_AppClassName);
         }
     }
 
@@ -62,6 +62,10 @@ extern "C" {
         } else {
             SaveData::saveBool(STR_SAVE_AUTO_LOGIN, g_AuthAutoDefault);
             g_AuthAuto = g_AuthAutoDefault;
+        }
+
+        if (g_AuthAuto && strlen(g_AuthKey) > 0 && g_AuthStage == AuthStage::None && Socket::isOpen) {
+            Socket::handleLogin();
         }
     }
 }
