@@ -301,6 +301,10 @@ class X67Socket extends events.EventEmitter {
     cmd.data = data;
     this.sendJson(cmd);
   }
+
+  destroy() {
+    this._socket.destroy();
+  }
 }
 
 export default X67Socket;

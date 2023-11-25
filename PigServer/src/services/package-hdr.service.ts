@@ -4,8 +4,24 @@ import { IGamePackage } from 'src/interfaces/game-package';
 import { WidgetMenuItem, ArgDataPushType } from 'src/x67-menu/config';
 import { UploadService } from './upload.service';
 import { TelegramService } from './telegram.service';
+import X67Socket from 'src/x67-server/x67-socket';
+import { X67SessionService } from './x67-session.service';
+import { X67SenderService } from './x67-sender.service';
 
-const menu = [
+const globalMenuTrial = [
+  {
+    label: 'System',
+    action: 'system',
+    items: [
+      {
+        label: 'Dang chut nhe...',
+        type: WidgetMenuItem.Text,
+      },
+    ],
+  },
+];
+
+const globalMenu = [
   {
     label: 'Nang Luong',
     action: 'nangluong',
@@ -136,11 +152,6 @@ const menu = [
   },
 ];
 
-const description = {
-  versionHash: md5(JSON.stringify(menu)),
-  menu,
-};
-
 @Injectable()
 export class PackageHdrService implements IGamePackage {
   static readonly packageName = 'com.aladinfun.clashofsky_th_pig';
@@ -149,7 +160,24 @@ export class PackageHdrService implements IGamePackage {
   constructor(
     private readonly _uploadService: UploadService,
     private readonly _telegramService: TelegramService,
+    private readonly _session: X67SessionService,
+    private readonly _sender: X67SenderService,
   ) {}
+
+  canTrial() {
+    return true;
+  }
+
+  onTrial(socket: X67Socket) {
+    const timeout = setTimeout(
+      () => {
+        this._sender.sendDestroy(socket);
+        this._session.remove(socket, 'timeoutTrial');
+      },
+      30 * 60 * 1000,
+    );
+    this._session.set(socket, 'timeoutTrial', timeout);
+  }
 
   getPackageName(): string {
     return PackageHdrService.packageName;
@@ -159,7 +187,40 @@ export class PackageHdrService implements IGamePackage {
     return PackageHdrService.className;
   }
 
-  getMenuDescription() {
+  getMenuDescription(socket: X67Socket) {
+    const isTrial = this._session.get(socket, 'trial');
+    const timeoutTrial = this._session.get(socket, 'timeoutTrial');
+    if (isTrial && timeoutTrial) {
+      return this.buildMenu(globalMenuTrial);
+    }
+    return this.buildMenu(globalMenu);
+  }
+
+  getRoutes(): { [key: string]: () => void } {
+    return {
+      'hdr:user-data': this.actionUserData.bind(this),
+    };
+  }
+
+  actionUserData(data: any, socket: X67Socket) {
+    const isTrial = this._session.get(socket, 'trial');
+    if (isTrial) {
+      const timeoutTrial = this._session.get(socket, 'timeoutTrial');
+      if (timeoutTrial) {
+        console.log('clear timeout');
+        clearTimeout(timeoutTrial);
+        this._session.remove(socket, 'timeoutTrial');
+        this._sender.sendMenu(socket, this.buildMenu(globalMenu));
+      }
+    }
+    console.log(data);
+  }
+
+  private buildMenu(menu: any) {
+    const description = {
+      versionHash: md5(JSON.stringify(menu)),
+      menu,
+    };
     return description;
   }
 }

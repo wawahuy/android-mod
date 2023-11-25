@@ -18,7 +18,6 @@ import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
 import { UploadService } from './upload.service';
 import { createHashMd5 } from 'src/utils/ws';
-import { PackageDtdService } from './package-dtd.service';
 
 @Injectable()
 export class X67GatewayService {
@@ -35,7 +34,6 @@ export class X67GatewayService {
     private readonly _session: X67SessionService,
     private readonly _uploadService: UploadService,
     private readonly _packageHdrService: PackageHdrService,
-    private readonly _packageDtdService: PackageDtdService,
     @InjectModel(GameKey.name)
     private _gameKeyModel: Model<GameKeyDocument>,
   ) {
@@ -50,16 +48,27 @@ export class X67GatewayService {
     // package mapping
     this._packageMapping = {
       [PackageHdrService.packageName]: this._packageHdrService,
-      [PackageDtdService.packageName]: this._packageDtdService,
     };
 
     // route
     const onAuthorizatedBinded = this.onAuthorizated.bind(this);
     const listener = this._server.eventClients;
     listener.on('login', this.onLogin.bind(this));
-    listener.on('get-menu', onAuthorizatedBinded(this.onGetMenu));
-    listener.on('get-lib-ij', onAuthorizatedBinded(this.onGetLibIj));
-    listener.on('menu-action', onAuthorizatedBinded(this.onMenuAction));
+    listener.on('get-menu', onAuthorizatedBinded(this.onGetMenu.bind(this)));
+    listener.on('get-lib-ij', onAuthorizatedBinded(this.onGetLibIj.bind(this)));
+    listener.on(
+      'menu-action',
+      onAuthorizatedBinded(this.onMenuAction.bind(this)),
+    );
+
+    // add route pkg
+    for (const packageName in this._packageMapping) {
+      const service = this._packageMapping[packageName];
+      const routes = service.getRoutes();
+      for (const route in routes) {
+        listener.on(route, onAuthorizatedBinded(routes[route]));
+      }
+    }
   }
 
   private async onLogin(data: CommandLoginRequest, socket: X67Socket) {
@@ -73,7 +82,9 @@ export class X67GatewayService {
 
     const telegramMsg = [
       `${data.package} (LOGIN)`,
-      `Key: ${data.key}`,
+      `--------------------------`,
+      `|  Key: ${data.key}`,
+      `--------------------------`,
       `IsTrial: ${data.trial}`,
       `Version: ${data.version}`,
       `MAC: ${data.mac}`,
@@ -88,7 +99,19 @@ export class X67GatewayService {
     let msgError: string | null;
     let needUpdate = false;
     let gameKey: GameKeyDocument;
-    if (!data.trial) {
+
+    const service = this._packageMapping[data.package];
+    if (!service) {
+      msgError = 'Package not config';
+    } else if (data.trial) {
+      // when trial
+      if (service.canTrial()) {
+        service.onTrial(socket);
+      } else {
+        msgError = 'Khong ho tro dung thu';
+      }
+    } else {
+      // when enter token
       gameKey = await this._gameKeyModel.findOne({
         key: data.key,
         package: data.package,
@@ -137,9 +160,9 @@ export class X67GatewayService {
     if (!msgError) {
       const buffer = this._uploadService.getLibIjBuffer(data.package);
       if (buffer) {
-        const service = this._packageMapping[data.package];
         const libIjHash = createHashMd5(buffer);
         this._session.set(socket, 'package', data.package);
+        this._session.set(socket, 'trial', data.trial);
         this._sender.sendLoginSuccess(socket, {
           isLogin: true,
           libIjHash,
@@ -148,7 +171,6 @@ export class X67GatewayService {
         });
         return;
       }
-
       msgError = 'Loi file!';
     }
 
@@ -158,10 +180,9 @@ export class X67GatewayService {
   private onAuthorizated(
     next: (data: CommandLoginRequest, socket: X67Socket) => void,
   ) {
-    const _next = next.bind(this);
     return (data: CommandLoginRequest, socket: X67Socket) => {
       if (this._session.has(socket)) {
-        _next(data, socket);
+        next(data, socket);
       }
     };
   }
@@ -170,7 +191,7 @@ export class X67GatewayService {
     const pkg = this._session.get(socket, 'package');
     const service = this._packageMapping[pkg];
     if (service) {
-      this._sender.sendMenu(socket, service.getMenuDescription());
+      this._sender.sendMenu(socket, service.getMenuDescription(socket));
     }
   }
 

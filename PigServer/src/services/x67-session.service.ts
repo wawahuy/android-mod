@@ -3,6 +3,8 @@ import X67Socket from 'src/x67-server/x67-socket';
 
 export interface X67SessionData {
   package: string;
+  trial: boolean;
+  timeoutTrial: NodeJS.Timeout;
 }
 
 @Injectable()
@@ -13,9 +15,12 @@ export class X67SessionService {
 
   session(socket: X67Socket) {
     if (!this.data[socket.id]) {
-      this.data[socket.id] = <any>{};
+      const data = (this.data[socket.id] = <X67SessionData>(<unknown>{}));
       socket.eventSystem.once('close', () => {
         this.delete(socket);
+        if (data.timeoutTrial) {
+          clearTimeout(data.timeoutTrial);
+        }
       });
     }
     return this.data[socket.id];
@@ -34,8 +39,15 @@ export class X67SessionService {
     return !!this.data[socket.id];
   }
 
-  get(socket: X67Socket, key: keyof X67SessionData) {
+  get<T extends keyof X67SessionData>(
+    socket: X67Socket,
+    key: T,
+  ): X67SessionData[T] {
     return this.data[socket.id][key];
+  }
+
+  remove<T extends keyof X67SessionData>(socket: X67Socket, key: T) {
+    delete this.data[socket.id][key];
   }
 
   delete(socket: X67Socket) {
