@@ -6,7 +6,7 @@ import { TelegramConfig } from 'src/configs/telegram.config';
 import { SchemaModule } from 'src/schema/schema.module';
 import { UploadConfig } from 'src/configs/upload.config';
 import { UploadService } from './upload.service';
-import { PackageHdrService } from './package-hdr.service';
+import { PkgHdrService } from './pkg-hdr.service';
 import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
 import { GameConfigService } from './game-config.service';
@@ -19,7 +19,7 @@ const services = [
   TelegramService,
   AsmService,
   UploadService,
-  PackageHdrService,
+  PkgHdrService,
   GameConfigService,
   GameKeyService,
 ];

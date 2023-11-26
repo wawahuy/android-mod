@@ -15,6 +15,8 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
 
 const globalMenuTrial = [
   {
@@ -161,12 +163,12 @@ const globalMenu = [
 ];
 
 @Injectable()
-export class PackageHdrService implements IGamePackage {
+export class PkgHdrService implements IGamePackage {
   static readonly packageName = 'com.aladinfun.clashofsky_th_pig';
   static readonly className = 'com.aladinfun.piggyboom.MainAppActivity';
   readonly trialSecond = 3 * 24 * 60 * 60;
 
-  _logger = new Logger('PackageHdrService');
+  _logger = new Logger('PkgHdrService');
 
   constructor(
     private readonly _uploadService: UploadService,
@@ -194,11 +196,11 @@ export class PackageHdrService implements IGamePackage {
   }
 
   getPackageName(): string {
-    return PackageHdrService.packageName;
+    return PkgHdrService.packageName;
   }
 
   getClassName(): string {
-    return PackageHdrService.className;
+    return PkgHdrService.className;
   }
 
   getMenuDescription(socket: X67Socket) {
@@ -217,6 +219,13 @@ export class PackageHdrService implements IGamePackage {
   }
 
   async actionUserData(data: HdrUserDataRequest, socket: X67Socket) {
+    data = plainToClass(HdrUserDataRequest, data);
+    const errors = await validate(data);
+    if (errors && errors.length) {
+      this._logger.error(errors);
+      return;
+    }
+
     const telegramMsg: string[] = [];
     let allowTrial = false;
     let hdrAccount = await this._pkgHdrAccountModel.findOne({

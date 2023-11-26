@@ -6,7 +6,7 @@ import { TelegramService } from './telegram.service';
 import X67Socket from 'src/x67-server/x67-socket';
 import { CommandLoginRequest } from 'src/dtos/x67-server.dto';
 import { IGamePackage } from 'src/interfaces/game-package';
-import { PackageHdrService } from './package-hdr.service';
+import { PkgHdrService } from './pkg-hdr.service';
 import { plainToClass } from 'class-transformer';
 import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
@@ -28,7 +28,7 @@ export class X67GatewayService {
     private readonly _sender: X67SenderService,
     private readonly _session: X67SessionService,
     private readonly _uploadService: UploadService,
-    private readonly _packageHdrService: PackageHdrService,
+    private readonly _pkgHdrService: PkgHdrService,
     private readonly _gameConfigService: GameConfigService,
     private readonly _gameKeyService: GameKeyService,
   ) {
@@ -42,7 +42,7 @@ export class X67GatewayService {
 
     // package mapping
     this._packageMapping = {
-      [PackageHdrService.packageName]: this._packageHdrService,
+      [PkgHdrService.packageName]: this._pkgHdrService,
     };
 
     // route
