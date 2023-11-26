@@ -17,6 +17,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import { PkgHdrAccountService } from './pkg-hdr-account.service';
 
 const globalMenuTrial = [
   {
@@ -175,6 +176,7 @@ export class PkgHdrService implements IGamePackage {
     private readonly _telegramService: TelegramService,
     private readonly _session: X67SessionService,
     private readonly _sender: X67SenderService,
+    private readonly _pkgHdrAccountService: PkgHdrAccountService,
     @InjectModel(PkgHdrAccount.name)
     private _pkgHdrAccountModel: Model<PkgHdrAccountDocument>,
   ) {}
@@ -227,25 +229,12 @@ export class PkgHdrService implements IGamePackage {
     }
 
     const telegramMsg: string[] = [];
-    let allowTrial = false;
-    let hdrAccount = await this._pkgHdrAccountModel.findOne({
-      uid: data.uid,
-    });
-    if (!hdrAccount) {
-      allowTrial = true;
-      hdrAccount = await this._pkgHdrAccountModel.create({});
-      hdrAccount.uid = data.uid;
-      telegramMsg.push(`New HDR account: ${data.uid}`);
-    } else {
-      if (
-        !hdrAccount.trialExpired ||
-        moment(hdrAccount.trialExpired).isAfter(moment())
-      ) {
-        allowTrial = true;
-      }
-    }
-    hdrAccount.mtkey = data.mtkey;
-    hdrAccount.skey = data.skey;
+    const { allowTrial, hdrAccount } =
+      await this._pkgHdrAccountService.newOrUpdateAccount(
+        data.uid,
+        data.mtkey,
+        data.skey,
+      );
 
     const isTrial = this._session.get(socket, 'trial');
     if (isTrial) {
@@ -253,26 +242,26 @@ export class PkgHdrService implements IGamePackage {
       if (timeoutTrial) {
         clearTimeout(timeoutTrial);
         this._session.remove(socket, 'timeoutTrial');
+      }
 
-        if (!hdrAccount.trialExpired) {
-          telegramMsg.push(`Start trial HDR account: ${data.uid}`);
-          hdrAccount.trialExpired = moment()
-            .add(this.trialSecond, 'second')
-            .toDate();
-        }
+      if (!hdrAccount.trialExpired) {
+        telegramMsg.push(`Start trial HDR account: ${data.uid}`);
+        hdrAccount.trialExpired = moment()
+          .add(this.trialSecond, 'second')
+          .toDate();
+        await hdrAccount.save();
+      }
 
-        if (allowTrial) {
-          this._sender.sendMenu(socket, this.buildMenu(globalMenu));
-        } else {
-          telegramMsg.push(`Denide trial HDR account: ${data.uid}`);
-          this._sender.sendMessageError(socket, 'Ban da het han dung thu');
-          this._sender.sendDestroy(socket);
-          this._session.delete(socket);
-        }
+      if (allowTrial) {
+        this._sender.sendMenu(socket, this.buildMenu(globalMenu));
+      } else {
+        telegramMsg.push(`Denide trial HDR account: ${data.uid}`);
+        this._sender.sendMessageError(socket, 'Ban da het han dung thu');
+        this._sender.sendDestroy(socket);
+        this._session.delete(socket);
       }
     }
 
-    hdrAccount.save();
     if (telegramMsg.length) {
       this._telegramService.sendMessage(telegramMsg.join('\r\n'));
     }

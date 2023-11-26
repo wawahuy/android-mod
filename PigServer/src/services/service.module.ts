@@ -11,6 +11,8 @@ import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
 import { GameConfigService } from './game-config.service';
 import { GameKeyService } from './game-key.service';
+import { PkgHdrAccountService } from './pkg-hdr-account.service';
+import { PkgHdrAccountActiveService } from './pkg-hdr-account-active.service';
 
 const services = [
   X67GatewayService,
@@ -20,6 +22,8 @@ const services = [
   AsmService,
   UploadService,
   PkgHdrService,
+  PkgHdrAccountService,
+  PkgHdrAccountActiveService,
   GameConfigService,
   GameKeyService,
 ];
