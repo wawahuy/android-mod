@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import X67Server from 'src/x67-server/x67-server';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as moment from 'moment';
 import { validate } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
@@ -18,6 +16,7 @@ import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
 import { UploadService } from './upload.service';
 import { createHashMd5 } from 'src/utils/ws';
+import { GameConfigService } from './game-config.service';
 
 @Injectable()
 export class X67GatewayService {
@@ -34,6 +33,7 @@ export class X67GatewayService {
     private readonly _session: X67SessionService,
     private readonly _uploadService: UploadService,
     private readonly _packageHdrService: PackageHdrService,
+    private readonly _gameConfig: GameConfigService,
     @InjectModel(GameKey.name)
     private _gameKeyModel: Model<GameKeyDocument>,
   ) {
@@ -91,18 +91,18 @@ export class X67GatewayService {
     ];
 
     const pkg = data.package;
-    if (!pkg) {
-      this._logger.error('package not found!');
-      return;
-    }
+    const userVersion = data.version;
 
     let msgError: string | null;
     let needUpdate = false;
     let gameKey: GameKeyDocument;
 
-    const service = this._packageMapping[data.package];
+    const supportVersion = await this._gameConfig.getVersion(pkg);
+    const service = this._packageMapping[pkg];
     if (!service) {
-      msgError = 'Package not config';
+      msgError = 'Game khong ho tro';
+    } else if (supportVersion !== userVersion) {
+      msgError = 'Chung toi dang cap nhat phien ban moi';
     } else if (data.trial) {
       // when trial
       if (service.canTrial()) {

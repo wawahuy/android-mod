@@ -9,6 +9,8 @@ import { UploadService } from './upload.service';
 import { PackageHdrService } from './package-hdr.service';
 import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
+import { GameConfigService } from './game-config.service';
+import { GameKeyService } from './game-key.service';
 
 const services = [
   X67GatewayService,
@@ -18,6 +20,8 @@ const services = [
   AsmService,
   UploadService,
   PackageHdrService,
+  GameConfigService,
+  GameKeyService,
 ];
 
 const serviceImport = [TelegramConfig, UploadConfig];

@@ -8,6 +8,7 @@ import {
   PkgHdrAccountActive,
   PkgHdrAccountActiveSchema,
 } from './pkg-hdr-account-active.schema';
+import { GameConfig, GameConfigSchema } from './game-config.schema';
 
 export const features: ModelDefinition[] = [
   {
@@ -17,6 +18,10 @@ export const features: ModelDefinition[] = [
   {
     name: GameKey.name,
     schema: GameKeySchema,
+  },
+  {
+    name: GameConfig.name,
+    schema: GameConfigSchema,
   },
   {
     name: PkgHdrAccount.name,
