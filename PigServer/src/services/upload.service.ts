@@ -3,14 +3,47 @@ import { ConfigService } from '@nestjs/config';
 import * as stream from 'stream';
 import * as fs from 'fs';
 import * as path from 'path';
+import { UploadConfig } from 'src/configs/upload.config';
+import { createHashMd5 } from 'src/utils/ws';
+import * as _ from 'lodash';
+import { GameConfigService } from './game-config.service';
 
 @Injectable()
 export class UploadService {
   private _logger = new Logger('UploadService');
-  constructor(private readonly _configService: ConfigService) {}
+  constructor(
+    private readonly _uploadConfig: UploadConfig,
+    private readonly _configService: ConfigService,
+    private readonly _gameConfigService: GameConfigService,
+  ) {
+    this.watchFolderLibso();
+  }
 
-  getFolderLibso() {
-    return this._configService.get<string>('FOLDER_LIBSO');
+  watchFolderLibso() {
+    const changeDebouncedFunc: { [key: string]: _.DebouncedFunc<any> } = {};
+    fs.watch(this._uploadConfig.getFolderLibso(), (event, filename) => {
+      if (filename) {
+        let cb = changeDebouncedFunc[filename];
+        if (!cb) {
+          cb = _.debounce(this.onChangeLibsoHash.bind(this), 250);
+          changeDebouncedFunc[filename] = cb;
+          this._logger.debug(`add debounce watch to ${filename}`);
+        }
+        cb(filename);
+      }
+    });
+  }
+
+  private async onChangeLibsoHash(filename: string) {
+    const hash = this.getRealLibsoHash(filename);
+    await this._gameConfigService.setLibijHash(filename, hash);
+    this._logger.debug(`New hash ${filename}: ${hash}`);
+  }
+
+  getRealLibsoHash(filename: string) {
+    const buffer = this.getLibIjBuffer(filename);
+    const libsoHash = createHashMd5(buffer);
+    return libsoHash;
   }
 
   uploadLibIj(strPackage: string, fileStream: stream.Readable) {
@@ -19,7 +52,7 @@ export class UploadService {
   }
 
   getLibIjPath(strPackage: string) {
-    return path.join(this.getFolderLibso(), strPackage);
+    return path.join(this._uploadConfig.getFolderLibso(), strPackage);
   }
 
   getLibIjStream(strPackage: string) {

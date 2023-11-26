@@ -12,6 +12,9 @@ export class GameConfig {
 
   @Prop()
   package: string;
+
+  @Prop()
+  libijHash: string;
 }
 
 export const GameConfigSchema = SchemaFactory.createForClass(GameConfig);

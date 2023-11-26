@@ -2,18 +2,22 @@ import { Controller, Get, Res, StreamableFile } from '@nestjs/common';
 import { UploadService } from 'src/services/upload.service';
 import { createHashMd5 } from 'src/utils/ws';
 import { Response } from 'express';
+import { GameConfigService } from 'src/services/game-config.service';
 
 @Controller('libpigmod')
 export class LibpigmodController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly gameConfigService: GameConfigService,
+  ) {}
 
   @Get('hash')
-  getHash(@Res() res: Response) {
-    const buffer = this.uploadService.getLibIjBuffer('libpigmod.so');
-    if (!buffer) {
+  async getHash(@Res() res: Response) {
+    const hash = await this.gameConfigService.getLibijHash('libpigmod.so');
+    if (!hash) {
       res.status(404).send();
     } else {
-      res.send(createHashMd5(buffer) + 1);
+      res.send(hash);
     }
   }
 
