@@ -13,6 +13,14 @@ import { GameConfigService } from './game-config.service';
 import { GameKeyService } from './game-key.service';
 import { PkgHdrAccountService } from './pkg-hdr-account.service';
 import { PkgHdrAccountActiveService } from './pkg-hdr-account-active.service';
+import { BullModule } from '@nestjs/bull';
+import {
+  QUEUE_ACCOUNT_ACTIVE,
+  QUEUE_HDR_ADS_REWARD,
+} from 'src/utils/constants';
+import { BullConfig } from 'src/configs/bull.config';
+import { PkgHdrAdsRewardProcessor } from './processor/hdr-ads-reward.processor';
+import { AccountActiveProcessor } from './processor/account-active.processor';
 
 const services = [
   X67GatewayService,
@@ -26,12 +34,22 @@ const services = [
   PkgHdrAccountActiveService,
   GameConfigService,
   GameKeyService,
+
+  AccountActiveProcessor,
+  PkgHdrAdsRewardProcessor,
 ];
 
 const serviceImport = [TelegramConfig, UploadConfig];
 
 @Module({
-  imports: [SchemaModule],
+  imports: [
+    SchemaModule,
+    BullModule.forRootAsync({ useClass: BullConfig }),
+    BullModule.registerQueue(
+      { name: QUEUE_HDR_ADS_REWARD },
+      { name: QUEUE_ACCOUNT_ACTIVE },
+    ),
+  ],
   providers: [...services, ...serviceImport],
   exports: [...services],
 })

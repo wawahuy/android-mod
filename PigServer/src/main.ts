@@ -8,6 +8,7 @@ import { BullAdapter } from '@bull-board/api/bullAdapter';
 
 import { AppModule } from './app.module';
 import { factorySuperAuthorizer } from './guards/bullboard';
+import { QUEUE_ACCOUNT_ACTIVE, QUEUE_HDR_ADS_REWARD } from './utils/constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,7 +28,8 @@ async function bootstrap() {
   bullAdapter.setBasePath('/mana/bull');
   createBullBoard({
     queues: [
-      // new BullAdapter(app.get<Queue>('BullQueue_' + JOB_NAME_HDR_ACTIVE)),
+      new BullAdapter(app.get<Queue>('BullQueue_' + QUEUE_ACCOUNT_ACTIVE)),
+      new BullAdapter(app.get<Queue>('BullQueue_' + QUEUE_HDR_ADS_REWARD)),
     ],
     serverAdapter: bullAdapter,
   });

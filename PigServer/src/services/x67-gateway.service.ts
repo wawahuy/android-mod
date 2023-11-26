@@ -13,6 +13,7 @@ import { X67SessionService } from './x67-session.service';
 import { UploadService } from './upload.service';
 import { GameConfigService } from './game-config.service';
 import { GameKeyService } from './game-key.service';
+import { GameKeyDocument } from 'src/schema/game-key.schema';
 
 @Injectable()
 export class X67GatewayService {
@@ -75,6 +76,7 @@ export class X67GatewayService {
       return;
     }
 
+    let keyDocument: GameKeyDocument | null;
     let msgError: string | null;
     const pkg = data.package;
     const version = data.version;
@@ -107,10 +109,11 @@ export class X67GatewayService {
         data.mac,
       );
       msgError = active.error;
+      keyDocument = active.model;
     }
 
     if (!msgError) {
-      const result = await this.onLoginSuccess(data, socket);
+      const result = await this.onLoginSuccess(data, socket, keyDocument);
       if (!result) {
         msgError = 'Loi xu ly';
       }
@@ -126,7 +129,11 @@ export class X67GatewayService {
     }
   }
 
-  private async onLoginSuccess(data: CommandLoginRequest, socket: X67Socket) {
+  private async onLoginSuccess(
+    data: CommandLoginRequest,
+    socket: X67Socket,
+    key: GameKeyDocument,
+  ) {
     const pkg = data.package;
     const service = this._packageMapping[pkg];
     const libIjHash = await this._gameConfigService.getLibijHash(pkg);
@@ -136,6 +143,7 @@ export class X67GatewayService {
 
     this._session.set(socket, 'package', pkg);
     this._session.set(socket, 'trial', data.trial);
+    this._session.set(socket, 'key', key);
     this._sender.sendLoginSuccess(socket, {
       isLogin: true,
       libIjHash,

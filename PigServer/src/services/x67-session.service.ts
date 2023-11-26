@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { GameKeyDocument } from 'src/schema/game-key.schema';
 import X67Socket from 'src/x67-server/x67-socket';
 
 export interface X67SessionData {
   package: string;
   trial: boolean;
   timeoutTrial: NodeJS.Timeout;
+  key: GameKeyDocument;
 }
 
 @Injectable()
