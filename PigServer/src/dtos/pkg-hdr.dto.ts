@@ -13,3 +13,13 @@ export class HdrUserDataRequest {
   @IsAlphanumeric()
   uid: string;
 }
+
+export enum JobAdsType {
+  Ads1 = 1,
+  Ads2 = 2,
+}
+
+export class JobAdsData {
+  id: string;
+  type: JobAdsType;
+}

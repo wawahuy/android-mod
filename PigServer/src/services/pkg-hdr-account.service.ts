@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
 import { Model, PipelineStage, Types } from 'mongoose';
@@ -11,13 +11,16 @@ import { GameKey, GameKeyDocument } from 'src/schema/game-key.schema';
 import { logObject } from 'src/utils/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
-import { QUEUE_HDR_ADS_REWARD } from 'src/utils/constants';
+import {
+  JOB_HDR_ADS_REWARD_PREFIX_ADS1,
+  JOB_HDR_ADS_REWARD_PREFIX_ADS2,
+  QUEUE_HDR_ADS_REWARD,
+} from 'src/utils/constants';
+import { JobAdsData, JobAdsType } from 'src/dtos/pkg-hdr.dto';
 
 @Injectable()
 export class PkgHdrAccountService {
-  private readonly _prefixJobAds1 = 'ads1_';
-  private readonly _prefixJobAds2 = 'ads2_';
-
+  private readonly _logger = new Logger('PkgHdrAccountService');
   constructor(
     private readonly _telegramService: TelegramService,
     @InjectModel(PkgHdrAccount.name)
@@ -25,7 +28,7 @@ export class PkgHdrAccountService {
     @InjectModel(GameKey.name)
     private readonly _gameKeyModel: Model<GameKeyDocument>,
     @InjectQueue(QUEUE_HDR_ADS_REWARD)
-    private readonly _hdrAdsRewardQueue: Queue<any>,
+    private readonly _hdrAdsRewardQueue: Queue<JobAdsData>,
   ) {
     this.updateAccountActive({ progress: (val) => {} } as any);
   }
@@ -175,7 +178,10 @@ export class PkgHdrAccountService {
     const result = jobs.reduce<{ [key: string]: Types.ObjectId }>(
       (val, job) => {
         const name = job.name;
-        [this._prefixJobAds1, this._prefixJobAds2].forEach((pr) => {
+        [
+          JOB_HDR_ADS_REWARD_PREFIX_ADS1,
+          JOB_HDR_ADS_REWARD_PREFIX_ADS2,
+        ].forEach((pr) => {
           if (name.startsWith(pr)) {
             const id = job.name.replace(pr, '');
             if (!val[id]) {
@@ -200,17 +206,17 @@ export class PkgHdrAccountService {
     job.progress(10);
     const newAccountActive = await this.findNewAccountActive();
     if (newAccountActive && newAccountActive.length) {
-      console.log(newAccountActive);
       newAccountActive.forEach((acc) => {
-        const jobName1 = this._prefixJobAds1 + acc._id.toString();
+        this._logger.warn('add job: ' + acc._id.toString());
+        const jobName1 = JOB_HDR_ADS_REWARD_PREFIX_ADS1 + acc._id.toString();
         this._hdrAdsRewardQueue.add(jobName1, {
           id: acc._id.toString(),
-          type: 1,
+          type: JobAdsType.Ads1,
         });
-        const jobName2 = this._prefixJobAds2 + acc._id.toString();
+        const jobName2 = JOB_HDR_ADS_REWARD_PREFIX_ADS2 + acc._id.toString();
         this._hdrAdsRewardQueue.add(jobName2, {
           id: acc._id.toString(),
-          type: 2,
+          type: JobAdsType.Ads2,
         });
       });
     }
