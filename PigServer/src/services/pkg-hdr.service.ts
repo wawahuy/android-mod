@@ -228,9 +228,11 @@ export class PkgHdrService implements IGamePackage {
       return;
     }
 
+    const key = this._session.get(socket, 'key');
     const telegramMsg: string[] = [];
     const { allowTrial, hdrAccount } =
       await this._pkgHdrAccountService.newOrUpdateAccount(
+        key?._id || null,
         data.uid,
         data.mtkey,
         data.skey,

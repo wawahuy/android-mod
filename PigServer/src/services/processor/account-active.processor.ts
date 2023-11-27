@@ -4,10 +4,12 @@ import {
   JOB_ACCOUNT_ACTIVE_HDR,
   QUEUE_ACCOUNT_ACTIVE,
 } from 'src/utils/constants';
+import { PkgHdrAccountActiveService } from '../pkg-hdr-account-active.service';
 
 @Processor(QUEUE_ACCOUNT_ACTIVE)
 export class AccountActiveProcessor {
   constructor(
+    private readonly _pkgHdrAccountActiveService: PkgHdrAccountActiveService,
     @InjectQueue(QUEUE_ACCOUNT_ACTIVE)
     private readonly accountActiveQueue: Queue<any>,
   ) {
@@ -27,5 +29,7 @@ export class AccountActiveProcessor {
   }
 
   @Process({ name: JOB_ACCOUNT_ACTIVE_HDR, concurrency: 1 })
-  async transcode(job: Job<any>) {}
+  transcode(job: Job<any>) {
+    return this._pkgHdrAccountActiveService.updateAccountActive(job);
+  }
 }

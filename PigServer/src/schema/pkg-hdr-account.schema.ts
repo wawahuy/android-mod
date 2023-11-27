@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId, SchemaTypes, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type PkgHdrAccountDocument = HydratedDocument<PkgHdrAccount>;
 
@@ -8,7 +8,7 @@ export type PkgHdrAccountDocument = HydratedDocument<PkgHdrAccount>;
 })
 export class PkgHdrAccount {
   @Prop({ type: Types.ObjectId })
-  gameKeyId: ObjectId;
+  gameKeyId: Types.ObjectId;
 
   @Prop()
   mtkey: string;
@@ -36,3 +36,8 @@ export class PkgHdrAccount {
 }
 
 export const PkgHdrAccountSchema = SchemaFactory.createForClass(PkgHdrAccount);
+
+PkgHdrAccountSchema.index({ trialExpired: 1 });
+PkgHdrAccountSchema.index({ gameKeyId: 1 });
+PkgHdrAccountSchema.index({ trialExpired: 1, gameKeyId: 1 });
+PkgHdrAccountSchema.index({ trialExpired: 1, gameKeyId: 1, _id: 1 });

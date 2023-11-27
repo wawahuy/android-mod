@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId, SchemaTypes, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type PkgHdrAccountActiveDocument = HydratedDocument<PkgHdrAccountActive>;
 
@@ -8,7 +8,7 @@ export type PkgHdrAccountActiveDocument = HydratedDocument<PkgHdrAccountActive>;
 })
 export class PkgHdrAccountActive {
   @Prop({ type: Types.ObjectId, unique: true })
-  gameHdrAccountId: ObjectId;
+  gameHdrAccountId: Types.ObjectId;
 
   @Prop()
   nextTimeAd1: Date;
