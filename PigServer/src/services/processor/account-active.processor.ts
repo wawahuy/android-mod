@@ -1,15 +1,15 @@
 import { Processor, Process, InjectQueue } from '@nestjs/bull';
-import { Job, Queue } from 'bull';
+import Bull, { Job, Queue } from 'bull';
 import {
   JOB_ACCOUNT_ACTIVE_HDR,
   QUEUE_ACCOUNT_ACTIVE,
 } from 'src/utils/constants';
-import { PkgHdrAccountActiveService } from '../pkg-hdr-account-active.service';
+import { PkgHdrAccountService } from '../pkg-hdr-account.service';
 
 @Processor(QUEUE_ACCOUNT_ACTIVE)
 export class AccountActiveProcessor {
   constructor(
-    private readonly _pkgHdrAccountActiveService: PkgHdrAccountActiveService,
+    private readonly _pkgHdrAccountService: PkgHdrAccountService,
     @InjectQueue(QUEUE_ACCOUNT_ACTIVE)
     private readonly accountActiveQueue: Queue<any>,
   ) {
@@ -30,6 +30,6 @@ export class AccountActiveProcessor {
 
   @Process({ name: JOB_ACCOUNT_ACTIVE_HDR, concurrency: 1 })
   transcode(job: Job<any>) {
-    return this._pkgHdrAccountActiveService.updateAccountActive(job);
+    return this._pkgHdrAccountService.updateAccountActive(job);
   }
 }

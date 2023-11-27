@@ -33,6 +33,12 @@ export class PkgHdrAccount {
 
   @Prop()
   stsDaySnowball: number;
+
+  @Prop()
+  nextTimeAd1: Date;
+
+  @Prop()
+  nextTimeAd2: Date;
 }
 
 export const PkgHdrAccountSchema = SchemaFactory.createForClass(PkgHdrAccount);
