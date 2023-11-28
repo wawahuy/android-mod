@@ -16,7 +16,7 @@ import {
   JOB_HDR_ADS_REWARD_PREFIX_ADS2,
   QUEUE_HDR_ADS_REWARD,
 } from 'src/utils/constants';
-import { JobAdsData, JobAdsType } from 'src/dtos/pkg-hdr.dto';
+import { HdrGameRpcAdsType, JobAdsData } from 'src/dtos/pkg-hdr.dto';
 
 @Injectable()
 export class PkgHdrAccountService {
@@ -169,12 +169,76 @@ export class PkgHdrAccountService {
     return account;
   }
 
+  async getUnexpiredAccount(accountId: string): Promise<PkgHdrAccountDocument> {
+    const aggs: PipelineStage[] = [
+      {
+        $match: {
+          _id: new Types.ObjectId(accountId),
+        },
+      },
+      {
+        $lookup: {
+          from: this._gameKeyModel.collection.name,
+          localField: 'gameKeyId',
+          foreignField: '_id',
+          as: 'gameKey',
+        },
+      },
+    ];
+    const accounts = await this._pkgHdrAccountModel.aggregate(aggs);
+    const account = accounts?.[0] as PkgHdrAccountDocument;
+    if (!account) {
+      return null;
+    }
+
+    const gameKeys = (account as any).gameKey as GameKeyDocument[];
+    const gameKey = gameKeys?.[0];
+    if (gameKey) {
+      if (moment(gameKey.expiredAt).isBefore(new Date())) {
+        return null;
+      }
+    } else {
+      if (moment(account.trialExpired).isBefore(new Date())) {
+        return null;
+      }
+    }
+
+    delete (account as any).gameKey;
+    return account;
+  }
+
+  updateNonDocument(obj: any) {
+    return this._pkgHdrAccountModel.updateOne(
+      { _id: obj._id },
+      {
+        $set: obj,
+      },
+    );
+  }
+
+  async getHashAdsJobName() {
+    const jobs = await this._hdrAdsRewardQueue.getJobs([
+      'delayed',
+      'active',
+      'waiting',
+    ]);
+    const result = jobs.reduce<{ [key: string]: boolean }>((val, job) => {
+      const name = job.name;
+      if (!val[name]) {
+        val[name] = true;
+      }
+      return val;
+    }, {});
+    return result;
+  }
+
   async getListAccountActiveID(): Promise<Types.ObjectId[]> {
     const jobs = await this._hdrAdsRewardQueue.getJobs([
       'delayed',
       'active',
       'waiting',
     ]);
+    const bk: { [key: string]: number } = {};
     const result = jobs.reduce<{ [key: string]: Types.ObjectId }>(
       (val, job) => {
         const name = job.name;
@@ -184,7 +248,8 @@ export class PkgHdrAccountService {
         ].forEach((pr) => {
           if (name.startsWith(pr)) {
             const id = job.name.replace(pr, '');
-            if (!val[id]) {
+            bk[id] = (bk[id] || 0) + 1;
+            if (!val[id] && bk[id] >= 2) {
               val[id] = new Types.ObjectId(id);
             }
           }
@@ -204,23 +269,57 @@ export class PkgHdrAccountService {
 
   async updateAccountActive(job: Job<any>) {
     job.progress(10);
+    const hashAdsJobName = await this.getHashAdsJobName();
     const newAccountActive = await this.findNewAccountActive();
     if (newAccountActive && newAccountActive.length) {
       newAccountActive.forEach((acc) => {
         this._logger.warn('add job: ' + acc._id.toString());
-        const jobName1 = JOB_HDR_ADS_REWARD_PREFIX_ADS1 + acc._id.toString();
-        this._hdrAdsRewardQueue.add(jobName1, {
-          id: acc._id.toString(),
-          type: JobAdsType.Ads1,
-        });
-        const jobName2 = JOB_HDR_ADS_REWARD_PREFIX_ADS2 + acc._id.toString();
-        this._hdrAdsRewardQueue.add(jobName2, {
-          id: acc._id.toString(),
-          type: JobAdsType.Ads2,
-        });
+        this._telegramService.sendMessage('add job: ' + acc._id.toString());
+        this.addJobAdsRewardIfNotExists(
+          hashAdsJobName,
+          JOB_HDR_ADS_REWARD_PREFIX_ADS1,
+          acc._id,
+          'adGiftBox1',
+        );
+        this.addJobAdsRewardIfNotExists(
+          hashAdsJobName,
+          JOB_HDR_ADS_REWARD_PREFIX_ADS2,
+          acc._id,
+          'adGiftBox2',
+        );
       });
     }
     job.progress(100);
     return newAccountActive.length;
+  }
+
+  addJobAdsRewardIfNotExists(
+    hash: { [key: string]: boolean },
+    jobNamePrefix: string,
+    id: Types.ObjectId | string,
+    type: HdrGameRpcAdsType,
+    delay = 0,
+  ) {
+    const jobName = jobNamePrefix + id.toString();
+    if (!hash[jobName]) {
+      return this.addJobAdsReward(jobNamePrefix, id, type, delay);
+    }
+  }
+
+  addJobAdsReward(
+    jobNamePrefix: string,
+    id: Types.ObjectId | string,
+    type: HdrGameRpcAdsType,
+    delay = 0,
+  ) {
+    const jobName = jobNamePrefix + id.toString();
+    return this._hdrAdsRewardQueue.add(
+      jobName,
+      {
+        id: id.toString(),
+        type,
+      },
+      { removeOnComplete: true, delay },
+    );
   }
 }

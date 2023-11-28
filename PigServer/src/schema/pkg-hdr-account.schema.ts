@@ -35,6 +35,9 @@ export class PkgHdrAccount {
   stsDaySnowball: number;
 
   @Prop()
+  stsDayTime: Date;
+
+  @Prop()
   nextTimeAd1: Date;
 
   @Prop()

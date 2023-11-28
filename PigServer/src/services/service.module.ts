@@ -20,6 +20,7 @@ import {
 import { BullConfig } from 'src/configs/bull.config';
 import { PkgHdrAdsRewardProcessor } from './processor/hdr-ads-reward.processor';
 import { AccountActiveProcessor } from './processor/account-active.processor';
+import { PkgHdrRpcGameService } from './pkg-hdr-rpc-game';
 
 const services = [
   X67GatewayService,
@@ -35,6 +36,7 @@ const services = [
 
   AccountActiveProcessor,
   PkgHdrAdsRewardProcessor,
+  PkgHdrRpcGameService,
 ];
 
 const serviceImport = [TelegramConfig, UploadConfig];
