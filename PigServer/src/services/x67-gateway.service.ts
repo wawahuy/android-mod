@@ -167,7 +167,8 @@ export class X67GatewayService {
     const pkg = this._session.get(socket, 'package');
     const service = this._packageMapping[pkg];
     if (service) {
-      this._sender.sendMenu(socket, service.getMenuDescription(socket));
+      const menu = await service.getMenuDescription(socket);
+      this._sender.sendMenu(socket, menu);
     }
   }
 

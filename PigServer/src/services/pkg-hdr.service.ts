@@ -28,136 +28,10 @@ const globalMenuTrial = [
         label: 'Dang chut nhe...',
         type: WidgetMenuItem.Text,
       },
-    ],
-  },
-];
-
-const globalMenu = [
-  {
-    label: 'Nang Luong',
-    action: 'nangluong',
-    items: [
-      {
-        label: 'Trang thai',
-        valueDefault: true,
-        type: WidgetMenuItem.ServerSwitch,
-        action: 'autoNangLuong',
-        items: [
-          {
-            label: 'Test',
-            type: WidgetMenuItem.Text,
-          },
-        ],
-      },
       {
         type: WidgetMenuItem.Call,
         action: 'userData',
         delay: 10000,
-      },
-    ],
-  },
-  {
-    label: 'Cay Thong',
-    action: 'cayThong',
-    items: [
-      {
-        label: 'Auto trung',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'autoTrung',
-      },
-      {
-        label: 'Ban nhanh',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'banNhanh',
-      },
-      {
-        label: 'Ban 1 cham',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'ban1Cham',
-      },
-      {
-        label: 'Nap dan nhanh',
-        valueDefault: true,
-        type: WidgetMenuItem.Switch,
-        action: 'napDanNhanh',
-        items: [
-          {
-            arg: 'count',
-            label: 'So luong (vien/1 lan)',
-            type: WidgetMenuItem.InputInt,
-            valueDefault: 1,
-            valueMin: 1,
-            valueMax: 8,
-            valueStep: 1,
-            valueStepFast: 2,
-            valueWidth: 250,
-          },
-          {
-            arg: 'speed',
-            label: 'Toc do (giay)',
-            type: WidgetMenuItem.SliderFloat,
-            valueDefault: 0.25,
-            valueMin: 0,
-            valueMax: 1,
-            valueStep: 0.1,
-            valueStepFast: 0.2,
-            valueWidth: 250,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: 'Vong xoay',
-    action: 'bet',
-    items: [
-      {
-        label: 'Vong xoay',
-        valueDefault: false,
-        type: WidgetMenuItem.Switch,
-        action: 'vongXoay',
-        items: [
-          {
-            type: WidgetMenuItem.SliderInt,
-            arg: 'count',
-            valueDefault: 10,
-            valueMin: 1,
-            valueMax: 2000,
-            valueStep: 10,
-            valueStepFast: 50,
-            valueWidth: 400,
-            hashId: 'vongXoay.count.slider',
-          },
-          {
-            label: 'x100',
-            valueDefault: false,
-            type: WidgetMenuItem.Button,
-            pushArgs: [['count', 100]],
-            pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: ['vongXoay.count.slider'],
-            sameLine: true,
-          },
-          {
-            label: 'x500',
-            valueDefault: false,
-            type: WidgetMenuItem.Button,
-            pushArgs: [['count', 500]],
-            pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: ['vongXoay.count.slider'],
-            sameLine: true,
-          },
-          {
-            label: 'x1000',
-            valueDefault: false,
-            type: WidgetMenuItem.Button,
-            pushArgs: [['count', 1000]],
-            pushArgsType: ArgDataPushType.Focus,
-            callReMapArgsHashId: ['vongXoay.count.slider'],
-          },
-        ],
       },
     ],
   },
@@ -205,13 +79,13 @@ export class PkgHdrService implements IGamePackage {
     return PkgHdrService.className;
   }
 
-  getMenuDescription(socket: X67Socket) {
+  async getMenuDescription(socket: X67Socket) {
     const isTrial = this._session.get(socket, 'trial');
     const timeoutTrial = this._session.get(socket, 'timeoutTrial');
     if (isTrial && timeoutTrial) {
       return this.buildMenu(globalMenuTrial);
     }
-    return this.buildMenu(globalMenu);
+    return this.buildMenu(await this.getUserMenu(socket));
   }
 
   getRoutes(): { [key: string]: () => void } {
@@ -221,6 +95,10 @@ export class PkgHdrService implements IGamePackage {
   }
 
   async actionUserData(data: HdrUserDataRequest, socket: X67Socket) {
+    if (!data) {
+      return;
+    }
+
     data = plainToClass(HdrUserDataRequest, data);
     const errors = await validate(data);
     if (errors && errors.length) {
@@ -228,6 +106,7 @@ export class PkgHdrService implements IGamePackage {
       return;
     }
 
+    let isReSendMenu = true;
     const key = this._session.get(socket, 'key');
     const telegramMsg: string[] = [];
     const { allowTrial, hdrAccount } =
@@ -238,6 +117,7 @@ export class PkgHdrService implements IGamePackage {
         data.skey,
       );
 
+    this._session.set(socket, 'account', hdrAccount);
     const isTrial = this._session.get(socket, 'trial');
     if (isTrial) {
       const timeoutTrial = this._session.get(socket, 'timeoutTrial');
@@ -254,14 +134,20 @@ export class PkgHdrService implements IGamePackage {
         await hdrAccount.save();
       }
 
-      if (allowTrial) {
-        this._sender.sendMenu(socket, this.buildMenu(globalMenu));
-      } else {
+      if (!allowTrial) {
         telegramMsg.push(`Denide trial HDR account: ${data.uid}`);
         this._sender.sendMessageError(socket, 'Ban da het han dung thu');
         this._sender.sendDestroy(socket);
         this._session.delete(socket);
+        isReSendMenu = false;
       }
+    }
+
+    if (isReSendMenu) {
+      this._sender.sendMenu(
+        socket,
+        this.buildMenu(await this.getUserMenu(socket)),
+      );
     }
 
     if (telegramMsg.length) {
@@ -275,5 +161,201 @@ export class PkgHdrService implements IGamePackage {
       menu,
     };
     return description;
+  }
+
+  private getExpiredString(socket: X67Socket) {
+    const key = this._session.get(socket, 'key');
+    if (key && key.expiredAt) {
+      const d = moment(key.expiredAt);
+      if (d.isAfter(new Date())) {
+        return d.format('DD/MM/YYYY HH:mm:ss');
+      }
+    }
+
+    const account = this._session.get(socket, 'account');
+    if (account && account.trialExpired) {
+      const d = moment(account.trialExpired);
+      if (d.isAfter(new Date())) {
+        return d.format('DD/MM/YYYY HH:mm:ss');
+      }
+    }
+    return '-';
+  }
+
+  private async getUserMenu(socket: X67Socket) {
+    const result = [
+      {
+        label: 'System',
+        action: 'system',
+        items: [
+          {
+            label: 'HSD: ' + this.getExpiredString(socket),
+            type: WidgetMenuItem.Text,
+          },
+        ],
+      },
+      {
+        label: 'Cay Thong',
+        action: 'cayThong',
+        items: [
+          {
+            label: 'Auto trung',
+            valueDefault: true,
+            type: WidgetMenuItem.Switch,
+            action: 'autoTrung',
+          },
+          {
+            label: 'Ban nhanh',
+            valueDefault: true,
+            type: WidgetMenuItem.Switch,
+            action: 'banNhanh',
+          },
+          {
+            label: 'Ban 1 cham',
+            valueDefault: true,
+            type: WidgetMenuItem.Switch,
+            action: 'ban1Cham',
+          },
+          {
+            label: 'Nap dan nhanh',
+            valueDefault: true,
+            type: WidgetMenuItem.Switch,
+            action: 'napDanNhanh',
+            items: [
+              {
+                arg: 'count',
+                label: 'So luong (vien/1 lan)',
+                type: WidgetMenuItem.InputInt,
+                valueDefault: 1,
+                valueMin: 1,
+                valueMax: 8,
+                valueStep: 1,
+                valueStepFast: 2,
+                valueWidth: 250,
+              },
+              {
+                arg: 'speed',
+                label: 'Toc do (giay)',
+                type: WidgetMenuItem.SliderFloat,
+                valueDefault: 0.25,
+                valueMin: 0,
+                valueMax: 1,
+                valueStep: 0.1,
+                valueStepFast: 0.2,
+                valueWidth: 250,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        label: 'Vong xoay',
+        action: 'bet',
+        items: [
+          {
+            label: 'Vong xoay',
+            valueDefault: false,
+            type: WidgetMenuItem.Switch,
+            action: 'vongXoay',
+            items: [
+              {
+                type: WidgetMenuItem.SliderInt,
+                arg: 'count',
+                valueDefault: 10,
+                valueMin: 1,
+                valueMax: 2000,
+                valueStep: 10,
+                valueStepFast: 50,
+                valueWidth: 400,
+                hashId: 'vongXoay.count.slider',
+              },
+              {
+                label: 'x100',
+                valueDefault: false,
+                type: WidgetMenuItem.Button,
+                pushArgs: [['count', 100]],
+                pushArgsType: ArgDataPushType.Focus,
+                callReMapArgsHashId: ['vongXoay.count.slider'],
+                sameLine: true,
+              },
+              {
+                label: 'x500',
+                valueDefault: false,
+                type: WidgetMenuItem.Button,
+                pushArgs: [['count', 500]],
+                pushArgsType: ArgDataPushType.Focus,
+                callReMapArgsHashId: ['vongXoay.count.slider'],
+                sameLine: true,
+              },
+              {
+                label: 'x1000',
+                valueDefault: false,
+                type: WidgetMenuItem.Button,
+                pushArgs: [['count', 1000]],
+                pushArgsType: ArgDataPushType.Focus,
+                callReMapArgsHashId: ['vongXoay.count.slider'],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const account = this._session.get(socket, 'account');
+    if (!account) {
+      result.push({
+        label: 'Nang Luong',
+        action: 'nangluong',
+        items: [
+          {
+            type: WidgetMenuItem.Call,
+            action: 'userData',
+            delay: 10000,
+          },
+        ],
+      } as any);
+      return result;
+    }
+
+    result.push({
+      label: 'Nang Luong',
+      action: 'nangluong',
+      items: [
+        {
+          label: 'Thong ke hom nay',
+          type: WidgetMenuItem.Text,
+          items: [
+            {
+              label: 'Nang luong: ' + (account.stsDayTili || '-'),
+              type: WidgetMenuItem.Text,
+            },
+            {
+              label: 'Cau tuyet: ' + (account.stsDaySnowball || '-'),
+              type: WidgetMenuItem.Text,
+            },
+          ],
+        },
+        {
+          label: 'Thong ke tat ca',
+          type: WidgetMenuItem.Text,
+          items: [
+            {
+              label: 'Nang luong: ' + (account.stsAllTili || '-'),
+              type: WidgetMenuItem.Text,
+            },
+            {
+              label: 'Cau tuyet: ' + (account.stsAllSnowball || '-'),
+              type: WidgetMenuItem.Text,
+            },
+          ],
+        },
+        {
+          type: WidgetMenuItem.Call,
+          action: 'userData',
+          delay: 10000,
+        },
+      ],
+    } as any);
+    return result;
   }
 }

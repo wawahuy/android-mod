@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GameKeyDocument } from 'src/schema/game-key.schema';
+import { PkgHdrAccountDocument } from 'src/schema/pkg-hdr-account.schema';
 import X67Socket from 'src/x67-server/x67-socket';
 
 export interface X67SessionData {
@@ -7,6 +8,7 @@ export interface X67SessionData {
   trial: boolean;
   timeoutTrial: NodeJS.Timeout;
   key: GameKeyDocument;
+  account: PkgHdrAccountDocument;
 }
 
 @Injectable()
