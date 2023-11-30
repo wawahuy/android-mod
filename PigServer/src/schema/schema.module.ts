@@ -4,10 +4,7 @@ import { MongoConfig } from '../configs/mongo.config';
 import { TelegramBot, TelegramBotSchema } from './telegram.schema';
 import { GameKey, GameKeySchema } from './game-key.schema';
 import { PkgHdrAccount, PkgHdrAccountSchema } from './pkg-hdr-account.schema';
-import {
-  PkgHdrAccountActive,
-  PkgHdrAccountActiveSchema,
-} from './pkg-hdr-account-active.schema';
+import { GameConfig, GameConfigSchema } from './game-config.schema';
 
 export const features: ModelDefinition[] = [
   {
@@ -19,12 +16,12 @@ export const features: ModelDefinition[] = [
     schema: GameKeySchema,
   },
   {
-    name: PkgHdrAccount.name,
-    schema: PkgHdrAccountSchema,
+    name: GameConfig.name,
+    schema: GameConfigSchema,
   },
   {
-    name: PkgHdrAccountActive.name,
-    schema: PkgHdrAccountActiveSchema,
+    name: PkgHdrAccount.name,
+    schema: PkgHdrAccountSchema,
   },
 ];
 

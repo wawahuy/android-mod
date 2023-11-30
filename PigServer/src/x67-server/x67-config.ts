@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // fin opcode 2size 16iv 12pad .... (32 byte header)
 
 export const ByteFin = {

@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { TelegramBotDocument } from 'src/schema/telegram.schema';
 import { Model } from 'mongoose';
 import { UploadService } from './upload.service';
+import { GameConfigService } from './game-config.service';
 
 @Injectable()
 export class TelegramService {
@@ -12,7 +13,8 @@ export class TelegramService {
   private _bot: TelegramBot;
 
   private readonly _msgLogin = /^\/login(\s+)(?<password>(.{6,32}))$/;
-  private readonly _msgUploadLibIj = /^\/libij(\s+)(?<package>(.*))$/;
+  private readonly _msgUploadLibIj =
+    /^\/libij(\s+)(?<version>(.*))(\s+)(?<package>(.*))$/;
 
   private _msgNoLoggedMapping = [];
   private _msgLoggedMapping = [];
@@ -20,6 +22,7 @@ export class TelegramService {
   constructor(
     private readonly _uploadService: UploadService,
     private readonly _telegramConfig: TelegramConfig,
+    private readonly _gameConfigService: GameConfigService,
     @InjectModel(TelegramBot.name)
     private _telegramBotModel: Model<TelegramBotDocument>,
   ) {
@@ -114,7 +117,8 @@ export class TelegramService {
     }
 
     const strPackage = m.groups['package'];
-    if (!strPackage) {
+    const strVersion = m.groups['version'];
+    if (!strPackage || !strVersion) {
       return;
     }
 
@@ -126,7 +130,8 @@ export class TelegramService {
     const s = this._bot.getFileStream(document.file_id);
     this._uploadService
       .uploadLibIj(strPackage, s)
-      .on('finish', () => {
+      .on('finish', async () => {
+        await this._gameConfigService.setVersion(strPackage, strVersion);
         this.sendMessage(`New libij ${strPackage}`);
       })
       .on('error', (err) => {

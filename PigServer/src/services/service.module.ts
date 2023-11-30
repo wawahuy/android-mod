@@ -6,10 +6,21 @@ import { TelegramConfig } from 'src/configs/telegram.config';
 import { SchemaModule } from 'src/schema/schema.module';
 import { UploadConfig } from 'src/configs/upload.config';
 import { UploadService } from './upload.service';
-import { PackageHdrService } from './package-hdr.service';
+import { PkgHdrService } from './pkg-hdr.service';
 import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
-import { PackageDtdService } from './package-dtd.service';
+import { GameConfigService } from './game-config.service';
+import { GameKeyService } from './game-key.service';
+import { PkgHdrAccountService } from './pkg-hdr-account.service';
+import { BullModule } from '@nestjs/bull';
+import {
+  QUEUE_ACCOUNT_ACTIVE,
+  QUEUE_HDR_ADS_REWARD,
+} from 'src/utils/constants';
+import { BullConfig } from 'src/configs/bull.config';
+import { PkgHdrAdsRewardProcessor } from './processor/hdr-ads-reward.processor';
+import { AccountActiveProcessor } from './processor/account-active.processor';
+import { PkgHdrRpcGameService } from './pkg-hdr-rpc-game';
 
 const services = [
   X67GatewayService,
@@ -18,14 +29,27 @@ const services = [
   TelegramService,
   AsmService,
   UploadService,
-  PackageHdrService,
-  PackageDtdService,
+  PkgHdrService,
+  PkgHdrAccountService,
+  GameConfigService,
+  GameKeyService,
+
+  AccountActiveProcessor,
+  PkgHdrAdsRewardProcessor,
+  PkgHdrRpcGameService,
 ];
 
 const serviceImport = [TelegramConfig, UploadConfig];
 
 @Module({
-  imports: [SchemaModule],
+  imports: [
+    SchemaModule,
+    BullModule.forRootAsync({ useClass: BullConfig }),
+    BullModule.registerQueue(
+      { name: QUEUE_HDR_ADS_REWARD },
+      { name: QUEUE_ACCOUNT_ACTIVE },
+    ),
+  ],
   providers: [...services, ...serviceImport],
   exports: [...services],
 })

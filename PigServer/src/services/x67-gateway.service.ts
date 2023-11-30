@@ -1,24 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import X67Server from 'src/x67-server/x67-server';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as moment from 'moment';
 import { validate } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import { TelegramService } from './telegram.service';
 import X67Socket from 'src/x67-server/x67-socket';
 import { CommandLoginRequest } from 'src/dtos/x67-server.dto';
 import { IGamePackage } from 'src/interfaces/game-package';
-import { PackageHdrService } from './package-hdr.service';
-import { GameKey, GameKeyDocument } from 'src/schema/game-key.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { PkgHdrService } from './pkg-hdr.service';
 import { plainToClass } from 'class-transformer';
 import { X67SenderService } from './x67-sender.service';
 import { X67SessionService } from './x67-session.service';
 import { UploadService } from './upload.service';
-import { createHashMd5 } from 'src/utils/ws';
-import { PackageDtdService } from './package-dtd.service';
+import { GameConfigService } from './game-config.service';
+import { GameKeyService } from './game-key.service';
+import { GameKeyDocument } from 'src/schema/game-key.schema';
 
 @Injectable()
 export class X67GatewayService {
@@ -34,10 +29,9 @@ export class X67GatewayService {
     private readonly _sender: X67SenderService,
     private readonly _session: X67SessionService,
     private readonly _uploadService: UploadService,
-    private readonly _packageHdrService: PackageHdrService,
-    private readonly _packageDtdService: PackageDtdService,
-    @InjectModel(GameKey.name)
-    private _gameKeyModel: Model<GameKeyDocument>,
+    private readonly _pkgHdrService: PkgHdrService,
+    private readonly _gameConfigService: GameConfigService,
+    private readonly _gameKeyService: GameKeyService,
   ) {
     this.init();
   }
@@ -49,17 +43,28 @@ export class X67GatewayService {
 
     // package mapping
     this._packageMapping = {
-      [PackageHdrService.packageName]: this._packageHdrService,
-      [PackageDtdService.packageName]: this._packageDtdService,
+      [PkgHdrService.packageName]: this._pkgHdrService,
     };
 
     // route
     const onAuthorizatedBinded = this.onAuthorizated.bind(this);
     const listener = this._server.eventClients;
     listener.on('login', this.onLogin.bind(this));
-    listener.on('get-menu', onAuthorizatedBinded(this.onGetMenu));
-    listener.on('get-lib-ij', onAuthorizatedBinded(this.onGetLibIj));
-    listener.on('menu-action', onAuthorizatedBinded(this.onMenuAction));
+    listener.on('get-menu', onAuthorizatedBinded(this.onGetMenu.bind(this)));
+    listener.on('get-lib-ij', onAuthorizatedBinded(this.onGetLibIj.bind(this)));
+    listener.on(
+      'menu-action',
+      onAuthorizatedBinded(this.onMenuAction.bind(this)),
+    );
+
+    // add route pkg
+    for (const packageName in this._packageMapping) {
+      const service = this._packageMapping[packageName];
+      const routes = service.getRoutes();
+      for (const route in routes) {
+        listener.on(route, onAuthorizatedBinded(routes[route]));
+      }
+    }
   }
 
   private async onLogin(data: CommandLoginRequest, socket: X67Socket) {
@@ -71,97 +76,89 @@ export class X67GatewayService {
       return;
     }
 
+    let keyDocument: GameKeyDocument | null;
+    let msgError: string | null;
+    const pkg = data.package;
+    const version = data.version;
     const telegramMsg = [
       `${data.package} (LOGIN)`,
-      `Key: ${data.key}`,
+      `--------------------------`,
+      `|  Key: ${data.key}`,
+      `--------------------------`,
       `IsTrial: ${data.trial}`,
       `Version: ${data.version}`,
       `MAC: ${data.mac}`,
     ];
 
-    const pkg = data.package;
-    if (!pkg) {
-      this._logger.error('package not found!');
-      return;
-    }
-
-    let msgError: string | null;
-    let needUpdate = false;
-    let gameKey: GameKeyDocument;
-    if (!data.trial) {
-      gameKey = await this._gameKeyModel.findOne({
-        key: data.key,
-        package: data.package,
-      });
-
-      if (!gameKey) {
-        msgError = 'Key khong ton tai';
-      } else if (gameKey.expiredAt && moment().isAfter(gameKey.expiredAt)) {
-        msgError = 'Key het han';
+    const supportVersion = await this._gameConfigService.getVersion(pkg);
+    const service = this._packageMapping[pkg];
+    if (!service) {
+      msgError = 'Game khong ho tro';
+    } else if (supportVersion !== version) {
+      msgError = 'Chung toi dang cap nhat phien ban moi';
+    } else if (data.trial) {
+      if (service.canTrial()) {
+        service.onTrial(socket);
       } else {
-        let newDevice = false;
-        const devices = (gameKey.devices = gameKey.devices || []);
-        if (!devices.includes(data.mac)) {
-          newDevice = true;
-        }
-        if (newDevice) {
-          if (devices.length < gameKey.maximumDevice) {
-            devices.push(data.mac);
-            needUpdate = true;
-            telegramMsg.push(`Push devices: ${data.mac}`);
-          } else {
-            msgError = 'So luong thiet bi toi da';
-          }
-        }
+        msgError = 'Khong ho tro dung thu';
       }
+    } else {
+      const active = await this._gameKeyService.validateOrActive(
+        pkg,
+        data.key,
+        data.mac,
+      );
+      msgError = active.error;
+      keyDocument = active.model;
     }
 
     if (!msgError) {
-      if (gameKey && !gameKey.expiredAt) {
-        needUpdate = true;
-        gameKey.expiredAt = moment().add(gameKey.amountSec, 'second').toDate();
-        telegramMsg.push(`Expired at: ${moment(gameKey.expiredAt).format()}`);
+      const result = await this.onLoginSuccess(data, socket, keyDocument);
+      if (!result) {
+        msgError = 'Loi xu ly';
       }
-    } else {
-      telegramMsg.push(msgError);
     }
 
-    if (gameKey && needUpdate) {
-      await gameKey.save();
+    if (msgError) {
+      telegramMsg.push(msgError);
+      this._sender.sendLoginFailed(socket, msgError);
     }
 
     if (!data.re) {
       this._telegramService.sendMessage(telegramMsg.join('\r\n'));
     }
+  }
 
-    if (!msgError) {
-      const buffer = this._uploadService.getLibIjBuffer(data.package);
-      if (buffer) {
-        const service = this._packageMapping[data.package];
-        const libIjHash = createHashMd5(buffer);
-        this._session.set(socket, 'package', data.package);
-        this._sender.sendLoginSuccess(socket, {
-          isLogin: true,
-          libIjHash,
-          packageName: service.getPackageName(),
-          className: service.getClassName(),
-        });
-        return;
-      }
-
-      msgError = 'Loi file!';
+  private async onLoginSuccess(
+    data: CommandLoginRequest,
+    socket: X67Socket,
+    key: GameKeyDocument,
+  ) {
+    const pkg = data.package;
+    const service = this._packageMapping[pkg];
+    const libIjHash = await this._gameConfigService.getLibijHash(pkg);
+    if (!libIjHash) {
+      return false;
     }
 
-    this._sender.sendLoginFailed(socket, msgError);
+    this._session.set(socket, 'package', pkg);
+    this._session.set(socket, 'trial', data.trial);
+    this._session.set(socket, 'key', key);
+    this._sender.sendLoginSuccess(socket, {
+      isLogin: true,
+      libIjHash,
+      packageName: service.getPackageName(),
+      className: service.getClassName(),
+    });
+    return true;
   }
 
   private onAuthorizated(
     next: (data: CommandLoginRequest, socket: X67Socket) => void,
   ) {
-    const _next = next.bind(this);
     return (data: CommandLoginRequest, socket: X67Socket) => {
       if (this._session.has(socket)) {
-        _next(data, socket);
+        next(data, socket);
       }
     };
   }
@@ -170,7 +167,8 @@ export class X67GatewayService {
     const pkg = this._session.get(socket, 'package');
     const service = this._packageMapping[pkg];
     if (service) {
-      this._sender.sendMenu(socket, service.getMenuDescription());
+      const menu = await service.getMenuDescription(socket);
+      this._sender.sendMenu(socket, menu);
     }
   }
 

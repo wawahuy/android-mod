@@ -27,3 +27,5 @@ export class GameKey {
 }
 
 export const GameKeySchema = SchemaFactory.createForClass(GameKey);
+
+GameKeySchema.index({ expiredAt: 1 });
