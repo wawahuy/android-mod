@@ -106,7 +106,8 @@ namespace Socket {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
             std::string msg = js["msg"].template get<std::string>();
-            memcpy(g_SystemMessage, &msg[0], msg.size() < 255 ? msg.size() : 255);
+            memcpy(g_SystemMessage, &msg[0], msg.size() < 254 ? msg.size() : 254);
+            msg[msg.size()] = '\0';
 
             if (js.contains("color")) {
                 g_SystemMessageColor[0] = js["color"][0].template get<char>();
@@ -142,6 +143,14 @@ namespace Socket {
         }
     };
 
+    class OnDestroyCallback: public X67HuySocketCallback {
+    public:
+        void runnable(const json& js, X67HuySocket* sk) {
+            Menu::release();
+            g_AuthStage = AuthStage::None;
+        }
+    };
+
     void init() {
         g_Socket = new X67HuySocket(SOCKET_HOST, SOCKET_PORT, true);
         g_Socket->on(X67_EVENT_OPEN, new OnOpenCallback());
@@ -152,6 +161,7 @@ namespace Socket {
         g_Socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
         g_Socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
         g_Socket->on(STR_COMMAND_R_MENU, new OnMenuCallback());
+        g_Socket->on(STR_COMMAND_R_DESTROY, new OnDestroyCallback());
         g_Socket->start();
     }
 }

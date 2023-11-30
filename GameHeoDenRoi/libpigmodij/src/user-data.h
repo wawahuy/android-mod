@@ -56,14 +56,14 @@ namespace UserDataPatch {
         userData["uid"] = uid;
         userData["mtkey"] = mtkey;
         userData["skey"] = skey;
-        m_sendCommand("wtf", userData);
+        m_sendCommand("hdr:user-data", userData);
         
         UserData__ParsePBOrigin(__this, res, method);
     }
 
     void userDataRequest(const nlohmann::json& js) {
         LOG_E("Call userDataRequest 2");
-        m_sendCommand("wtf", userData);
+        m_sendCommand("hdr:user-data", userData);
     }
 
     void init() {

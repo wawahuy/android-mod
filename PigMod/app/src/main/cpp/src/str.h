@@ -16,6 +16,7 @@
 #define STR_COMMAND_R_IS_LOGIN "is-login"
 #define STR_COMMAND_R_SYS_MSG "sys-message"
 #define STR_COMMAND_R_MENU "menu"
+#define STR_COMMAND_R_DESTROY "destroy"
 
 #define STR_WINDOWS_SERVER "0x67Huy - Server"
 #define STR_WINDOWS_LOGIN "0x67Huy - Dang Nhap"
