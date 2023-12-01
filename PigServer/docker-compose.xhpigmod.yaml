@@ -35,7 +35,7 @@ services:
     environment:
       <<: *shared_environment
     ports:
-      - "127.0.0.1:27027:27017"
+      - "10.8.0.1:27027:27017"
     volumes:
       - ./conf/dev/mongod.conf:/etc/mongodb.conf
       - ./data/mongo/log:/var/log/mongodb/

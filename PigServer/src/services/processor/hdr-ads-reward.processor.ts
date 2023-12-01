@@ -79,7 +79,7 @@ export class PkgHdrAdsRewardProcessor {
       // statistic
       let isNewDay = false;
       if (
-        account.stsDayTime ||
+        !account.stsDayTime ||
         !moment(account.stsDayTime).isSame(moment().startOf('day'))
       ) {
         isNewDay = true;
