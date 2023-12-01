@@ -12,8 +12,8 @@ x-shared_environment: &shared_environment
   XH_SUPER_PWD: ${XH_SUPER_PWD}
 
 services:
-  xhpigmod-server:
-    image: xhpigmod-server
+  xhpigmod-v2-server:
+    image: xhpigmod-v2-server
     environment:
       <<: *shared_environment
     volumes:
@@ -21,21 +21,21 @@ services:
     networks:
       - all
 
-  xhpigmod-cloudflare:
+  xhpigmod-v2-cloudflare:
     image: cloudflare/cloudflared
     command: tunnel --protocol http2 --no-autoupdate run
     environment:
-      - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiOTFkMjBkYTEtYWZhNy00NWM1LWFjODAtNTMyNDA5YTEwOTkyIiwicyI6Ik1UUTJaRGxrWVdFdFpUUXhZaTAwTVdJNExXSTFPRFF0TnprMllXWXhOell5WWpjeiJ9
+      - TUNNEL_TOKEN=eyJhIjoiOTQ0NDM0YjgzY2JmM2YxMGE1NjQ2MGIxZGRmYjViYjEiLCJ0IjoiNzI0YWZiMjItNGU0Mi00NGYwLWE2MGEtMzRhMjMzN2IwZjIwIiwicyI6IlpHWTNNRGcxWTJFdE56Um1aUzAwWWpNNUxUZzNZV0l0WmpkaU1EbGxOREV3T0RCbSJ9
     networks:
       - all
 
-  xhpigmod-mongo:
+  xhpigmod-v2-mongo:
     image: mongo:7.0.3
     command: mongod --quiet --logpath /dev/null
     environment:
       <<: *shared_environment
     ports:
-      - "127.0.0.1:27018:27017"
+      - "127.0.0.1:27027:27017"
     volumes:
       - ./conf/dev/mongod.conf:/etc/mongodb.conf
       - ./data/mongo/log:/var/log/mongodb/
@@ -43,12 +43,12 @@ services:
     networks:
       - all
 
-  xhpigmod-redis:
+  xhpigmod-v2-redis:
     image: redis:7.2.3-alpine3.18
     environment:
       <<: *shared_environment
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6389:6379"
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
       - ./conf/dev/redis.conf:/usr/local/etc/redis/redis.conf
