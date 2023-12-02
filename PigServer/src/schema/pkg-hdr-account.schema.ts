@@ -1,5 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import {
+  AnyKeys,
+  AnyObject,
+  HydratedDocument,
+  Types,
+  Document,
+} from 'mongoose';
 
 export type PkgHdrAccountDocument = HydratedDocument<PkgHdrAccount>;
 
@@ -42,6 +48,9 @@ export class PkgHdrAccount {
 
   @Prop()
   nextTimeAd2: Date;
+
+  @Prop()
+  httpFailed: number;
 }
 
 export const PkgHdrAccountSchema = SchemaFactory.createForClass(PkgHdrAccount);
@@ -50,3 +59,19 @@ PkgHdrAccountSchema.index({ trialExpired: 1 });
 PkgHdrAccountSchema.index({ gameKeyId: 1 });
 PkgHdrAccountSchema.index({ trialExpired: 1, gameKeyId: 1 });
 PkgHdrAccountSchema.index({ trialExpired: 1, gameKeyId: 1, _id: 1 });
+PkgHdrAccountSchema.index({
+  trialExpired: 1,
+  gameKeyId: 1,
+  _id: 1,
+  httpFailed: 1,
+});
+PkgHdrAccountSchema.index({ httpFailed: 1 });
+PkgHdrAccountSchema.index({ httpFailed: 1, _id: 1 });
+
+export type AnyKeysHdrAccount = AnyKeys<
+  Document<unknown, unknown, PkgHdrAccount> &
+    PkgHdrAccount & {
+      _id: Types.ObjectId;
+    }
+> &
+  AnyObject;
