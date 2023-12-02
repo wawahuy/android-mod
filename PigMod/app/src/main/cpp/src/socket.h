@@ -39,6 +39,12 @@ namespace Socket {
         g_Socket->send(STR_COMMAND_S_LOGIN, js);
     }
 
+    void handleLogout() {
+        Menu::release();
+        g_AuthStage = AuthStage::None;
+        g_AuthRe = false;
+    }
+
     class OnOpenCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
@@ -53,7 +59,7 @@ namespace Socket {
             isOpen = true;
             g_AuthStage = AuthStage::None;
             g_SystemMessage[0] = 0;
-            if (g_AuthAuto && strlen(g_AuthKey) > 0) {
+            if ((g_AuthAuto && strlen(g_AuthKey) > 0) || g_AuthRe) {
                 handleLogin();
             }
         }
@@ -74,7 +80,6 @@ namespace Socket {
             if (isLogin) {
                 g_AppPackageName = js["packageName"];
                 g_AppClassName = js["className"];
-                g_AuthRe = true;
                 if (js.contains("libIjHash") && !LibIj::isLoaded) {
                     LOG_E("LibIJ wait load");
                     std::string libIjHash = js["libIjHash"].template get<std::string>();
@@ -121,11 +126,16 @@ namespace Socket {
     class OnMenuCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
-#ifndef IS_DEBUG_NOT_GAME
+            bool noReload = js.contains("noReloadIfReconnect") && js["noReloadIfReconnect"].template get<bool>();
             if (Menu::canInit(js)) {
-                Menu::init(js);
+                if (!(g_AuthRe && noReload)) {
+                    LOG_E("Load menu");
+                    Menu::init(js);
+                } else {
+                    Menu::reset();
+                }
             }
-#endif
+            g_AuthRe = true;
         }
     };
 
@@ -146,8 +156,7 @@ namespace Socket {
     class OnDestroyCallback: public X67HuySocketCallback {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
-            Menu::release();
-            g_AuthStage = AuthStage::None;
+            handleLogout();
         }
     };
 

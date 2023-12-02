@@ -168,8 +168,7 @@ namespace MenuRenderer {
 
         ImGui::SameLine();
         if (ImGui::Button(STR_BUTTON_LOGOUT)) {
-            Menu::release();
-            g_AuthStage = AuthStage::None;
+            Socket::handleLogout();
         }
 
         if (g_MenuInit) {
