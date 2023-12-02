@@ -108,9 +108,9 @@ export class PkgHdrService implements IGamePackage {
       return;
     }
 
-    let isReSendMenu = true;
+    let isReSendMenu = !this._session.get(socket, 'account');
     const key = this._session.get(socket, 'key');
-    const telegramMsg: string[] = [];
+    const telegramMsg: string[] = [`uid: ${data.uid} update user data`];
     const { allowTrial, hdrAccount } =
       await this._pkgHdrAccountService.newOrUpdateAccount(
         key?._id || null,
@@ -187,7 +187,6 @@ export class PkgHdrService implements IGamePackage {
   }
 
   private async sendStatisticTextServer(socket: X67Socket) {
-    // await new Promise((res) => setTimeout(res, 1000));
     const account = this._session.get(socket, 'account');
     const stsTili = `Nang luong: ${account.stsDayTili || 0} - all: ${
       account.stsAllTili || 0
