@@ -33,7 +33,7 @@
 
 #define STR_BUTTON_FLOAT "0x67Huy"
 #define STR_BUTTON_HIDE_MENU "An Menu"
-#define STR_BUTTON_LOGOUT "Thoat"
+#define STR_BUTTON_LOGOUT "Dang xuat"
 
 #define STR_MENU_STARTING "Dang khoi dong..."
 #define STR_MENU_AUTO_RELOAD "Force update (danger)"

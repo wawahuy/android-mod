@@ -39,6 +39,7 @@ import java.util.Objects;
 
 public class MainActivity extends Activity {
     static final String endpoint = "http://192.168.1.21:3000";
+//    static final String endpoint = "http://x67api.j2run.com";
     static final String libraryHashUrl = endpoint + "/libpigmod/hash";
     static final String libraryFontUrl = endpoint + "/libpigmod/font";
     static final String libraryUrl = endpoint + "/libpigmod/down";

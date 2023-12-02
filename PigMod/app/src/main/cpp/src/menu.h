@@ -72,7 +72,9 @@ struct MenuItemSliderFloat: MenuItemTemplate<float>, MenuMaxMinBaseTemplate<floa
 struct MenuItemSliderInt: MenuItemTemplate<int>, MenuMaxMinBaseTemplate<int> {};
 struct MenuItemCall: MenuItemBase {
     int delay;
+    int delayBackup;
     int interval;
+    int intervalBackup;
     uint64_t saveTime;
 };
 
@@ -309,6 +311,8 @@ namespace Menu {
                 } else {
                     sm->interval = -1;
                 }
+                sm->intervalBackup = sm->interval;
+                sm->delayBackup = sm->delayBackup;
                 sm->saveTime = getMs();
                 break;
             }
@@ -406,6 +410,20 @@ namespace Menu {
         }
 
         g_MenuInit = true;
+    }
+
+    void reset() {
+        LOG_E("Reset menu");
+        for (auto menuGroupItem: menu) {
+            for (auto menuItem: menuGroupItem->items) {
+                if (menuItem->type == WidgetMenuBaseType::Call) {
+                    auto sm = (MenuItemCall*) menuItem;
+                    sm->delay = sm->delayBackup;
+                    sm->interval = sm->intervalBackup;
+                    sm->saveTime = getMs();
+                }
+            }
+        }
     }
 }
 #endif //PIGMOD_MENU_H
