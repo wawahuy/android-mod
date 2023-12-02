@@ -1,6 +1,6 @@
 #pragma once
 
-#define ACTION_USER_DATA_REQUEST AY_OBFUSCATE("nangluong.userData")
+#define ACTION_USER_DATA_REQUEST AY_OBFUSCATE("nangLuong.userData")
 
 struct Forevernine_Com_Planet_Proto_GameLoginRsp_Fields {
     void* _unknownFields;

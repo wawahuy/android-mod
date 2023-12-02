@@ -12,6 +12,7 @@ enum WidgetMenuBaseType {
     SliderInt = 4,
     Button = 5,
     Text = 6,
+    TextServer = 7,
 
     ServerSwitch = 101,
     Call = 102,
@@ -67,6 +68,9 @@ struct MenuItemTemplate: MenuItemBase, MenuValueBaseTemplate<T> {
 struct MenuItemSwitch: MenuItemTemplate<bool> {};
 struct MenuItemButton: MenuItemTemplate<bool> {};
 struct MenuItemText: MenuItemTemplate<bool> {};
+struct MenuItemTextServer: MenuItemTemplate<bool> {
+    std::string textServerName;
+};
 struct MenuItemInputInt: MenuItemTemplate<int>, MenuMaxMinBaseTemplate<int> {};
 struct MenuItemSliderFloat: MenuItemTemplate<float>, MenuMaxMinBaseTemplate<float> {};
 struct MenuItemSliderInt: MenuItemTemplate<int>, MenuMaxMinBaseTemplate<int> {};
@@ -87,6 +91,7 @@ struct MenuGroup {
 namespace Menu {
     static std::vector<MenuGroup*> menu;
     static std::unordered_map<std::string, MenuItemBase*> hashIdItems;
+    static std::unordered_map<std::string, MenuItemBase*> hashTextServer;
 
     static struct MenuInfo {
         std::string hash;
@@ -119,6 +124,13 @@ namespace Menu {
                 }
             }
         }
+    }
+
+    void handleTextServer(std::string& name, std::string& data) {
+        LOG_E(" === MENU:SET %s %s", name.c_str(), data.c_str());
+        auto& smb = hashTextServer[name];
+        auto sm = (MenuItemTextServer *) smb;
+        sm->label = data;
     }
 
     void handlePushArgs2ArgData(MenuItemBase* mib) {
@@ -184,6 +196,9 @@ namespace Menu {
                 break;
             case WidgetMenuBaseType::Text:
                 menuItem = new MenuItemText;
+                break;
+            case WidgetMenuBaseType::TextServer:
+                menuItem = new MenuItemTextServer;
                 break;
             case WidgetMenuBaseType::InputInt:
                 menuItem = new MenuItemInputInt;
@@ -257,6 +272,13 @@ namespace Menu {
             case WidgetMenuBaseType::Button:
             case WidgetMenuBaseType::Text:
             {
+                break;
+            }
+            case WidgetMenuBaseType::TextServer:
+            {
+                auto sm = (MenuItemTextServer *) menuItem;
+                sm->textServerName = jsMenuItem["textServerName"].template get<std::string>();
+                hashTextServer[sm->textServerName] = menuItem;
                 break;
             }
             case WidgetMenuBaseType::InputInt:
@@ -354,6 +376,7 @@ namespace Menu {
         }
         menu.clear();
         hashIdItems.clear();
+        hashTextServer.clear();
         g_MenuInit = false;
     }
 

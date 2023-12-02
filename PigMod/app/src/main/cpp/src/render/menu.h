@@ -38,6 +38,7 @@ namespace MenuRenderer {
                 break;
             }
             case WidgetMenuBaseType::Text:
+            case WidgetMenuBaseType::TextServer:
             {
                 MenuItemText* mis = (MenuItemText *) menuItem;
                 ImGui::Text("%s", mis->label.c_str());

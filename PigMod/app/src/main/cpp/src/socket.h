@@ -127,15 +127,24 @@ namespace Socket {
     public:
         void runnable(const json& js, X67HuySocket* sk) {
             bool noReload = js.contains("noReloadIfReconnect") && js["noReloadIfReconnect"].template get<bool>();
-            if (Menu::canInit(js)) {
-                if (!(g_AuthRe && noReload)) {
-                    LOG_E("Load menu");
-                    Menu::init(js);
-                } else {
+            if (Menu::canInit(js) && !(g_AuthRe && noReload)) {
+                LOG_E("Load menu");
+                Menu::init(js);
+            } else {
+                if (g_AuthRe && !noReload) {
                     Menu::reset();
                 }
             }
             g_AuthRe = true;
+        }
+    };
+
+    class OnMenuTextServerCallback: public X67HuySocketCallback {
+    public:
+        void runnable(const json& js, X67HuySocket* sk) {
+            std::string name = js["name"].template get<std::string>();
+            std::string data = js["data"].template get<std::string>();
+            Menu::handleTextServer(name, data);
         }
     };
 
@@ -170,6 +179,7 @@ namespace Socket {
         g_Socket->on(STR_COMMAND_R_IS_LOGIN, new OnIsLoginCallback());
         g_Socket->on(STR_COMMAND_R_SYS_MSG, new OnSysMsgCallback());
         g_Socket->on(STR_COMMAND_R_MENU, new OnMenuCallback());
+        g_Socket->on(STR_COMMAND_R_MENU_TEXT_SERVER, new OnMenuTextServerCallback());
         g_Socket->on(STR_COMMAND_R_DESTROY, new OnDestroyCallback());
         g_Socket->start();
     }

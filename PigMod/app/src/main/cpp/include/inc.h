@@ -5,7 +5,7 @@
 #ifndef PIGMOD_COMMON_INC_H
 #define PIGMOD_COMMON_INC_H
 
-//#define IS_DEBUG true
+#define IS_DEBUG true
 //#define IS_DEBUG_NOT_GAME true
 
 #ifdef IS_DEBUG
