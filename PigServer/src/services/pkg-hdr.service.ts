@@ -42,6 +42,8 @@ export class PkgHdrService implements IGamePackage {
   static readonly packageName = 'com.aladinfun.clashofsky_th_pig';
   static readonly className = 'com.aladinfun.piggyboom.MainAppActivity';
   readonly trialSecond = 3 * 24 * 60 * 60;
+  readonly textServerStsTili = 'sts:tili';
+  readonly textServerStsSnowball = 'sts:snowball';
 
   _logger = new Logger('PkgHdrService');
 
@@ -95,7 +97,6 @@ export class PkgHdrService implements IGamePackage {
   }
 
   async actionUserData(data: HdrUserDataRequest, socket: X67Socket) {
-    console.log(data);
     if (!data) {
       return;
     }
@@ -107,9 +108,9 @@ export class PkgHdrService implements IGamePackage {
       return;
     }
 
-    let isReSendMenu = true;
+    let isReSendMenu = !this._session.get(socket, 'account');
     const key = this._session.get(socket, 'key');
-    const telegramMsg: string[] = [];
+    const telegramMsg: string[] = [`uid: ${data.uid} update user data`];
     const { allowTrial, hdrAccount } =
       await this._pkgHdrAccountService.newOrUpdateAccount(
         key?._id || null,
@@ -149,6 +150,7 @@ export class PkgHdrService implements IGamePackage {
         socket,
         this.buildMenu(await this.getUserMenu(socket)),
       );
+      this.sendStatisticTextServer(socket);
     }
 
     if (telegramMsg.length) {
@@ -182,6 +184,22 @@ export class PkgHdrService implements IGamePackage {
       }
     }
     return '-';
+  }
+
+  private async sendStatisticTextServer(socket: X67Socket) {
+    const account = this._session.get(socket, 'account');
+    const stsTili = `Nang luong: ${account.stsDayTili || 0} - all: ${
+      account.stsAllTili || 0
+    }`;
+    const stsSnowball = `Qua cau tuyet: ${account.stsDaySnowball || 0} - all: ${
+      account.stsAllSnowball || 0
+    }`;
+    this._sender.sendMenuTextServer(socket, this.textServerStsTili, stsTili);
+    this._sender.sendMenuTextServer(
+      socket,
+      this.textServerStsSnowball,
+      stsSnowball,
+    );
   }
 
   private async getUserMenu(socket: X67Socket) {
@@ -301,63 +319,32 @@ export class PkgHdrService implements IGamePackage {
           },
         ],
       },
-    ];
-
-    const account = this._session.get(socket, 'account');
-    if (!account) {
-      result.push({
+      {
         label: 'Nang Luong',
-        action: 'nangluong',
+        action: 'nangLuong',
         items: [
+          {
+            label: 'Thong ke',
+            type: WidgetMenuItem.Text,
+            items: [
+              {
+                textServerName: this.textServerStsTili,
+                type: WidgetMenuItem.TextServer,
+              },
+              {
+                textServerName: this.textServerStsSnowball,
+                type: WidgetMenuItem.TextServer,
+              },
+            ],
+          },
           {
             type: WidgetMenuItem.Call,
             action: 'userData',
             delay: 1234,
           },
         ],
-      } as any);
-      return result;
-    }
-
-    result.push({
-      label: 'Nang Luong',
-      action: 'nangluong',
-      items: [
-        {
-          label: 'Thong ke hom nay',
-          type: WidgetMenuItem.Text,
-          items: [
-            {
-              label: 'Nang luong: ' + (account.stsDayTili || '-'),
-              type: WidgetMenuItem.Text,
-            },
-            {
-              label: 'Cau tuyet: ' + (account.stsDaySnowball || '-'),
-              type: WidgetMenuItem.Text,
-            },
-          ],
-        },
-        {
-          label: 'Thong ke tat ca',
-          type: WidgetMenuItem.Text,
-          items: [
-            {
-              label: 'Nang luong: ' + (account.stsAllTili || '-'),
-              type: WidgetMenuItem.Text,
-            },
-            {
-              label: 'Cau tuyet: ' + (account.stsAllSnowball || '-'),
-              type: WidgetMenuItem.Text,
-            },
-          ],
-        },
-        {
-          type: WidgetMenuItem.Call,
-          action: 'userData',
-          delay: 1234,
-        },
-      ],
-    } as any);
+      },
+    ];
     return result;
   }
 }
