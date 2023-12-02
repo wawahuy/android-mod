@@ -25,7 +25,10 @@ export class UploadService {
       if (filename) {
         let cb = changeDebouncedFunc[filename];
         if (!cb) {
-          cb = _.debounce(this.onChangeLibsoHash.bind(this), 250);
+          cb = _.debounce(
+            this.onChangeLibsoHash.bind(this),
+            this._uploadConfig.getWatchDebounce(),
+          );
           changeDebouncedFunc[filename] = cb;
           this._logger.debug(`add debounce watch to ${filename}`);
         }

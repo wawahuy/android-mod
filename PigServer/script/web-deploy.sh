@@ -37,15 +37,15 @@ echo "Docker installed! version: $dockerVersion"
 
 #####################
 # build & push
-runCommandRemote "mkdir -p ~/xhpigmod"
+runCommandRemote "mkdir -p ~/xhpigmod-v2"
 
 # push libso
-# runCommandRemote "rm -rf ~/xhpigmod/libso"
-# scp -r "${currentDir}/../libso/" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
+# runCommandRemote "rm -rf ~/xhpigmod-v2/libso"
+# scp -r "${currentDir}/../libso/" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod-v2"
 
-imageXhPigModServer="xhpigmod-server:latest"
-fileXhPigModServer="${currentDir}/../data-docker/xhpigmod-server.tar"
-fileXhPigModServerRemote="~/xhpigmod/xhpigmod-server.tar"
+imageXhPigModServer="xhpigmod-v2-server:latest"
+fileXhPigModServer="${currentDir}/../data-docker/xhpigmod-v2-server.tar"
+fileXhPigModServerRemote="~/xhpigmod-v2/xhpigmod-v2-server.tar"
 fileXhPigModServerContinue=1
 
 mkdir -p "${currentDir}/../data-docker"
@@ -81,28 +81,28 @@ fi
 
 # stop & remove image
 cmdRemoveImage=" \
-cd ~/xhpigmod;
-docker compose --env-file ~/xhpigmod/.env.prod -f ./docker-compose.xhpigmod.yaml down; \
+cd ~/xhpigmod-v2;
+docker compose --env-file ~/xhpigmod-v2/.env.prod -f ./docker-compose.xhpigmod.yaml down; \
 "
 echo "Container Stoping..."
 runCommandRemote "$cmdRemoveImage"
 
 # push env
-scp "${currentDir}/../env/.env.prod" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
+scp "${currentDir}/../env/.env.prod" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod-v2"
 
 # push docker-compose file to remote
-scp "${currentDir}/../docker-compose.xhpigmod.yaml" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
+scp "${currentDir}/../docker-compose.xhpigmod.yaml" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod-v2"
 
 # push backend to remote
 if [ "$fileXhPigModServerContinue" -eq 1 ]; then
   echo "Push server image..."
-  scp "$fileXhPigModServer" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod"
+  scp "$fileXhPigModServer" "${SSH_USERNAME}@${SSH_HOST}:~/xhpigmod-v2"
   runCommandRemote "docker rmi ${imageXhPigModServer}; docker load -i ${fileXhPigModServerRemote};"
 fi
 
 # deploy web
 cmdDeploy=" \
-cd ~/xhpigmod;
-docker compose --env-file ~/xhpigmod/.env.prod -f ./docker-compose.xhpigmod.yaml up -d --remove-orphans --build --force-recreate; \
+cd ~/xhpigmod-v2;
+docker compose --env-file ~/xhpigmod-v2/.env.prod -f ./docker-compose.xhpigmod.yaml up -d --remove-orphans --build --force-recreate; \
 "
 runCommandRemote "$cmdDeploy"

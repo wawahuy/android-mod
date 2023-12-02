@@ -11,6 +11,8 @@ import { PkgHdrRpcGameService } from '../pkg-hdr-rpc-game';
 import { Logger } from '@nestjs/common';
 import * as moment from 'moment';
 import { TelegramService } from '../telegram.service';
+import { AxiosError } from 'axios';
+import { AnyKeysHdrAccount } from 'src/schema/pkg-hdr-account.schema';
 
 @Processor(QUEUE_HDR_ADS_REWARD)
 export class PkgHdrAdsRewardProcessor {
@@ -53,7 +55,26 @@ export class PkgHdrAdsRewardProcessor {
       );
     const resRewardData = await this._pkgHdrRpcGameService
       .rewardAdGiftBox(reqRewardData)
-      .then((rs) => rs.data);
+      .then((rs) => rs.data)
+      .catch((err: AxiosError) => err);
+
+    if (resRewardData instanceof AxiosError) {
+      const status = resRewardData.response.status;
+      if ((status >= 500 && status <= 599) || status === 403) {
+        this._telegramService.sendMessage(
+          `failed reward ${account.uid}, status: ${status}, attempt: ${
+            account.httpFailed || 0
+          }`,
+        );
+        await this._pkgHdrAccountService.increaseHttpFailed(account._id, 1);
+      }
+      return Promise.reject(resRewardData);
+    }
+
+    const $inc: AnyKeysHdrAccount = {};
+    const $set: AnyKeysHdrAccount = {
+      httpFailed: 0,
+    };
 
     if (!resRewardData._d) {
       this._telegramService.sendMessage(
@@ -73,34 +94,33 @@ export class PkgHdrAdsRewardProcessor {
       rewardNextTime = d.giftBoxInfo[giftIndex].giftBoxCDTime;
     } else {
       const d = _d.data;
-      console.log(d);
       rewardNextTime = d.giftBoxInfo[giftIndex].giftBoxCDTime;
 
       // statistic
       let isNewDay = false;
       if (
-        account.stsDayTime ||
+        !account.stsDayTime ||
         !moment(account.stsDayTime).isSame(moment().startOf('day'))
       ) {
         isNewDay = true;
-        account.stsDayTime = moment().startOf('day').toDate();
+        $set.stsDayTime = moment().startOf('day').toDate();
       }
       d.reward.forEach((r) => {
         switch (r.type) {
           case 'tili':
-            account.stsAllTili = (account.stsAllTili || 0) + r.num;
+            $inc.stsAllTili = r.num;
             if (isNewDay) {
-              account.stsDayTili = r.num;
+              $set.stsDayTili = r.num;
             } else {
-              account.stsDayTili = (account.stsDayTili || 0) + r.num;
+              $inc.stsDayTili = r.num;
             }
             break;
           case 'snowBall':
-            account.stsAllSnowball = (account.stsAllSnowball || 0) + r.num;
+            $inc.stsAllSnowball = r.num;
             if (isNewDay) {
-              account.stsDaySnowball = r.num;
+              $set.stsDaySnowball = r.num;
             } else {
-              account.stsDaySnowball = (account.stsDaySnowball || 0) + r.num;
+              $inc.stsDaySnowball = r.num;
             }
             break;
         }
@@ -113,7 +133,7 @@ export class PkgHdrAdsRewardProcessor {
     if (data.type == 'adGiftBox2') {
       account.nextTimeAd2 = moment().add(rewardNextTime, 'second').toDate();
     }
-    await this._pkgHdrAccountService.updateNonDocument(account);
+    await this._pkgHdrAccountService.updateSetInc(account._id, $set, $inc);
 
     this._logger.warn(
       `add job accId: ${data.id} - ${data.type} - CD: ${rewardNextTime}`,

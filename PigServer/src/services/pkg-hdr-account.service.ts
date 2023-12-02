@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as moment from 'moment';
 import { Model, PipelineStage, Types } from 'mongoose';
 import {
+  AnyKeysHdrAccount,
   PkgHdrAccount,
   PkgHdrAccountDocument,
 } from 'src/schema/pkg-hdr-account.schema';
 import { TelegramService } from './telegram.service';
 import { GameKey, GameKeyDocument } from 'src/schema/game-key.schema';
-import { logObject } from 'src/utils/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 import {
@@ -33,6 +33,35 @@ export class PkgHdrAccountService {
     this.updateAccountActive({ progress: (val) => {} } as any);
   }
 
+  increaseHttpFailed(_id: Types.ObjectId, num: number) {
+    return this._pkgHdrAccountModel.updateOne(
+      {
+        _id,
+      },
+      {
+        $inc: {
+          httpFailed: num,
+        },
+      },
+    );
+  }
+
+  updateSetInc(
+    _id: Types.ObjectId,
+    $set: AnyKeysHdrAccount,
+    $inc: AnyKeysHdrAccount,
+  ) {
+    return this._pkgHdrAccountModel.updateOne(
+      {
+        _id,
+      },
+      {
+        $inc,
+        $set,
+      },
+    );
+  }
+
   async newOrUpdateAccount(
     gameKeyId: Types.ObjectId,
     uid: string,
@@ -50,6 +79,7 @@ export class PkgHdrAccountService {
       result.allowTrial = true;
       hdrAccount = await this._pkgHdrAccountModel.create({});
       hdrAccount.uid = uid;
+      result.hdrAccount = hdrAccount;
       this._telegramService.sendMessage(`New HDR account: ${uid}`);
     } else {
       if (
@@ -97,6 +127,27 @@ export class PkgHdrAccountService {
 
     const aggs: PipelineStage[] = [
       ...aggFilter,
+      {
+        $match: {
+          $or: [
+            {
+              httpFailed: {
+                $lte: 5,
+              },
+            },
+            {
+              httpFailed: {
+                $eq: null,
+              },
+            },
+            {
+              httpFailed: {
+                $exists: false,
+              },
+            },
+          ],
+        },
+      },
       {
         $lookup: {
           from: this._gameKeyModel.collection.name,
@@ -158,6 +209,27 @@ export class PkgHdrAccountService {
           },
         },
       },
+      {
+        $match: {
+          $or: [
+            {
+              httpFailed: {
+                $lte: 5,
+              },
+            },
+            {
+              httpFailed: {
+                $eq: null,
+              },
+            },
+            {
+              httpFailed: {
+                $exists: false,
+              },
+            },
+          ],
+        },
+      },
     ];
     // await this._pkgHdrAccountModel
     //   .aggregate(aggs)
@@ -205,15 +277,6 @@ export class PkgHdrAccountService {
 
     delete (account as any).gameKey;
     return account;
-  }
-
-  updateNonDocument(obj: any) {
-    return this._pkgHdrAccountModel.updateOne(
-      { _id: obj._id },
-      {
-        $set: obj,
-      },
-    );
   }
 
   async getHashAdsJobName() {

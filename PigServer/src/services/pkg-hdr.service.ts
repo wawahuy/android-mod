@@ -31,7 +31,7 @@ const globalMenuTrial = [
       {
         type: WidgetMenuItem.Call,
         action: 'userData',
-        delay: 10000,
+        delay: 1234,
       },
     ],
   },
@@ -83,7 +83,7 @@ export class PkgHdrService implements IGamePackage {
     const isTrial = this._session.get(socket, 'trial');
     const timeoutTrial = this._session.get(socket, 'timeoutTrial');
     if (isTrial && timeoutTrial) {
-      return this.buildMenu(globalMenuTrial);
+      return this.buildMenu(globalMenuTrial, true);
     }
     return this.buildMenu(await this.getUserMenu(socket));
   }
@@ -95,6 +95,7 @@ export class PkgHdrService implements IGamePackage {
   }
 
   async actionUserData(data: HdrUserDataRequest, socket: X67Socket) {
+    console.log(data);
     if (!data) {
       return;
     }
@@ -155,9 +156,10 @@ export class PkgHdrService implements IGamePackage {
     }
   }
 
-  private buildMenu(menu: any) {
+  private buildMenu(menu: any, noReloadIfReconnect = false) {
     const description = {
       versionHash: md5(JSON.stringify(menu)),
+      noReloadIfReconnect,
       menu,
     };
     return description;
@@ -310,7 +312,7 @@ export class PkgHdrService implements IGamePackage {
           {
             type: WidgetMenuItem.Call,
             action: 'userData',
-            delay: 10000,
+            delay: 1234,
           },
         ],
       } as any);
@@ -352,7 +354,7 @@ export class PkgHdrService implements IGamePackage {
         {
           type: WidgetMenuItem.Call,
           action: 'userData',
-          delay: 10000,
+          delay: 1234,
         },
       ],
     } as any);
