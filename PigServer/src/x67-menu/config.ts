@@ -5,6 +5,7 @@ export enum WidgetMenuItem {
   SliderInt = 4,
   Button = 5,
   Text = 6,
+  TextServer = 7,
 
   ServerSwitch = 101,
   Call = 102,

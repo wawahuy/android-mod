@@ -5,6 +5,13 @@ import X67Socket from 'src/x67-server/x67-socket';
 
 @Injectable()
 export class X67SenderService {
+  sendMenuTextServer(socket: X67Socket, name: string, data: any) {
+    socket.command('menu:text-server', {
+      name,
+      data,
+    });
+  }
+
   sendDestroy(socket: X67Socket) {
     socket.command('destroy', {});
   }
