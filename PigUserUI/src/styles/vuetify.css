@@ -1,0 +1,6 @@
+$font: Manrope, Roboto;
+
+@use 'vuetify' with (
+  $heading-font-family: $font,
+  $body-font-family: $font,
+);

@@ -8,8 +8,9 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-import './styles/base.scss';
-import './styles/tailwind.scss';
+import './styles/vuetify.css';
+import './styles/base.css';
+import './styles/tailwind.css';
 
 const vuetify = createVuetify({
     components,
