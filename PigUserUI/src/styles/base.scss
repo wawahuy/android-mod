@@ -1,0 +1,28 @@
+$font: Manrope, Roboto;
+
+@use 'vuetify' with (
+  $heading-font-family: $font,
+  $body-font-family: $font,
+);
+
+
+@import "@mdi/font/css/materialdesignicons.css";
+@import "@fortawesome/fontawesome-free/css/all.css";
+
+@font-face {
+  font-family: ADLaM_Display;
+  src: url('@/assets/fonts/ADLaM_Display/ADLaMDisplay-Regular.ttf');
+}
+
+@font-face {
+  font-family: Unbounded;
+  src: url('@/assets/fonts/Unbounded/static/Unbounded-SemiBold.ttf');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: Manrope;
+  src: url("@/assets/fonts/Manrope/static/Manrope-Light.ttf") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
