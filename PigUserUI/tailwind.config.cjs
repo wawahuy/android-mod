@@ -4,6 +4,7 @@ export default {
   theme: {
     fontFamily: {
       ADLaM: ['ADLaM_Display'],
+      Unbounded: ['Unbounded'],
     },
     extend: {},
   },
