@@ -50,9 +50,7 @@ import { useDisplay } from 'vuetify';
 import * as _ from 'lodash';
 import ButtonLogin from './ButtonLogin.vue';
 import Logo from '../common/Logo.vue';
-import { onMounted } from 'vue';
-import { es } from 'vuetify/locale';
-import { onUnmounted } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 
 const display = ref(useDisplay());
 
@@ -81,7 +79,7 @@ const onMouseEnter = (event: MouseEvent) => {
 }
 
 const onWindowScroll = () => {
-  state.height = window.scrollY > 100 ? 65 : 100;
+  state.height = window.scrollY > 100 ? 60 : 100;
 }
 
 onMounted(() => {
