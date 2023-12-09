@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar :elevation="0" class="tw-border-b-2 tw-border-[#e7e7e7] tw-px-2" :height="state.height">
+  <v-app-bar :elevation="0" class="tw-border-b-2 tw-border-[#5f5f5f] tw-px-2" :height="state.height">
     <v-container>
       <v-row class="tw-gap-1 tw-relative" align="center">
         <Logo />
@@ -20,7 +20,7 @@
       </v-row>
     </v-container>
     <div
-      class="tw-absolute tw-bottom-0 tw-h-[3px] tw-w-16 tw-bg-black tw-transition-all"
+      class="tw-absolute tw-bottom-0 tw-h-[3px] tw-w-16 tw-bg-white tw-transition-all"
       :style="{
         left: state.lineHoverX,
         opacity: state.lineHoverOpacity,
@@ -32,9 +32,9 @@
 <style scoped>
 :deep(.login-button) {
   border-radius: 50px;
-  color: black;
+  color: white;
   font-size: 14px;
-  border: 2px solid black;
+  border: 2px solid white;
   .v-btn__underlay {
     background-color: transparent;
   }
@@ -49,7 +49,7 @@ import { ref, reactive } from 'vue';
 import { useDisplay } from 'vuetify';
 import * as _ from 'lodash';
 import ButtonLogin from './ButtonLogin.vue';
-import Logo from '../common/Logo.vue';
+import Logo from '@/components/common/Logo.vue';
 import { onMounted, onUnmounted } from 'vue';
 
 const display = ref(useDisplay());

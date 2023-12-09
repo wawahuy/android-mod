@@ -15,6 +15,9 @@ import './styles/tailwind.css';
 const vuetify = createVuetify({
     components,
     directives,
+    theme: {
+      defaultTheme: 'dark'
+    }
 })
 
 const pinia = createPinia();

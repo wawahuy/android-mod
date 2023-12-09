@@ -32,10 +32,10 @@
 
 <script setup lang="ts">
 import { shallowRef, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
-import { AnimationRoundHandler } from '../three/handler';
-const Header = shallowRef(defineAsyncComponent(() => import('../components/ladding/Header.vue')));
-const Scroll = shallowRef(defineAsyncComponent(() => import('../components/ladding/Scroll.vue')));
-const Slogan = shallowRef(defineAsyncComponent(() => import('../components/ladding/Slogan.vue')));
+import { AnimationRoundHandler } from '@/three/ladding/handler';
+const Header = shallowRef(defineAsyncComponent(() => import('@/components/ladding/Header.vue')));
+const Scroll = shallowRef(defineAsyncComponent(() => import('@/components/ladding/Scroll.vue')));
+const Slogan = shallowRef(defineAsyncComponent(() => import('@/components/ladding/Slogan.vue')));
 
 const refBg = ref<HTMLDivElement>();
 const refHandler = ref<AnimationRoundHandler>();
@@ -45,11 +45,11 @@ onMounted(() => {
   const handler = new AnimationRoundHandler(container);
   setTimeout(() => {
     handler.initGsap("#home-sec-test");
-  }, 100);
+  }, 500);
   refHandler.value = handler;
 });
 
 onUnmounted(() => {
   refHandler.value?.release();
 })
-</script>
+</script>../three/Ladding/handler../three/ladding/handler
