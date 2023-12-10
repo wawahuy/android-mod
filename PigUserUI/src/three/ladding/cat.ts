@@ -45,7 +45,7 @@ export class Cat extends Group {
       sceneMatrix.multiply(this._mtxTS);
       
       scene.getWorldPosition(this._light.position);
-      this._light.position.y = 1;
+      this._light.position.y = 0.1;
     }});
 
     this.add(scene);

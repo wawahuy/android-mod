@@ -23,7 +23,7 @@ export class AnimationRoundHandler {
     const width = window.innerWidth, height = window.innerHeight;
     this._camera = new three.PerspectiveCamera( 70, width / height, 0.01, 1000 );
     this._scene = new three.Scene();
-    this._scene.fog = new three.Fog(0xcccccc, 20, 50);
+    // this._scene.fog = new three.Fog(0xcccccc, 20, 50);
 
     const light = new three.AmbientLight(0xffffff, 0.01);
     this._scene.add(light);
