@@ -40,8 +40,7 @@ export class Cat extends Group {
 
     const sceneRot = scene.rotation.clone();
     gsap.to(sceneRot, { y: Math.PI * 2, duration: 25, repeat: 1111, ease: "sine", onUpdate: () => {
-      sceneMatrix.identity();
-      sceneMatrix.multiply(mtxTemp.makeRotationY(sceneRot.y));
+      sceneMatrix.copy(mtxTemp.makeRotationY(sceneRot.y));
       sceneMatrix.multiply(this._mtxTS);
       
       scene.getWorldPosition(this._light.position);
