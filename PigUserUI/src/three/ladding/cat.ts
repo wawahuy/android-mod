@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 
 import catAsset from '@/assets/model/cat_rigged.glb?url';
-import { loadGLTF } from '../common';
+import { addDebug, loadGLTF } from '../common';
 
 export class Cat extends Group {
   private _mixer: three.AnimationMixer;
@@ -50,6 +50,13 @@ export class Cat extends Group {
     this.add(scene);
     this._mixer = new three.AnimationMixer(scene);
     this._mixer.clipAction(this._model.animations[0]).play();
+
+    // Debug
+    if (import.meta.env.DEV) {
+      const pointLightHelper = new three.PointLightHelper(this._light, 0.15);
+      this.add(pointLightHelper);
+      addDebug(pointLightHelper);
+    }
   }
 
   update(delta: number) {

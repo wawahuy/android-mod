@@ -1,8 +1,9 @@
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import * as three from 'three';
-import { Terrian } from './terrian';
+import { WaterSimulation } from '../water/simulation';
 import { Cat } from './cat';
+import { addDebug } from '../common';
 
 import abc from '@/assets/texture/abc.jpg';
 
@@ -11,7 +12,7 @@ export class AnimationRoundHandler {
   private _scene: three.Scene;
   private _camera: three.Camera;
   private _cube: three.Group;
-  private _terrian: Terrian;
+  private _water: WaterSimulation;
   private _cat: Cat;
   private _isRunning = true;
 
@@ -23,7 +24,7 @@ export class AnimationRoundHandler {
     const width = window.innerWidth, height = window.innerHeight;
     this._camera = new three.PerspectiveCamera( 70, width / height, 0.01, 1000 );
     this._scene = new three.Scene();
-    // this._scene.fog = new three.Fog(0xcccccc, 20, 50);
+    this._scene.fog = new three.Fog(0xcccccc, 20, 50);
 
     const light = new three.AmbientLight(0xffffff, 0.01);
     this._scene.add(light);
@@ -41,18 +42,17 @@ export class AnimationRoundHandler {
     this._renderer.shadowMap.type = three.PCFSoftShadowMap;
     container.appendChild(this._renderer.domElement);
 
-    // const size = 30;
-    // const divisions = 20;
-
-    // const gridHelper = new three.GridHelper(size, divisions);
-    // this._scene.add(gridHelper);
-
-    // const axesHelper = new three.AxesHelper(10);
-    // this._scene.add(axesHelper);
+    if (import.meta.env.DEV) {
+      const gridHelper = new three.GridHelper(30, 20);
+      const axesHelper = new three.AxesHelper(10);
+      this._scene.add(gridHelper);
+      this._scene.add(axesHelper);
+      addDebug(gridHelper, axesHelper);
+    }
     
-    this._terrian = new Terrian();
+    this._water = new WaterSimulation();
     this._cat = new Cat();
-    this._scene.add(this._terrian);
+    this._scene.add(this._water);
     this._scene.add(this._cat);
 
     this.init().then(() => {
@@ -61,7 +61,7 @@ export class AnimationRoundHandler {
   }
 
   async init() {
-    await this._terrian.init();
+    await this._water.init();
     await this._cat.init();
   }
 
@@ -91,10 +91,12 @@ export class AnimationRoundHandler {
 
     const d = this._clock.getDelta();
     this._delta += d;
+    this._water.update(d);
     this._cat.update(d);
     if (this._delta  > this._interval) {
-        this.render();
-        this._delta = this._delta % this._interval;
+      this._water.render();
+      this.render();
+      this._delta = this._delta % this._interval;
     }
   }
 
