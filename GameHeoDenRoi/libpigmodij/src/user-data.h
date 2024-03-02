@@ -37,7 +37,7 @@ namespace UserDataPatch {
     nlohmann::json userData;
     
     //
-    uintptr_t UserData__ParsePBOffset = 0x35E2C70;
+    uintptr_t UserData__ParsePBOffset = 0x34FD430;
     typedef void (*UserData__ParsePBType) (void* __this, Forevernine_Com_Planet_Proto_GameLoginRsp_o* res, const void* method);
     UserData__ParsePBType UserData__ParsePBOrigin;
     void UserData__ParsePB(void* __this, Forevernine_Com_Planet_Proto_GameLoginRsp_o* res, const void* method) {

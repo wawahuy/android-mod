@@ -17,7 +17,7 @@ namespace CayThongPatch {
     uint64_t Slingshot__OnPointerUpTime = 0;
     int Slingshot__OnPointerUpCountCall = 1;
     int Slingshot__OnPointerUpSpeed = 100;
-    uintptr_t Slingshot__OnPointerUpOffset = 0x2EE16B0;
+    uintptr_t Slingshot__OnPointerUpOffset = 0x2E27264;
     typedef void (*Slingshot__OnPointerUpType)(void* __this, void* eventData, const void* method);
     void (*Slingshot__OnPointerUpOrigin)(void* __this, void* eventData, const void* method);
     void Slingshot__OnPointerUp(void* __this, void* eventData, const void* method) {
@@ -124,14 +124,14 @@ namespace CayThongPatch {
             // -------------------------------------------
             // | B ??
             // -------------------------------------------
-            MemoryPatch(g_il2CppBase + 0x2F9796C, { 0x05, 0x00, 0x00, 0x14 }),
+            MemoryPatch(g_il2CppBase + 0x2F07D90, { 0x05, 0x00, 0x00, 0x14 }),
             
             // if ((uVar2 & 1) != 0) {     <------- TARGET
             //   if (((*(long *)(param_4 + 0x38...
             // -------------------------------------------
             // | B ??
             // -------------------------------------------
-            MemoryPatch(g_il2CppBase + 0x2F979B4, { 0x31, 0x00, 0x00, 0x14 })
+            MemoryPatch(g_il2CppBase + 0x2F07DD8, { 0x31, 0x00, 0x00, 0x14 })
         };
 
         // Slingshot$$Shot
@@ -143,7 +143,7 @@ namespace CayThongPatch {
         // -----------------------------------------------
         // | 0x1D47ef4 - 0x1D47d70 = 184 -> B 61
         // -----------------------------------------------
-        mbBanNhanh = MemoryPatch(g_il2CppBase + 0x2ee1e60, { 0x61, 0x00, 0x00, 0x14 });
+        mbBanNhanh = MemoryPatch(g_il2CppBase + 0x2e27a14, { 0x61, 0x00, 0x00, 0x14 });
         
         // Slingshot$$OnPointerUp
         // uVar1 = Slingshot$$CheckShotOrNot(fVar3,param_1);
@@ -151,6 +151,6 @@ namespace CayThongPatch {
         // -----------------------------------------------
         // | NOP
         // -----------------------------------------------
-        mbBan1Cham = MemoryPatch(g_il2CppBase + 0x2ee175c, { 0x1F, 0x20, 0x03, 0xD5 });
+        mbBan1Cham = MemoryPatch(g_il2CppBase + 0x2e27310, { 0x1F, 0x20, 0x03, 0xD5 });
     }
 }

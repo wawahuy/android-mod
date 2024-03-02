@@ -2,6 +2,7 @@ Game*/*.apk
 Game*/smali*
 Game*/*.dex
 Game*/*.so
+Game*/lib/arm64-v8a/*.so
 Game*/dump
 
 **/*/build.apk.idsig

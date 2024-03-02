@@ -17,9 +17,9 @@ extern "C" {
         m_protectIl2cpp = (void (*)())protectIl2cpp;
         m_sendCommand = (m_sendCommandType)sendCommand;
 
-        uintptr_t il2cpp_domain_getOffset = 0xf5982c; 
-        uintptr_t il2cpp_thread_detachOffset = 0xf59cb4;
-        uintptr_t il2cpp_thread_attachOffset = 0xf59cb0;
+        uintptr_t il2cpp_domain_getOffset = 0xf7ffc8; 
+        uintptr_t il2cpp_thread_detachOffset = 0xf80450;
+        uintptr_t il2cpp_thread_attachOffset = 0xf8044c;
         il2cpp_thread_detach = (void (*)(void *))(g_il2CppBase + il2cpp_thread_detachOffset);
         il2cpp_thread_attach = (void* (*)(void *))(g_il2CppBase + il2cpp_thread_attachOffset);
         il2cpp_domain_get = (void* (*)())(g_il2CppBase + il2cpp_domain_getOffset);

@@ -22,6 +22,7 @@ export class UploadService {
   watchFolderLibso() {
     const changeDebouncedFunc: { [key: string]: _.DebouncedFunc<any> } = {};
     fs.watch(this._uploadConfig.getFolderLibso(), (event, filename) => {
+      console.log(filename);
       if (filename) {
         let cb = changeDebouncedFunc[filename];
         if (!cb) {
@@ -39,12 +40,19 @@ export class UploadService {
 
   private async onChangeLibsoHash(filename: string) {
     const hash = this.getRealLibsoHash(filename);
-    await this._gameConfigService.setLibijHash(filename, hash);
-    this._logger.debug(`New hash ${filename}: ${hash}`);
+    if (hash) {
+      await this._gameConfigService.setLibijHash(filename, hash);
+      this._logger.debug(`New hash ${filename}: ${hash}`);
+    } else {
+      this._logger.debug(`Hash null`);
+    }
   }
 
   getRealLibsoHash(filename: string) {
     const buffer = this.getLibIjBuffer(filename);
+    if (!buffer) {
+      return null;
+    }
     const libsoHash = createHashMd5(buffer);
     return libsoHash;
   }

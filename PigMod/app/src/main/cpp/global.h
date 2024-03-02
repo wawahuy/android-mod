@@ -13,7 +13,7 @@
 
 #ifdef IS_DEBUG
 #define SOCKET_PORT 1235
-#define SOCKET_HOST "192.168.1.21"
+#define SOCKET_HOST "192.168.1.147"
 #else
 #define SOCKET_PORT 80
 #define SOCKET_HOST "x67socket.j2run.com"

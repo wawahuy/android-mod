@@ -7,7 +7,7 @@ typedef void BetButton_o;
 
 namespace BetPatch {
     //
-    uintptr_t BetButton__SetNextMultipleOffset = 0x2CA1840;
+    uintptr_t BetButton__SetNextMultipleOffset = 0x2CF86E8;
     typedef void (*BetButton__SetNextMultipleType) (BetButton_o* __this, const void* method);
     BetButton__SetNextMultipleType BetButton__SetNextMultipleOrigin;
     void BetButton__SetNextMultiple(BetButton_o* __this, const void* method) {

@@ -8,6 +8,6 @@ use('pigmod');
 db.getCollection('gamekeys').insertOne({
   key: 'huy_best_key_x67_011223',
   package: 'com.aladinfun.clashofsky_th_pig',
-  amountSec: 300000,
+  amountSec: 3000000,
   maximumDevice: 1,
 });
