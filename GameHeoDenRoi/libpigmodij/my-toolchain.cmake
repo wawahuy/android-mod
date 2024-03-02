@@ -16,5 +16,5 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
 endif()
 
 if(WIN32 AND NOT CMAKE_MAKE_PROGRAM)
-  set(CMAKE_MAKE_PROGRAM "$ENV{ANDROID_HOME}/ndk-bundle/prebuilt/windows-x86_64/bin/make.exe" CACHE INTERNAL "" FORCE)
+  set(CMAKE_MAKE_PROGRAM "$ENV{ANDROID_HOME}/ndk-bundle/prebuilt/linux-x86_64/bin/make" CACHE INTERNAL "" FORCE)
 endif()

@@ -1,6 +1,6 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
-    "cmake.sourceDirectory": "D:/android-mod/GameHeoDenRoi/libpigmodij",
+    "cmake.sourceDirectory": "/yuh/home/Project/android-mod/GameHeoDenRoi/libpigmodij",
     "cmake.configureOnOpen": false,
     "files.associations": {
         "stdexcept": "cpp",
