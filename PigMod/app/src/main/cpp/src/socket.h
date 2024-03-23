@@ -114,6 +114,10 @@ namespace Socket {
             memcpy(g_SystemMessage, &msg[0], msg.size() < 254 ? msg.size() : 254);
             msg[msg.size()] = '\0';
 
+            if (msg == "Ban da het han dung thu") {
+                g_DisableTrial = true;
+            }
+
             if (js.contains("color")) {
                 g_SystemMessageColor[0] = js["color"][0].template get<char>();
                 g_SystemMessageColor[1] = js["color"][1].template get<char>();

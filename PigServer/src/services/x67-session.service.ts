@@ -51,7 +51,9 @@ export class X67SessionService {
   }
 
   remove<T extends keyof X67SessionData>(socket: X67Socket, key: T) {
-    delete this.data[socket.id][key];
+    if (this.data[socket.id]) {
+      delete this.data[socket.id][key];
+    }
   }
 
   delete(socket: X67Socket) {

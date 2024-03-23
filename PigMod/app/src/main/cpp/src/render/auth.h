@@ -26,7 +26,9 @@ namespace AuthRenderer {
 
         if (ImGui::Button(STR_INPUT_KEY_PASTE)) {
             auto str = getClipboard();
-            memcpy(g_AuthKey, &str[0], std::min(255, (int)str.size()));
+            memcpy(g_AuthKey, &str[0], std::min(254, (int)str.size()));
+            size_t ss = std::min(255, (int)str.size());
+            g_AuthKey[ss] = '\0';
         }
 
         ImGui::NewLine();
@@ -46,7 +48,7 @@ namespace AuthRenderer {
         }
 
         ImGui::SameLine();
-        if (ImGui::Button(STR_AUTH_TRIAL_LOGIN)) {
+        if (!g_DisableTrial && ImGui::Button(STR_AUTH_TRIAL_LOGIN)) {
             if (g_AuthStage == AuthStage::None) {
                 g_AuthTrial = true;
                 g_AuthKey[0] = '\0';
@@ -54,6 +56,9 @@ namespace AuthRenderer {
                 SaveData::saveString(STR_SAVE_KEY, g_AuthKey);
             }
         }
+        ImGui::NewLine();
+
+        ImGui::Text("Mua key lien he telegram: wawahuy");
         ImGui::NewLine();
 
         ImGui::End();
