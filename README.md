@@ -1,0 +1,2 @@
+# ANDROID MOD
+This project is a sophisticated game cheat mod encompassing hooking source codes, precise game memory addresses, and advanced techniques for TCP data transmission between client and server, effectively bypassing Cloudflare. It employs robust 256-bit symmetric encryption. The inclusion of versatile tools and a remote menu interface significantly enhances its flexibility and usability.
